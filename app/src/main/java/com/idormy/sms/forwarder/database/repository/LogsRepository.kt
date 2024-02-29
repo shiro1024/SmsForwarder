@@ -16,7 +16,8 @@ class LogsRepository(private val logsDao: LogsDao) {
     fun deleteAll() = logsDao.deleteAll()
 
     @WorkerThread
-    fun updateStatus(id: Long, status: Int, response: String): Int = logsDao.updateStatus(id, status, response)
+    fun updateStatus(id: Long, status: Int, response: String): Int =
+        logsDao.updateStatus(id, status, response)
 
     @WorkerThread
     fun updateResponse(id: Long, response: String): Int = logsDao.updateResponse(id, response)

@@ -14,7 +14,10 @@ import java.util.Date
 @Entity(tableName = "Task")
 data class Task(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
-    @ColumnInfo(name = "type", defaultValue = "1") var type: Int = 1, // 任务类型：＜1000为任务模板，>=1000为自定义任务
+    @ColumnInfo(
+        name = "type",
+        defaultValue = "1"
+    ) var type: Int = 1, // 任务类型：＜1000为任务模板，>=1000为自定义任务
     @ColumnInfo(name = "name", defaultValue = "") val name: String = "", // 任务名称
     @ColumnInfo(name = "description", defaultValue = "") val description: String = "", // 任务描述
     @ColumnInfo(name = "conditions", defaultValue = "") val conditions: String = "", // 触发条件

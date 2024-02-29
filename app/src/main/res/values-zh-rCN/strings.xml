@@ -35,7 +35,6 @@
     <string name="menu_tasks">自动任务·快捷指令</string>
     <string name="menu_server">主动控制·服务端</string>
     <string name="menu_client">主动控制·客户端</string>
-    <string name="menu_frpc">内网穿透·Frpc</string>
     <string name="menu_apps">应用列表·复制包名</string>
     <string name="menu_logcat">日志抓取·Logcat</string>
     <string name="menu_help">使用帮助</string>
@@ -43,10 +42,8 @@
 
     <string name="about_app_version">软件版本：%s</string>
     <string name="about_cache_size">缓存大小：%s</string>
-    <string name="about_frpc_version">Frpc版本：%s</string>
     <string name="about_item_wechat_miniprogram">微信小程序</string>
     <string name="about_cache_purged">已清理缓存</string>
-    <string name="about_frpc_deleted">已删除动态库，重启APP以便生效！</string>
     <string name="about_copyright">© %1$s PPPSCN All rights reserved.</string>
     <string name="about_item_open_source">开源仓库</string>
     <string name="about_item_github">GitHub</string>
@@ -851,9 +848,6 @@
     <string name="request_failed">请求失败：</string>
     <string name="request_failed_tips">请求失败：%s</string>
     <string name="no_sms_sending_permission">没有短信发送权限</string>
-    <string name="frpclib_download_title">缺少 FrpcLib v%s 动态库</string>
-    <string name="frpclib_download_content">正在下载中，请稍后……</string>
-    <string name="frpclib_version_mismatch">FrpcLib 版本不匹配</string>
     <string name="page_not_found">页面未找到！</string>
     <string name="data_error">数据出错！</string>
     <string name="cannot_open_with_browser">Can\'t open with browser</string>
@@ -1087,7 +1081,6 @@
     <string name="safety_measures_none">不需要</string>
     <string name="safety_measures_sign">校验签名</string>
     <string name="safety_measures_rsa">RSA加密</string>
-    <string name="safety_measures_sm4">SM4加密</string>
     <string name="web_path_tips">参见 Github Wiki，下载到 Download 目录</string>
     <string name="time_tolerance">客户端与服务端时间容差</string>
     <string name="time_tolerance_tips">尽量缩短时间容差，避免请求重放攻击</string>
@@ -1097,8 +1090,6 @@
     <string name="public_key">RSA公钥</string>
     <string name="public_key_tips">RSA公钥用在客户端：客户端请求报文公钥加密，服务端私钥解密</string>
     <string name="copy_public_key">复制公钥</string>
-    <string name="sm4_key">SM4密钥</string>
-    <string name="sm4_key_tips">客户端/服务端交互采用SM4加解密</string>
 
     <string name="rule_del">删除转发规则</string>
     <string name="sender_del">删除发送通道</string>

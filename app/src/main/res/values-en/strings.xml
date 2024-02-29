@@ -35,7 +35,6 @@
     <string name="menu_tasks">Task</string>
     <string name="menu_server">Server</string>
     <string name="menu_client">Client</string>
-    <string name="menu_frpc">Frpc</string>
     <string name="menu_apps">App List</string>
     <string name="menu_logcat">Logcat</string>
     <string name="menu_help">Help</string>
@@ -43,10 +42,8 @@
 
     <string name="about_app_version">App Version: %s</string>
     <string name="about_cache_size">Cache Size: %s</string>
-    <string name="about_frpc_version">Frpc Version：%s</string>
     <string name="about_item_wechat_miniprogram">WeChat MiniProgram</string>
     <string name="about_cache_purged">Cache cleared</string>
-    <string name="about_frpc_deleted">Frpc Deleted, App restarting</string>
     <string name="about_copyright">© %1$s PPPSCN All rights reserved.</string>
     <string name="about_item_open_source">OpenSource Repo</string>
     <string name="about_item_github">GitHub</string>
@@ -850,9 +847,6 @@
     <string name="request_failed">Request failed: </string>
     <string name="request_failed_tips">Request failed: %s</string>
     <string name="no_sms_sending_permission">No SMS sending permission</string>
-    <string name="frpclib_download_title">Missing FrpcLib v%s</string>
-    <string name="frpclib_download_content">Downloading, please wait…</string>
-    <string name="frpclib_version_mismatch">FrpcLib version mismatch</string>
     <string name="page_not_found">Page not found!</string>
     <string name="data_error">Data error!</string>
     <string name="cannot_open_with_browser">Can\'t open with browser</string>
@@ -1086,7 +1080,6 @@
     <string name="safety_measures_none">None</string>
     <string name="safety_measures_sign">Sign</string>
     <string name="safety_measures_rsa">RSA Encrypt</string>
-    <string name="safety_measures_sm4">SM4 Encrypt</string>
     <string name="web_path_tips">See Github Wiki, download to Download directory</string>
     <string name="time_tolerance">Time Tolerance</string>
     <string name="time_tolerance_tips">Minimize time tolerance to avoid request replay attacks</string>
@@ -1096,8 +1089,6 @@
     <string name="public_key">Public Key</string>
     <string name="public_key_tips">Public key is used on the client: client request message public key encryption, server private key decryption</string>
     <string name="copy_public_key">Copy</string>
-    <string name="sm4_key">SM4 Key</string>
-    <string name="sm4_key_tips">Client or server interaction messages are all encrypted and decrypted using SM4</string>
 
     <string name="rule_del">Del Rule</string>
     <string name="sender_del">Del Sender</string>

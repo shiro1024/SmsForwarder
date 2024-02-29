@@ -19,7 +19,8 @@ class TaskRepository(private val taskDao: TaskDao) {
 
     fun update(task: Task) = taskDao.update(task)
 
-    fun updateExecTime(taskId: Long, lastExecTime: Date, nextExecTime: Date, status: Int) = taskDao.updateExecTime(taskId, lastExecTime, nextExecTime, status)
+    fun updateExecTime(taskId: Long, lastExecTime: Date, nextExecTime: Date, status: Int) =
+        taskDao.updateExecTime(taskId, lastExecTime, nextExecTime, status)
 
     fun updateStatusByIds(ids: List<Long>, status: Int) = taskDao.updateStatusByIds(ids, status)
 

@@ -31,13 +31,8 @@ import com.idormy.sms.forwarder.service.ForegroundService
 import com.idormy.sms.forwarder.service.HttpServerService
 import com.idormy.sms.forwarder.service.LocationService
 import com.idormy.sms.forwarder.utils.*
-import com.idormy.sms.forwarder.utils.sdkinit.UMengInit
 import com.idormy.sms.forwarder.utils.sdkinit.XBasicLibInit
-import com.idormy.sms.forwarder.utils.sdkinit.XUpdateInit
-import com.idormy.sms.forwarder.utils.tinker.TinkerLoadLibrary
 import com.king.location.LocationClient
-import com.xuexiang.xutil.file.FileUtils
-import frpclib.Frpclib
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -56,7 +51,6 @@ class App : Application(), CactusCallback, Configuration.Provider by Core {
 
     val applicationScope = CoroutineScope(SupervisorJob())
     val database by lazy { AppDatabase.getInstance(this) }
-    val frpcRepository by lazy { FrpcRepository(database.frpcDao()) }
     val msgRepository by lazy { MsgRepository(database.msgDao()) }
     val logsRepository by lazy { LogsRepository(database.logsDao()) }
     val ruleRepository by lazy { RuleRepository(database.ruleDao()) }
@@ -93,9 +87,6 @@ class App : Application(), CactusCallback, Configuration.Provider by Core {
         val LocationClient by lazy { LocationClient(context) }
         val Geocoder by lazy { Geocoder(context) }
         val DateFormat by lazy { SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()) }
-
-        //Frpclib是否已经初始化
-        var FrpclibInited = false
     }
 
     override fun attachBaseContext(base: Context) {
@@ -139,18 +130,6 @@ class App : Application(), CactusCallback, Configuration.Provider by Core {
 
             //初始化WorkManager
             WorkManager.initialize(this, Configuration.Builder().build())
-
-            //动态加载FrpcLib
-            val libPath = filesDir.absolutePath + "/libs"
-            val soFile = File(libPath)
-            if (soFile.exists()) {
-                try {
-                    TinkerLoadLibrary.installNativeLibraryPath(classLoader, soFile)
-                    FrpclibInited = FileUtils.isFileExists(filesDir.absolutePath + "/libs/libgojni.so") && FRPC_LIB_VERSION == Frpclib.getVersion()
-                } catch (throwable: Throwable) {
-                    Log.e("APP", throwable.message.toString())
-                }
-            }
 
             //启动前台服务
             val foregroundServiceIntent = Intent(this, ForegroundService::class.java)
@@ -210,7 +189,8 @@ class App : Application(), CactusCallback, Configuration.Provider by Core {
                 })
                 //设置通知栏点击事件
                 val activityIntent = Intent(this, MainActivity::class.java)
-                val flags = if (Build.VERSION.SDK_INT >= 30) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
+                val flags =
+                    if (Build.VERSION.SDK_INT >= 30) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
                 val pendingIntent = PendingIntent.getActivity(this, 0, activityIntent, flags)
                 cactus {
                     setServiceId(FRONT_NOTIFY_ID) //服务Id
@@ -243,7 +223,10 @@ class App : Application(), CactusCallback, Configuration.Provider by Core {
                     }
                     //切后台切换回调
                     addBackgroundCallback {
-                        Log.d(TAG, if (it) "SmsForwarder 切换到后台运行" else "SmsForwarder 切换到前台运行")
+                        Log.d(
+                            TAG,
+                            if (it) "SmsForwarder 切换到后台运行" else "SmsForwarder 切换到前台运行"
+                        )
                     }
                 }
             }
@@ -268,10 +251,6 @@ class App : Application(), CactusCallback, Configuration.Provider by Core {
         HistoryUtils.init(applicationContext)
         // X系列基础库初始化
         XBasicLibInit.init(this)
-        // 版本更新初始化
-        XUpdateInit.init(this)
-        // 运营统计数据
-        UMengInit.init(this)
         // 初始化语种切换框架
         MultiLanguages.init(this)
         // 设置语种变化监听器
@@ -308,13 +287,14 @@ class App : Application(), CactusCallback, Configuration.Provider by Core {
         mEndDate.postValue(CactusSave.endDate)
         mDisposable = Observable.interval(1, TimeUnit.SECONDS).map {
             oldTimer + it
-        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe { aLong ->
-            CactusSave.timer = aLong
-            CactusSave.date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).run {
-                format(Date())
+        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe { aLong ->
+                CactusSave.timer = aLong
+                CactusSave.date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).run {
+                    format(Date())
+                }
+                mTimer.value = dateFormat.format(Date(aLong * 1000))
             }
-            mTimer.value = dateFormat.format(Date(aLong * 1000))
-        }
     }
 
     override fun onStop() {

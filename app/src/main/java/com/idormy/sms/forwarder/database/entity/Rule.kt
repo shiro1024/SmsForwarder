@@ -104,11 +104,15 @@ data class Rule(
                 }
 
                 FILED_CALL_TYPE -> {
-                    sb.append(getString(R.string.rule_when)).append(FILED_MAP[filed]).append(CHECK_MAP[check]).append(CALL_TYPE_MAP[value]).append(getString(R.string.rule_fw_to))
+                    sb.append(getString(R.string.rule_when)).append(FILED_MAP[filed])
+                        .append(CHECK_MAP[check]).append(CALL_TYPE_MAP[value])
+                        .append(getString(R.string.rule_fw_to))
                 }
 
                 else -> {
-                    sb.append(getString(R.string.rule_when)).append(FILED_MAP[filed]).append(CHECK_MAP[check]).append(value).append(getString(R.string.rule_fw_to))
+                    sb.append(getString(R.string.rule_when)).append(FILED_MAP[filed])
+                        .append(CHECK_MAP[check]).append(value)
+                        .append(getString(R.string.rule_fw_to))
                 }
             }
             return sb.toString()
@@ -119,11 +123,21 @@ data class Rule(
     val name: String
         get() {
             val sb = StringBuilder()
-            if (type == "call" || type == "sms") sb.append(SIM_SLOT_MAP[simSlot].toString()).append(getString(R.string.rule_card))
+            if (type == "call" || type == "sms") sb.append(SIM_SLOT_MAP[simSlot].toString())
+                .append(getString(R.string.rule_card))
             when (filed) {
                 FILED_TRANSPOND_ALL -> sb.append(getString(R.string.rule_all_fw_to))
-                FILED_CALL_TYPE -> sb.append(getString(R.string.rule_when) + FILED_MAP[filed] + CHECK_MAP[check] + CALL_TYPE_MAP[value] + getString(R.string.rule_fw_to))
-                else -> sb.append(getString(R.string.rule_when) + FILED_MAP[filed] + CHECK_MAP[check] + value + getString(R.string.rule_fw_to))
+                FILED_CALL_TYPE -> sb.append(
+                    getString(R.string.rule_when) + FILED_MAP[filed] + CHECK_MAP[check] + CALL_TYPE_MAP[value] + getString(
+                        R.string.rule_fw_to
+                    )
+                )
+
+                else -> sb.append(
+                    getString(R.string.rule_when) + FILED_MAP[filed] + CHECK_MAP[check] + value + getString(
+                        R.string.rule_fw_to
+                    )
+                )
             }
             sb.append(senderList.joinToString(",") { it.name })
             return sb.toString()
@@ -131,18 +145,23 @@ data class Rule(
 
     val ruleMatch: String
         get() {
-            val simStr = if ("app" == type) "" else SIM_SLOT_MAP[simSlot].toString() + getString(R.string.rule_card)
+            val simStr =
+                if ("app" == type) "" else SIM_SLOT_MAP[simSlot].toString() + getString(R.string.rule_card)
             return when (filed) {
                 FILED_TRANSPOND_ALL -> {
                     simStr + getString(R.string.rule_all_fw_to)
                 }
 
                 FILED_CALL_TYPE -> {
-                    simStr + getString(R.string.rule_when) + FILED_MAP[filed] + CHECK_MAP[check] + CALL_TYPE_MAP[value] + getString(R.string.rule_fw_to)
+                    simStr + getString(R.string.rule_when) + FILED_MAP[filed] + CHECK_MAP[check] + CALL_TYPE_MAP[value] + getString(
+                        R.string.rule_fw_to
+                    )
                 }
 
                 else -> {
-                    simStr + getString(R.string.rule_when) + FILED_MAP[filed] + CHECK_MAP[check] + value + getString(R.string.rule_fw_to)
+                    simStr + getString(R.string.rule_when) + FILED_MAP[filed] + CHECK_MAP[check] + value + getString(
+                        R.string.rule_fw_to
+                    )
                 }
             }
         }
@@ -268,7 +287,10 @@ data class Rule(
 
             else -> {}
         }
-        Log.i(TAG, "checkValue " + msgValue + " " + this.check + " " + this.value + " checked:" + checked)
+        Log.i(
+            TAG,
+            "checkValue " + msgValue + " " + this.check + " " + this.value + " checked:" + checked
+        )
         return checked
     }
 }

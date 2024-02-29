@@ -11,7 +11,7 @@ ext.build_versions = build_versions
 
 ext.deps = [:]
 def versions = [:]
-versions.android_gradle_plugin = '7.2.2'
+versions.android_gradle_plugin = '7.4.2'
 versions.android_maven_gradle_plugin = "2.1"
 versions.gradle_bintray_plugin = "1.8.0"
 versions.booster = "3.1.0"
@@ -39,7 +39,6 @@ versions.kotlin = '1.7.21'
 //========xlibrary start========//
 
 versions.xui = "1.2.3"
-versions.xupdate = "2.1.4"
 versions.xaop = "1.1.0"
 versions.xutil = "2.0.0"
 versions.xhttp2 = "9a17bb5be6" //2.0.9
@@ -133,7 +132,6 @@ deps.leakcanary = "com.squareup.leakcanary:leakcanary-android:$versions.leakcana
 def xlibrary = [:]
 
 xlibrary.xui = "com.github.pppscn:XUI:$versions.xui" //com.github.xuexiangjys:XUI
-xlibrary.xupdate = "com.github.xuexiangjys:XUpdate:$versions.xupdate"
 xlibrary.xaop_runtime = "com.github.xuexiangjys.XAOP:xaop-runtime:$versions.xaop"
 xlibrary.xaop_plugin = "com.github.xuexiangjys.XAOP:xaop-plugin:$versions.xaop"
 xlibrary.xutil_core = "com.github.xuexiangjys.XUtil:xutil-core:$versions.xutil"
@@ -190,13 +188,9 @@ ext.isRelease = this.&isRelease
 //默认添加代码仓库路径
 static def addRepos(RepositoryHandler handler) {
     handler.mavenLocal()
-    //handler.google { url 'https://maven.aliyun.com/repository/google' }
-    //handler.mavenCentral { url 'https://maven.aliyun.com/repository/central' }
     handler.google()
     handler.mavenCentral()
-    handler.maven { url 'https://maven.aliyun.com/repository/google' }
-    handler.maven { url 'https://maven.aliyun.com/repository/central' }
-    handler.maven { url 'https://maven.aliyun.com/repository/public' }
+    handler.jcenter()
     handler.maven { url "https://repo1.maven.org/maven2/" }
     handler.maven { url 'https://oss.sonatype.org/content/repositories/public' }
     handler.maven { url "https://jitpack.io" }

@@ -35,7 +35,6 @@
     <string name="menu_tasks">自動任務·快捷指令</string>
     <string name="menu_server">主動控制·服務端</string>
     <string name="menu_client">主動控制·客戶端</string>
-    <string name="menu_frpc">內網穿透·Frpc</string>
     <string name="menu_apps">應用列表·複製包名</string>
     <string name="menu_logcat">日誌抓取·Logcat</string>
     <string name="menu_help">使用幫助</string>
@@ -43,10 +42,8 @@
 
     <string name="about_app_version">軟體版本：%s</string>
     <string name="about_cache_size">緩存大小：%s</string>
-    <string name="about_frpc_version">Frpc版本：%s</string>
     <string name="about_item_wechat_miniprogram">微信小程序</string>
     <string name="about_cache_purged">已清理緩存</string>
-    <string name="about_frpc_deleted">已刪除動態庫，重啟應用以生效！</string>
     <string name="about_copyright">© %1$s PPPSCN 版權所有。</string>
     <string name="about_item_open_source">開源倉庫</string>
     <string name="about_item_github">GitHub</string>
@@ -851,9 +848,6 @@
     <string name="request_failed">請求失敗：</string>
     <string name="request_failed_tips">請求失敗：%s</string>
     <string name="no_sms_sending_permission">沒有簡訊發送權限</string>
-    <string name="frpclib_download_title">缺少 FrpcLib v%s 動態庫</string>
-    <string name="frpclib_download_content">正在下載中，請稍後……</string>
-    <string name="frpclib_version_mismatch">FrpcLib 版本不匹配</string>
     <string name="page_not_found">頁面未找到！</string>
     <string name="data_error">數據出錯！</string>
     <string name="cannot_open_with_browser">無法使用瀏覽器打開</string>
@@ -1087,7 +1081,6 @@
     <string name="safety_measures_none">不需要</string>
     <string name="safety_measures_sign">校驗簽名</string>
     <string name="safety_measures_rsa">RSA加密</string>
-    <string name="safety_measures_sm4">SM4加密</string>
     <string name="web_path_tips">參見 Github Wiki，下載到 Download 目錄</string>
     <string name="time_tolerance">客戶端與服務端時間容差</string>
     <string name="time_tolerance_tips">盡量縮短時間容差，避免請求重放攻擊</string>
@@ -1097,8 +1090,6 @@
     <string name="public_key">RSA公鑰</string>
     <string name="public_key_tips">RSA公鑰用在客戶端：客戶端請求報文公鑰加密，服務端私鑰解密</string>
     <string name="copy_public_key">複製公鑰</string>
-    <string name="sm4_key">SM4密鑰</string>
-    <string name="sm4_key_tips">客戶端/服務端交互採用SM4加解密</string>
 
     <string name="rule_del">刪除轉發規則</string>
     <string name="sender_del">刪除發送通道</string>

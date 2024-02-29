@@ -28,7 +28,6 @@ import com.idormy.sms.forwarder.databinding.ActivityMainBinding
 import com.idormy.sms.forwarder.fragment.AboutFragment
 import com.idormy.sms.forwarder.fragment.AppListFragment
 import com.idormy.sms.forwarder.fragment.ClientFragment
-import com.idormy.sms.forwarder.fragment.FrpcFragment
 import com.idormy.sms.forwarder.fragment.LogsFragment
 import com.idormy.sms.forwarder.fragment.RulesFragment
 import com.idormy.sms.forwarder.fragment.SendersFragment
@@ -36,34 +35,19 @@ import com.idormy.sms.forwarder.fragment.ServerFragment
 import com.idormy.sms.forwarder.fragment.SettingsFragment
 import com.idormy.sms.forwarder.fragment.TasksFragment
 import com.idormy.sms.forwarder.service.ForegroundService
-import com.idormy.sms.forwarder.utils.CommonUtils.Companion.restartApplication
 import com.idormy.sms.forwarder.utils.EVENT_LOAD_APP_LIST
-import com.idormy.sms.forwarder.utils.FRPC_LIB_DOWNLOAD_URL
-import com.idormy.sms.forwarder.utils.FRPC_LIB_VERSION
-import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.utils.SettingUtils
 import com.idormy.sms.forwarder.utils.XToastUtils
-import com.idormy.sms.forwarder.utils.sdkinit.XUpdateInit
-import com.idormy.sms.forwarder.widget.GuideTipsDialog.Companion.showTips
 import com.idormy.sms.forwarder.workers.LoadAppListWorker
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.xuexiang.xhttp2.XHttp
-import com.xuexiang.xhttp2.callback.DownloadProgressCallBack
-import com.xuexiang.xhttp2.exception.ApiException
 import com.xuexiang.xui.utils.ResUtils
 import com.xuexiang.xui.utils.ThemeUtils
 import com.xuexiang.xui.utils.ViewUtils
 import com.xuexiang.xui.utils.WidgetUtils
-import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction
-import com.xuexiang.xui.widget.dialog.materialdialog.GravityEnum
-import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog
-import com.xuexiang.xutil.file.FileUtils
-import com.xuexiang.xutil.net.NetworkUtils
 import com.yarolegovich.slidingrootnav.SlideGravity
 import com.yarolegovich.slidingrootnav.SlidingRootNav
 import com.yarolegovich.slidingrootnav.SlidingRootNavBuilder
 import com.yarolegovich.slidingrootnav.callback.DragStateListener
-import java.io.File
 
 @Suppress("PrivatePropertyName", "unused", "DEPRECATION")
 class MainActivity : BaseActivity<ActivityMainBinding?>(), DrawerAdapter.OnItemSelectedListener {
@@ -76,10 +60,9 @@ class MainActivity : BaseActivity<ActivityMainBinding?>(), DrawerAdapter.OnItemS
     private val POS_TASK = 5 //4为空行
     private val POS_SERVER = 6
     private val POS_CLIENT = 7
-    private val POS_FRPC = 8
-    private val POS_APPS = 9
-    private val POS_HELP = 11 //10为空行
-    private val POS_ABOUT = 12
+    private val POS_APPS = 8
+    private val POS_HELP = 10 //9为空行
+    private val POS_ABOUT = 11
     private var needToAppListFragment = false
 
     private lateinit var mTabLayout: TabLayout
@@ -112,23 +95,25 @@ class MainActivity : BaseActivity<ActivityMainBinding?>(), DrawerAdapter.OnItemS
         }
 
         //检查通知权限是否获取
-        XXPermissions.with(this).permission(Permission.NOTIFICATION_SERVICE).permission(Permission.POST_NOTIFICATIONS).request(OnPermissionCallback { _, allGranted ->
-            if (!allGranted) {
-                XToastUtils.error(R.string.tips_notification)
-                return@OnPermissionCallback
-            }
-
-            //启动前台服务
-            if (!ForegroundService.isRunning) {
-                val serviceIntent = Intent(this, ForegroundService::class.java)
-                serviceIntent.action = "START"
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(serviceIntent)
-                } else {
-                    startService(serviceIntent)
+        XXPermissions.with(this).permission(Permission.NOTIFICATION_SERVICE)
+            .permission(Permission.POST_NOTIFICATIONS)
+            .request(OnPermissionCallback { _, allGranted ->
+                if (!allGranted) {
+                    XToastUtils.error(R.string.tips_notification)
+                    return@OnPermissionCallback
                 }
-            }
-        })
+
+                //启动前台服务
+                if (!ForegroundService.isRunning) {
+                    val serviceIntent = Intent(this, ForegroundService::class.java)
+                    serviceIntent.action = "START"
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        startForegroundService(serviceIntent)
+                    } else {
+                        startService(serviceIntent)
+                    }
+                }
+            })
 
         //监听已安装App信息列表加载完成事件
         LiveEventBus.get(EVENT_LOAD_APP_LIST, String::class.java).observe(this) {
@@ -148,10 +133,26 @@ class MainActivity : BaseActivity<ActivityMainBinding?>(), DrawerAdapter.OnItemS
 
     private fun initTab() {
         mTabLayout = binding!!.tabs
-        WidgetUtils.addTabWithoutRipple(mTabLayout, getString(R.string.menu_logs), R.drawable.selector_icon_tabbar_logs)
-        WidgetUtils.addTabWithoutRipple(mTabLayout, getString(R.string.menu_rules), R.drawable.selector_icon_tabbar_rules)
-        WidgetUtils.addTabWithoutRipple(mTabLayout, getString(R.string.menu_senders), R.drawable.selector_icon_tabbar_senders)
-        WidgetUtils.addTabWithoutRipple(mTabLayout, getString(R.string.menu_settings), R.drawable.selector_icon_tabbar_settings)
+        WidgetUtils.addTabWithoutRipple(
+            mTabLayout,
+            getString(R.string.menu_logs),
+            R.drawable.selector_icon_tabbar_logs
+        )
+        WidgetUtils.addTabWithoutRipple(
+            mTabLayout,
+            getString(R.string.menu_rules),
+            R.drawable.selector_icon_tabbar_rules
+        )
+        WidgetUtils.addTabWithoutRipple(
+            mTabLayout,
+            getString(R.string.menu_senders),
+            R.drawable.selector_icon_tabbar_senders
+        )
+        WidgetUtils.addTabWithoutRipple(
+            mTabLayout,
+            getString(R.string.menu_settings),
+            R.drawable.selector_icon_tabbar_settings
+        )
         WidgetUtils.setTabLayoutTextFont(mTabLayout)
         switchPage(LogsFragment::class.java)
         mTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
@@ -174,12 +175,6 @@ class MainActivity : BaseActivity<ActivityMainBinding?>(), DrawerAdapter.OnItemS
     private fun initData() {
         mMenuTitles = ResUtils.getStringArray(this, R.array.menu_titles)
         mMenuIcons = ResUtils.getDrawableArray(this, R.array.menu_icons)
-
-        //仅当开启自动检查且有网络时自动检查更新/获取提示
-        if (SettingUtils.autoCheckUpdate && NetworkUtils.isHaveInternet()) {
-            showTips(this)
-            XUpdateInit.checkUpdate(this, false)
-        }
     }
 
     //按返回键不退出回到桌面
@@ -204,7 +199,11 @@ class MainActivity : BaseActivity<ActivityMainBinding?>(), DrawerAdapter.OnItemS
     }
 
     private fun initSlidingMenu(savedInstanceState: Bundle?) {
-        mSlidingRootNav = SlidingRootNavBuilder(this).withGravity(if (ResUtils.isRtl(this)) SlideGravity.RIGHT else SlideGravity.LEFT).withMenuOpened(false).withContentClickableWhenMenuOpened(false).withSavedState(savedInstanceState).withMenuLayout(R.layout.menu_left_drawer).inject()
+        mSlidingRootNav =
+            SlidingRootNavBuilder(this).withGravity(if (ResUtils.isRtl(this)) SlideGravity.RIGHT else SlideGravity.LEFT)
+                .withMenuOpened(false).withContentClickableWhenMenuOpened(false)
+                .withSavedState(savedInstanceState).withMenuLayout(R.layout.menu_left_drawer)
+                .inject()
         mLLMenu = mSlidingRootNav.layout.findViewById(R.id.ll_menu)
         //val ivQrcode = mSlidingRootNav.layout.findViewById<AppCompatImageView>(R.id.iv_qrcode)
         //ivQrcode.setOnClickListener { openNewPage(SettingsFragment::class.java) }
@@ -221,7 +220,6 @@ class MainActivity : BaseActivity<ActivityMainBinding?>(), DrawerAdapter.OnItemS
                 createItemFor(POS_TASK),
                 createItemFor(POS_SERVER),
                 createItemFor(POS_CLIENT),
-                createItemFor(POS_FRPC),
                 createItemFor(POS_APPS),
                 SpaceItem(15),
                 createItemFor(POS_HELP),
@@ -277,28 +275,6 @@ class MainActivity : BaseActivity<ActivityMainBinding?>(), DrawerAdapter.OnItemS
             POS_TASK -> openNewPage(TasksFragment::class.java)
             POS_SERVER -> openNewPage(ServerFragment::class.java)
             POS_CLIENT -> openNewPage(ClientFragment::class.java)
-            POS_FRPC -> {
-                if (App.FrpclibInited) {
-                    openNewPage(FrpcFragment::class.java)
-                    return
-                }
-
-                val title = if (!FileUtils.isFileExists(filesDir.absolutePath + "/libs/libgojni.so")) {
-                    String.format(getString(R.string.frpclib_download_title), FRPC_LIB_VERSION)
-                } else {
-                    getString(R.string.frpclib_version_mismatch)
-                }
-
-                MaterialDialog.Builder(this)
-                    .title(title)
-                    .content(R.string.download_frpc_tips)
-                    .positiveText(R.string.lab_yes)
-                    .negativeText(R.string.lab_no)
-                    .onPositive { _: MaterialDialog?, _: DialogAction? ->
-                        downloadFrpcLib()
-                    }
-                    .show()
-            }
 
             POS_APPS -> {
                 if (App.UserAppList.isEmpty() && App.SystemAppList.isEmpty()) {
@@ -322,69 +298,6 @@ class MainActivity : BaseActivity<ActivityMainBinding?>(), DrawerAdapter.OnItemS
             .withTextTint(ThemeUtils.resolveColor(this, R.attr.xui_config_color_content_text))
             .withSelectedIconTint(ThemeUtils.getMainThemeColor(this))
             .withSelectedTextTint(ThemeUtils.getMainThemeColor(this))
-    }
-
-    //动态加载FrpcLib
-    private fun downloadFrpcLib() {
-        val cpuAbi = when (Build.CPU_ABI) {
-            "x86" -> "x86"
-            "x86_64" -> "x86_64"
-            "arm64-v8a" -> "arm64-v8a"
-            else -> "armeabi-v7a"
-        }
-
-        val libPath = filesDir.absolutePath + "/libs"
-        val soFile = File(libPath)
-        if (!soFile.exists()) soFile.mkdirs()
-        val downloadUrl = String.format(FRPC_LIB_DOWNLOAD_URL, FRPC_LIB_VERSION, cpuAbi)
-        val mContext = this
-        val dialog: MaterialDialog = MaterialDialog.Builder(mContext)
-            .title(String.format(getString(R.string.frpclib_download_title), FRPC_LIB_VERSION))
-            .content(getString(R.string.frpclib_download_content))
-            .contentGravity(GravityEnum.CENTER)
-            .progress(false, 0, true)
-            .progressNumberFormat("%2dMB/%1dMB")
-            .build()
-
-        XHttp.downLoad(downloadUrl)
-            .savePath(cacheDir.absolutePath)
-            .execute(object : DownloadProgressCallBack<String?>() {
-                override fun onStart() {
-                    dialog.show()
-                }
-
-                override fun onError(e: ApiException) {
-                    dialog.dismiss()
-                    XToastUtils.error(e.message.toString())
-                }
-
-                override fun update(bytesRead: Long, contentLength: Long, done: Boolean) {
-                    Log.d(TAG, "onProgress: bytesRead=$bytesRead, contentLength=$contentLength")
-                    dialog.maxProgress = (contentLength / 1048576L).toInt()
-                    dialog.setProgress((bytesRead / 1048576L).toInt())
-                }
-
-                override fun onComplete(srcPath: String) {
-                    dialog.dismiss()
-                    Log.d(TAG, "srcPath = $srcPath")
-
-                    val srcFile = File(srcPath)
-                    val destFile = File("$libPath/libgojni.so")
-                    FileUtils.moveFile(srcFile, destFile, null)
-
-                    MaterialDialog.Builder(this@MainActivity)
-                        .iconRes(R.drawable.ic_menu_frpc)
-                        .title(R.string.menu_frpc)
-                        .content(R.string.download_frpc_tips2)
-                        .cancelable(false)
-                        .positiveText(R.string.confirm)
-                        .onPositive { _: MaterialDialog?, _: DialogAction? ->
-                            restartApplication()
-                        }
-                        .show()
-                }
-            })
-
     }
 
 }
