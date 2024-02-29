@@ -10,7 +10,8 @@ class SpaceItem(private val spaceDp: Int) : DrawerItem<SpaceItem.ViewHolder>() {
         val context: Context = parent.context
         val view = View(context).apply {
             layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, (context.resources.displayMetrics.density * spaceDp).toInt()
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                (context.resources.displayMetrics.density * spaceDp).toInt()
             )
         }
         return ViewHolder(view)

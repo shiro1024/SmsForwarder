@@ -70,10 +70,15 @@ class FeishuAppUtils private constructor() {
                         val resp = Gson().fromJson(response, FeishuAppResult::class.java)
                         if (!TextUtils.isEmpty(resp?.tenant_access_token)) {
                             accessToken = resp.tenant_access_token.toString()
-                            expiresIn = System.currentTimeMillis() + ((resp.expire ?: 7010) - 120) * 1000L //提前2分钟过期
+                            expiresIn = System.currentTimeMillis() + ((resp.expire
+                                ?: 7010) - 120) * 1000L //提前2分钟过期
                             sendTextMsg(setting, msgInfo, rule, senderIndex, logId, msgId)
                         } else {
-                            SendUtils.updateLogs(logId, 0, String.format(getString(R.string.request_failed_tips), response))
+                            SendUtils.updateLogs(
+                                logId,
+                                0,
+                                String.format(getString(R.string.request_failed_tips), response)
+                            )
                             SendUtils.senderLogic(0, msgInfo, rule, senderIndex, msgId)
                         }
                     }
@@ -91,7 +96,8 @@ class FeishuAppUtils private constructor() {
             logId: Long = 0L,
             msgId: Long = 0L
         ) {
-            val requestUrl = "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=${setting.receiveIdType}"
+            val requestUrl =
+                "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=${setting.receiveIdType}"
             Log.d(TAG, "requestUrl：$requestUrl")
 
             val content: String = if (rule != null) {
@@ -107,17 +113,25 @@ class FeishuAppUtils private constructor() {
                     msgInfo.getTitleForSend(setting.titleTemplate)
                 }
                 if (TextUtils.isEmpty(setting.messageCard.trim())) {
-                    "{\"elements\":[{\"tag\":\"markdown\",\"content\":\"**[{{MSG_TITLE}}]({{MSG_URL}})**\\n --------------\\n{{MSG_CONTENT}}\"}]}".trimIndent().replace("{{MSG_TITLE}}", jsonInnerStr(title)).replace("{{MSG_URL}}", jsonInnerStr("https://github.com/pppscn/SmsForwarder")).replace("{{MSG_CONTENT}}", jsonInnerStr(content))
+                    "{\"elements\":[{\"tag\":\"markdown\",\"content\":\"**[{{MSG_TITLE}}]({{MSG_URL}})**\\n --------------\\n{{MSG_CONTENT}}\"}]}".trimIndent()
+                        .replace("{{MSG_TITLE}}", jsonInnerStr(title)).replace(
+                        "{{MSG_URL}}",
+                        jsonInnerStr("https://github.com/pppscn/SmsForwarder")
+                    ).replace("{{MSG_CONTENT}}", jsonInnerStr(content))
                 } else {
                     msgInfo.getContentFromJson(
                         setting.messageCard.trimIndent()
                             .replace("{{MSG_TITLE}}", jsonInnerStr(title))
-                            .replace("{{MSG_URL}}", jsonInnerStr("https://github.com/pppscn/SmsForwarder"))
+                            .replace(
+                                "{{MSG_URL}}",
+                                jsonInnerStr("https://github.com/pppscn/SmsForwarder")
+                            )
                             .replace("{{MSG_CONTENT}}", jsonInnerStr(content))
                     )
                 }
             } else {
-                "{\"text\":\"{{MSG_CONTENT}}\"}".trimIndent().replace("{{MSG_CONTENT}}", jsonInnerStr(content))
+                "{\"text\":\"{{MSG_CONTENT}}\"}".trimIndent()
+                    .replace("{{MSG_CONTENT}}", jsonInnerStr(content))
             }
 
             val textMsgMap: MutableMap<String, Any> = mutableMapOf()
@@ -129,7 +143,8 @@ class FeishuAppUtils private constructor() {
             Log.i(TAG, "requestMsg:$requestMsg")
 
             val accessToken: String by SharedPreference("feishu_access_token_" + setting.appId, "")
-            XHttp.post(requestUrl).upJson(requestMsg).headers("Authorization", "Bearer $accessToken").keepJson(true)
+            XHttp.post(requestUrl).upJson(requestMsg)
+                .headers("Authorization", "Bearer $accessToken").keepJson(true)
                 //.ignoreHttpsCert()
                 .retryCount(SettingUtils.requestRetryTimes) //超时重试的次数
                 .retryDelay(SettingUtils.requestDelayTime * 1000) //超时重试的延迟时间

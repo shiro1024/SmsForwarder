@@ -19,7 +19,8 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 
 @Suppress("PrivatePropertyName", "DEPRECATION")
-class LockScreenWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+class LockScreenWorker(context: Context, params: WorkerParameters) :
+    CoroutineWorker(context, params) {
 
     private val TAG: String = LockScreenWorker::class.java.simpleName
 
@@ -33,7 +34,8 @@ class LockScreenWorker(context: Context, params: WorkerParameters) : CoroutineWo
                 Log.d(TAG, "task = $task")
 
                 // 根据任务信息执行相应操作
-                val conditionList = Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
+                val conditionList =
+                    Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
                 if (conditionList.isEmpty()) {
                     Log.d(TAG, "TASK-${task.id}：conditionList is empty")
                     continue
@@ -44,14 +46,18 @@ class LockScreenWorker(context: Context, params: WorkerParameters) : CoroutineWo
                     continue
                 }
 
-                val lockScreenSetting = Gson().fromJson(firstCondition.setting, LockScreenSetting::class.java)
+                val lockScreenSetting =
+                    Gson().fromJson(firstCondition.setting, LockScreenSetting::class.java)
                 if (lockScreenSetting == null) {
                     Log.d(TAG, "TASK-${task.id}：lockScreenSetting is null")
                     continue
                 }
 
                 if (action != lockScreenSetting.action) {
-                    Log.d(TAG, "TASK-${task.id}：action is not match, action = $action, lockScreenSetting = $lockScreenSetting")
+                    Log.d(
+                        TAG,
+                        "TASK-${task.id}：action is not match, action = $action, lockScreenSetting = $lockScreenSetting"
+                    )
                     continue
                 }
 
@@ -69,10 +75,19 @@ class LockScreenWorker(context: Context, params: WorkerParameters) : CoroutineWo
                     else -> lockScreenSetting.timeAfterScreenLocked * 60000L
                 }
                 Log.d(TAG, "TASK-${task.id}：duration = $duration milliseconds")
-                val msgInfo = MsgInfo("task", task.name, lockScreenSetting.description, Date(), task.description)
+                val msgInfo = MsgInfo(
+                    "task",
+                    task.name,
+                    lockScreenSetting.description,
+                    Date(),
+                    task.description
+                )
                 val actionData = Data.Builder()
                     .putLong(TaskWorker.taskId, task.id)
-                    .putString(TaskWorker.taskConditions, if (lockScreenSetting.checkAgain && duration > 0) task.conditions else "")
+                    .putString(
+                        TaskWorker.taskConditions,
+                        if (lockScreenSetting.checkAgain && duration > 0) task.conditions else ""
+                    )
                     .putString(TaskWorker.taskActions, task.actions)
                     .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo))
                     .build()

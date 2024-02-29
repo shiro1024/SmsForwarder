@@ -29,7 +29,6 @@ import com.xuexiang.xui.widget.button.SmoothCheckBox
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog
 import com.xuexiang.xui.widget.picker.XSeekBar
 import com.xuexiang.xutil.app.ServiceUtils
-import com.xuexiang.xutil.data.ConvertTools
 import com.xuexiang.xutil.net.NetworkUtils
 import com.xuexiang.xutil.system.ClipboardUtils
 import java.io.File
@@ -95,11 +94,6 @@ class ServerFragment : BaseFragment<FragmentServerBinding?>(), View.OnClickListe
                 binding!!.layoutPublicKey.visibility = View.VISIBLE
             }
 
-            3 -> {
-                safetyMeasuresId = R.id.rb_safety_measures_sm4
-                binding!!.layoutSm4Key.visibility = View.VISIBLE
-            }
-
             else -> {}
         }
         binding!!.rgSafetyMeasures.check(safetyMeasuresId)
@@ -109,7 +103,6 @@ class ServerFragment : BaseFragment<FragmentServerBinding?>(), View.OnClickListe
             binding!!.layoutTimeTolerance.visibility = View.GONE
             binding!!.layoutPrivateKey.visibility = View.GONE
             binding!!.layoutPublicKey.visibility = View.GONE
-            binding!!.layoutSm4Key.visibility = View.GONE
             when (checkedId) {
                 R.id.rb_safety_measures_sign -> {
                     safetyMeasures = 1
@@ -123,26 +116,10 @@ class ServerFragment : BaseFragment<FragmentServerBinding?>(), View.OnClickListe
                     binding!!.layoutPublicKey.visibility = View.VISIBLE
                 }
 
-                R.id.rb_safety_measures_sm4 -> {
-                    safetyMeasures = 3
-                    binding!!.layoutSm4Key.visibility = View.VISIBLE
-                }
-
                 else -> {}
             }
             HttpServerUtils.safetyMeasures = safetyMeasures
         }
-
-        //SM4密钥
-        binding!!.btnSm4Key.setOnClickListener(this)
-        binding!!.etSm4Key.setText(HttpServerUtils.serverSm4Key)
-        binding!!.etSm4Key.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable) {
-                HttpServerUtils.serverSm4Key = binding!!.etSm4Key.text.toString().trim()
-            }
-        })
 
         //RSA公私钥
         binding!!.btnCopyPublicKey.setOnClickListener(this)
@@ -282,14 +259,6 @@ class ServerFragment : BaseFragment<FragmentServerBinding?>(), View.OnClickListe
                 refreshButtonText()
             }
 
-            R.id.btn_sm4_key -> {
-                val key = ConvertTools.bytes2HexString(SM4Crypt.createSM4Key())
-                println("SM4密钥：$key")
-                ClipboardUtils.copyText(key)
-                binding!!.etSm4Key.setText(key)
-                XToastUtils.info(getString(R.string.sign_key_tips))
-            }
-
             R.id.btn_generate_key -> {
                 val generator = KeyPairGenerator.getInstance("RSA") //密钥生成器
                 generator.initialize(2048)
@@ -323,8 +292,10 @@ class ServerFragment : BaseFragment<FragmentServerBinding?>(), View.OnClickListe
             }
 
             R.id.tv_server_tips, R.id.iv_copy -> {
-                var hostAddress: String = if (inetAddress != null) "${inetAddress?.hostAddress}" else "127.0.0.1"
-                hostAddress = if (hostAddress.indexOf(':', 0, false) > 0) "[${hostAddress}]" else hostAddress
+                var hostAddress: String =
+                    if (inetAddress != null) "${inetAddress?.hostAddress}" else "127.0.0.1"
+                hostAddress =
+                    if (hostAddress.indexOf(':', 0, false) > 0) "[${hostAddress}]" else hostAddress
                 val url = "http://${hostAddress}:5000"
                 ClipboardUtils.copyText(url)
                 XToastUtils.info(String.format(getString(R.string.copied_to_clipboard), url))
@@ -333,33 +304,47 @@ class ServerFragment : BaseFragment<FragmentServerBinding?>(), View.OnClickListe
             R.id.btn_path_picker -> {
                 // 申请储存权限
                 XXPermissions.with(this)
-                    .permission(Permission.MANAGE_EXTERNAL_STORAGE).request(object : OnPermissionCallback {
+                    .permission(Permission.MANAGE_EXTERNAL_STORAGE)
+                    .request(object : OnPermissionCallback {
                         @SuppressLint("SetTextI18n")
                         override fun onGranted(permissions: List<String>, all: Boolean) {
-                            val downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
+                            val downloadPath =
+                                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
                             val dirList = listSubDir(downloadPath)
                             if (dirList.isEmpty()) {
-                                XToastUtils.error(String.format(getString(R.string.download_first), downloadPath))
+                                XToastUtils.error(
+                                    String.format(
+                                        getString(R.string.download_first),
+                                        downloadPath
+                                    )
+                                )
                                 return
                             }
-                            MaterialDialog.Builder(requireContext()).title(getString(R.string.select_web_client_directory)).content(String.format(getString(R.string.root_directory), downloadPath)).items(dirList).itemsCallbackSingleChoice(0) { _: MaterialDialog?, _: View?, _: Int, text: CharSequence ->
-                                val webPath = "$downloadPath/$text"
-                                binding!!.etWebPath.setText(webPath)
-                                HttpServerUtils.serverWebPath = webPath
+                            MaterialDialog.Builder(requireContext())
+                                .title(getString(R.string.select_web_client_directory)).content(
+                                String.format(
+                                    getString(R.string.root_directory),
+                                    downloadPath
+                                )
+                            ).items(dirList)
+                                .itemsCallbackSingleChoice(0) { _: MaterialDialog?, _: View?, _: Int, text: CharSequence ->
+                                    val webPath = "$downloadPath/$text"
+                                    binding!!.etWebPath.setText(webPath)
+                                    HttpServerUtils.serverWebPath = webPath
 
-                                XToastUtils.info(getString(R.string.restarting_httpserver))
-                                Intent(appContext, HttpServerService::class.java).also {
-                                    if (ServiceUtils.isServiceRunning("com.idormy.sms.forwarder.service.HttpServerService")) {
-                                        appContext?.stopService(it)
-                                        Thread.sleep(500)
-                                        appContext?.startService(it)
-                                    } else {
-                                        appContext?.startService(it)
+                                    XToastUtils.info(getString(R.string.restarting_httpserver))
+                                    Intent(appContext, HttpServerService::class.java).also {
+                                        if (ServiceUtils.isServiceRunning("com.idormy.sms.forwarder.service.HttpServerService")) {
+                                            appContext?.stopService(it)
+                                            Thread.sleep(500)
+                                            appContext?.startService(it)
+                                        } else {
+                                            appContext?.startService(it)
+                                        }
                                     }
-                                }
-                                refreshButtonText()
-                                true // allow selection
-                            }.positiveText(R.string.select).negativeText(R.string.cancel).show()
+                                    refreshButtonText()
+                                    true // allow selection
+                                }.positiveText(R.string.select).negativeText(R.string.cancel).show()
                         }
 
                         override fun onDenied(permissions: List<String>, never: Boolean) {
@@ -386,11 +371,16 @@ class ServerFragment : BaseFragment<FragmentServerBinding?>(), View.OnClickListe
             binding!!.ivCopy.visibility = View.VISIBLE
             try {
                 inetAddress = NetworkUtils.getLocalInetAddress()
-                binding!!.tvServerTips.text = getString(R.string.http_server_running, inetAddress!!.hostAddress, HTTP_SERVER_PORT)
+                binding!!.tvServerTips.text = getString(
+                    R.string.http_server_running,
+                    inetAddress!!.hostAddress,
+                    HTTP_SERVER_PORT
+                )
             } catch (e: Exception) {
                 e.printStackTrace()
                 Log.e("ServerFragment", "refreshButtonText error: ${e.message}")
-                binding!!.tvServerTips.text = getString(R.string.http_server_running, "127.0.0.1", HTTP_SERVER_PORT)
+                binding!!.tvServerTips.text =
+                    getString(R.string.http_server_running, "127.0.0.1", HTTP_SERVER_PORT)
             }
         } else {
             binding!!.btnToggleServer.text = resources.getText(R.string.start_server)
@@ -475,44 +465,48 @@ class ServerFragment : BaseFragment<FragmentServerBinding?>(), View.OnClickListe
 
     //联系人权限
     private fun checkContactsPermission() {
-        XXPermissions.with(this).permission(*Permission.Group.CONTACTS).request(object : OnPermissionCallback {
-            override fun onGranted(permissions: List<String>, all: Boolean) {
-            }
-
-            override fun onDenied(permissions: List<String>, never: Boolean) {
-                if (never) {
-                    XToastUtils.error(R.string.toast_denied_never)
-                    // 如果是被永久拒绝就跳转到应用权限系统设置页面
-                    XXPermissions.startPermissionActivity(requireContext(), permissions)
-                } else {
-                    XToastUtils.error(R.string.toast_denied)
+        XXPermissions.with(this).permission(*Permission.Group.CONTACTS)
+            .request(object : OnPermissionCallback {
+                override fun onGranted(permissions: List<String>, all: Boolean) {
                 }
-                HttpServerUtils.enableApiContactQuery = false
-                binding!!.sbApiQueryContacts.isChecked = false
-                HttpServerUtils.enableApiContactAdd = false
-                binding!!.sbApiAddContacts.isChecked = false
-            }
-        })
+
+                override fun onDenied(permissions: List<String>, never: Boolean) {
+                    if (never) {
+                        XToastUtils.error(R.string.toast_denied_never)
+                        // 如果是被永久拒绝就跳转到应用权限系统设置页面
+                        XXPermissions.startPermissionActivity(requireContext(), permissions)
+                    } else {
+                        XToastUtils.error(R.string.toast_denied)
+                    }
+                    HttpServerUtils.enableApiContactQuery = false
+                    binding!!.sbApiQueryContacts.isChecked = false
+                    HttpServerUtils.enableApiContactAdd = false
+                    binding!!.sbApiAddContacts.isChecked = false
+                }
+            })
     }
 
     //定位权限
     private fun checkLocationPermission() {
-        XXPermissions.with(this).permission(Permission.ACCESS_COARSE_LOCATION).permission(Permission.ACCESS_FINE_LOCATION).permission(Permission.ACCESS_BACKGROUND_LOCATION).request(object : OnPermissionCallback {
-            override fun onGranted(permissions: List<String>, all: Boolean) {
-            }
-
-            override fun onDenied(permissions: List<String>, never: Boolean) {
-                if (never) {
-                    XToastUtils.error(R.string.toast_denied_never)
-                    // 如果是被永久拒绝就跳转到应用权限系统设置页面
-                    XXPermissions.startPermissionActivity(requireContext(), permissions)
-                } else {
-                    XToastUtils.error(R.string.toast_denied)
+        XXPermissions.with(this).permission(Permission.ACCESS_COARSE_LOCATION)
+            .permission(Permission.ACCESS_FINE_LOCATION)
+            .permission(Permission.ACCESS_BACKGROUND_LOCATION)
+            .request(object : OnPermissionCallback {
+                override fun onGranted(permissions: List<String>, all: Boolean) {
                 }
-                HttpServerUtils.enableApiLocation = false
-                binding!!.sbApiLocation.isChecked = false
-            }
-        })
+
+                override fun onDenied(permissions: List<String>, never: Boolean) {
+                    if (never) {
+                        XToastUtils.error(R.string.toast_denied_never)
+                        // 如果是被永久拒绝就跳转到应用权限系统设置页面
+                        XXPermissions.startPermissionActivity(requireContext(), permissions)
+                    } else {
+                        XToastUtils.error(R.string.toast_denied)
+                    }
+                    HttpServerUtils.enableApiLocation = false
+                    binding!!.sbApiLocation.isChecked = false
+                }
+            })
     }
 
     override fun onDestroy() {

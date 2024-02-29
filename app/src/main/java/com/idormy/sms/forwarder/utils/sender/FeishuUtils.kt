@@ -110,7 +110,12 @@ class FeishuUtils private constructor() {
 
                 //使用HmacSHA256算法计算签名
                 val mac = Mac.getInstance("HmacSHA256")
-                mac.init(SecretKeySpec(stringToSign.toByteArray(StandardCharsets.UTF_8), "HmacSHA256"))
+                mac.init(
+                    SecretKeySpec(
+                        stringToSign.toByteArray(StandardCharsets.UTF_8),
+                        "HmacSHA256"
+                    )
+                )
                 val signData = mac.doFinal(byteArrayOf())
                 val sign = String(Base64.encode(signData, Base64.NO_WRAP))
 
@@ -124,9 +129,15 @@ class FeishuUtils private constructor() {
                 msgMap["msg_type"] = "interactive"
                 if (TextUtils.isEmpty(setting.messageCard.trim())) {
                     msgMap["card"] = "{{CARD_BODY}}"
-                    requestMsg = Gson().toJson(msgMap).replace("\"{{CARD_BODY}}\"", buildMsg(title, content, from, msgInfo.date))
+                    requestMsg = Gson().toJson(msgMap)
+                        .replace("\"{{CARD_BODY}}\"", buildMsg(title, content, from, msgInfo.date))
                 } else {
-                    val msgTime = jsonInnerStr(SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(msgInfo.date))
+                    val msgTime = jsonInnerStr(
+                        SimpleDateFormat(
+                            "yyyy-MM-dd HH:mm:ss",
+                            Locale.getDefault()
+                        ).format(msgInfo.date)
+                    )
                     msgMap["card"] = msgInfo.getContentFromJson(
                         setting.messageCard.trimIndent()
                             .replace("{{MSG_TITLE}}", jsonInnerStr(title))
@@ -179,7 +190,9 @@ class FeishuUtils private constructor() {
             val msgTitle = jsonInnerStr(title)
             val msgContent = jsonInnerStr(content)
             val msgFrom = jsonInnerStr(from)
-            val msgTime = jsonInnerStr(SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(date))
+            val msgTime = jsonInnerStr(
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(date)
+            )
             return MSG_TEMPLATE.replace("{{MSG_TITLE}}", msgTitle)
                 .replace("{{MSG_TIME}}", msgTime)
                 .replace("{{MSG_FROM}}", msgFrom)

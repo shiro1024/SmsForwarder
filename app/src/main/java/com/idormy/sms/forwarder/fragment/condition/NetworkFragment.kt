@@ -26,7 +26,8 @@ import com.xuexiang.xui.widget.actionbar.TitleBar
 
 @Page(name = "Network")
 @Suppress("PrivatePropertyName", "SameParameterValue")
-class NetworkFragment : BaseFragment<FragmentTasksConditionNetworkBinding?>(), View.OnClickListener {
+class NetworkFragment : BaseFragment<FragmentTasksConditionNetworkBinding?>(),
+    View.OnClickListener {
 
     private val TAG: String = NetworkFragment::class.java.simpleName
     private var titleBar: TitleBar? = null
@@ -58,8 +59,10 @@ class NetworkFragment : BaseFragment<FragmentTasksConditionNetworkBinding?>(), V
 
         binding!!.rgNetworkState.setOnCheckedChangeListener { _, checkedId ->
             Log.d(TAG, "rgNetworkState checkedId:$checkedId")
-            binding!!.layoutDataSimSlot.visibility = if (checkedId == R.id.rb_net_mobile) View.VISIBLE else View.GONE
-            binding!!.layoutWifiSsid.visibility = if (checkedId == R.id.rb_net_wifi) View.VISIBLE else View.GONE
+            binding!!.layoutDataSimSlot.visibility =
+                if (checkedId == R.id.rb_net_mobile) View.VISIBLE else View.GONE
+            binding!!.layoutWifiSsid.visibility =
+                if (checkedId == R.id.rb_net_wifi) View.VISIBLE else View.GONE
             checkSetting(true)
         }
 

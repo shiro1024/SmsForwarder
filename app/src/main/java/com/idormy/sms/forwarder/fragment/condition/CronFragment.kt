@@ -105,7 +105,8 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, 3)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -169,12 +170,18 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
                 }
                 binding!!.tvDescription.text = description
                 //TODO：低版本Android解析Cron表达式会报错，暂时不处理
-                binding!!.tvCronExpressionCheckTips.text = if (expression == description) expression else "$expression\n$description"
-                binding!!.tvNextTimeList.text = String.format(getString(R.string.next_execution_times), times.toString(), nextTimeList.joinToString("\n"))
+                binding!!.tvCronExpressionCheckTips.text =
+                    if (expression == description) expression else "$expression\n$description"
+                binding!!.tvNextTimeList.text = String.format(
+                    getString(R.string.next_execution_times),
+                    times.toString(),
+                    nextTimeList.joinToString("\n")
+                )
                 binding!!.tvNextTimeList.visibility = View.VISIBLE
                 binding!!.separatorCronExpressionCheck.visibility = View.VISIBLE
             } else {
-                binding!!.tvCronExpressionCheckTips.text = String.format(getString(R.string.invalid_cron_expression), it.toString())
+                binding!!.tvCronExpressionCheckTips.text =
+                    String.format(getString(R.string.invalid_cron_expression), it.toString())
                 binding!!.tvNextTimeList.text = ""
                 binding!!.tvNextTimeList.visibility = View.GONE
                 binding!!.separatorCronExpressionCheck.visibility = View.GONE
@@ -194,7 +201,8 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
                             Log.d(TAG, settingVo.toString())
                             LiveEventBus.get(KEY_TEST_CONDITION, String::class.java).post("success")
                         } catch (e: Exception) {
-                            LiveEventBus.get(KEY_TEST_CONDITION, String::class.java).post(e.message.toString())
+                            LiveEventBus.get(KEY_TEST_CONDITION, String::class.java)
+                                .post(e.message.toString())
                             e.printStackTrace()
                             Log.e(TAG, "onClick error:$e")
                         }
@@ -384,8 +392,18 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
                     binding!!.rbSecondTypeCyclic.isChecked = true
                 }
 
-                regexNum.matches(second) && secondsList.indexOf(String.format("%02d", second.toInt())) != -1 -> {
-                    binding!!.flowlayoutMultiSelectSecond.setSelectedItems(String.format("%02d", second.toInt()))
+                regexNum.matches(second) && secondsList.indexOf(
+                    String.format(
+                        "%02d",
+                        second.toInt()
+                    )
+                ) != -1 -> {
+                    binding!!.flowlayoutMultiSelectSecond.setSelectedItems(
+                        String.format(
+                            "%02d",
+                            second.toInt()
+                        )
+                    )
                     binding!!.rbSecondTypeAssigned.isChecked = true
                     selectedSecondList = second
                 }
@@ -551,8 +569,18 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
                     binding!!.rbMinuteTypeCyclic.isChecked = true
                 }
 
-                regexNum.matches(minute) && minutesList.indexOf(String.format("%02d", minute.toInt())) != -1 -> {
-                    binding!!.flowlayoutMultiSelectMinute.setSelectedItems(String.format("%02d", minute.toInt()))
+                regexNum.matches(minute) && minutesList.indexOf(
+                    String.format(
+                        "%02d",
+                        minute.toInt()
+                    )
+                ) != -1 -> {
+                    binding!!.flowlayoutMultiSelectMinute.setSelectedItems(
+                        String.format(
+                            "%02d",
+                            minute.toInt()
+                        )
+                    )
                     binding!!.rbMinuteTypeAssigned.isChecked = true
                     selectedMinuteList = minute
                 }
@@ -718,8 +746,18 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
                     binding!!.rbHourTypeCyclic.isChecked = true
                 }
 
-                regexNum.matches(hour) && hoursList.indexOf(String.format("%02d", hour.toInt())) != -1 -> {
-                    binding!!.flowlayoutMultiSelectHour.setSelectedItems(String.format("%02d", hour.toInt()))
+                regexNum.matches(hour) && hoursList.indexOf(
+                    String.format(
+                        "%02d",
+                        hour.toInt()
+                    )
+                ) != -1 -> {
+                    binding!!.flowlayoutMultiSelectHour.setSelectedItems(
+                        String.format(
+                            "%02d",
+                            hour.toInt()
+                        )
+                    )
                     binding!!.rbHourTypeAssigned.isChecked = true
                     selectedHourList = hour
                 }
@@ -931,8 +969,18 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
                     binding!!.rbDayTypeCyclic.isChecked = true
                 }
 
-                regexNum.matches(day) && dayList.indexOf(String.format("%d", day.toInt())) != -1 -> {
-                    binding!!.flowlayoutMultiSelectDay.setSelectedItems(String.format("%d", day.toInt()))
+                regexNum.matches(day) && dayList.indexOf(
+                    String.format(
+                        "%d",
+                        day.toInt()
+                    )
+                ) != -1 -> {
+                    binding!!.flowlayoutMultiSelectDay.setSelectedItems(
+                        String.format(
+                            "%d",
+                            day.toInt()
+                        )
+                    )
                     binding!!.rbDayTypeAssigned.isChecked = true
                     selectedDayList = day
                 }
@@ -1502,7 +1550,11 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
     }
 
     //获取选中的项目
-    private fun getSelectedItems(parent: FlowTagLayout, selectedList: List<Int>, dataType: Int = 0): String {
+    private fun getSelectedItems(
+        parent: FlowTagLayout,
+        selectedList: List<Int>,
+        dataType: Int = 0
+    ): String {
         if (selectedList.isEmpty()) return ""
 
         val selectedNumList = mutableListOf<String>()
@@ -1552,7 +1604,10 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
     }
 
     //合并连续的数字
-    private fun mergeContinuousItems(input: List<String>, stringFormat: String = "%d"): List<String> {
+    private fun mergeContinuousItems(
+        input: List<String>,
+        stringFormat: String = "%d"
+    ): List<String> {
         if (input.isEmpty()) return emptyList()
 
         val items = input.map { it.toInt() }.sorted()
@@ -1568,7 +1623,12 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
                 if (start == end) {
                     result.add(String.format(stringFormat, start))
                 } else {
-                    result.add(String.format(stringFormat, start) + "-" + String.format(stringFormat, end))
+                    result.add(
+                        String.format(
+                            stringFormat,
+                            start
+                        ) + "-" + String.format(stringFormat, end)
+                    )
                 }
                 start = items[i]
                 end = items[i]
@@ -1585,7 +1645,10 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
     }
 
     //还原被合并的连续数字
-    private fun restoreMergedItems(mergedString: String, stringFormat: String = "%d"): List<String> {
+    private fun restoreMergedItems(
+        mergedString: String,
+        stringFormat: String = "%d"
+    ): List<String> {
         if (mergedString.isEmpty()) return emptyList()
 
         val items = mutableListOf<String>()
@@ -1633,7 +1696,8 @@ class CronFragment : BaseFragment<FragmentTasksConditionCronBinding?>(), View.On
             //TODO：支持多语言
             val locale = Locale.getDefault()
             //Chinese, Japanese, Korean and other East Asian languages have no spaces between words
-            options.isNeedSpaceBetweenWords = locale == Locale("zh") || locale == Locale("ja") || locale == Locale("ko")
+            options.isNeedSpaceBetweenWords =
+                locale == Locale("zh") || locale == Locale("ja") || locale == Locale("ko")
             description = CronExpressionDescriptor.getDescription(expression, options, locale)
         } else {
             description = expression

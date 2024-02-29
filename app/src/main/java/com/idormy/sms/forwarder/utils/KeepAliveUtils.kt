@@ -21,7 +21,8 @@ class KeepAliveUtils private constructor() {
             return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 true
             } else try {
-                val powerManager: PowerManager = activity.getSystemService(Context.POWER_SERVICE) as PowerManager
+                val powerManager: PowerManager =
+                    activity.getSystemService(Context.POWER_SERVICE) as PowerManager
                 powerManager.isIgnoringBatteryOptimizations(activity.packageName)
             } catch (e: Exception) {
                 XToastUtils.error(R.string.unsupport)
@@ -35,7 +36,8 @@ class KeepAliveUtils private constructor() {
                 if (isIgnoreBatteryOptimization(activity)) {
                     return
                 }
-                @SuppressLint("BatteryLife") val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                @SuppressLint("BatteryLife") val intent =
+                    Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
                 intent.data = Uri.parse("package:" + activity.packageName)
                 val resolveInfo: ResolveInfo? = activity.packageManager.resolveActivity(intent, 0)
                 if (resolveInfo != null) {

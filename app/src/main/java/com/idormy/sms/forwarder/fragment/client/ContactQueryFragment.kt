@@ -26,7 +26,6 @@ import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.utils.PhoneUtils
 import com.idormy.sms.forwarder.utils.PlaceholderHelper
 import com.idormy.sms.forwarder.utils.RSACrypt
-import com.idormy.sms.forwarder.utils.SM4Crypt
 import com.idormy.sms.forwarder.utils.XToastUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.scwang.smartrefresh.layout.api.RefreshLayout
@@ -42,7 +41,6 @@ import com.xuexiang.xui.adapter.recyclerview.RecyclerViewHolder
 import com.xuexiang.xui.utils.SnackbarUtils
 import com.xuexiang.xui.widget.actionbar.TitleBar
 import com.xuexiang.xui.widget.searchview.MaterialSearchView
-import com.xuexiang.xutil.data.ConvertTools
 import com.xuexiang.xutil.resource.ResUtils.getColor
 import com.xuexiang.xutil.system.ClipboardUtils
 import me.samlss.broccoli.Broccoli
@@ -110,7 +108,8 @@ class ContactQueryFragment : BaseFragment<FragmentClientContactQueryBinding?>() 
                 holder.click(R.id.iv_reply) {
                     XToastUtils.info(getString(R.string.remote_sms) + model.phoneNumber)
                     LiveEventBus.get<String>(EVENT_KEY_PHONE_NUMBERS).post(model.phoneNumber)
-                    PageOption.to(SmsSendFragment::class.java).setNewActivity(true).open((context as XPageActivity?)!!)
+                    PageOption.to(SmsSendFragment::class.java).setNewActivity(true)
+                        .open((context as XPageActivity?)!!)
                 }
             }
 
@@ -130,13 +129,18 @@ class ContactQueryFragment : BaseFragment<FragmentClientContactQueryBinding?>() 
         binding!!.recyclerView.adapter = delegateAdapter
 
         //搜索框
-        binding!!.searchView.findViewById<View>(com.xuexiang.xui.R.id.search_layout).visibility = View.GONE
+        binding!!.searchView.findViewById<View>(com.xuexiang.xui.R.id.search_layout).visibility =
+            View.GONE
         binding!!.searchView.setVoiceSearch(true)
         binding!!.searchView.setEllipsize(true)
         binding!!.searchView.setSuggestions(resources.getStringArray(R.array.query_suggestions))
-        binding!!.searchView.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener {
+        binding!!.searchView.setOnQueryTextListener(object :
+            MaterialSearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                SnackbarUtils.Indefinite(view, String.format(getString(R.string.search_keyword), query)).info()
+                SnackbarUtils.Indefinite(
+                    view,
+                    String.format(getString(R.string.search_keyword), query)
+                ).info()
                     .actionColor(getColor(R.color.xui_config_color_white))
                     .setAction(getString(R.string.clear)) {
                         keyword = ""
@@ -154,7 +158,8 @@ class ContactQueryFragment : BaseFragment<FragmentClientContactQueryBinding?>() 
                 return false
             }
         })
-        binding!!.searchView.setOnSearchViewListener(object : MaterialSearchView.SearchViewListener {
+        binding!!.searchView.setOnSearchViewListener(object :
+            MaterialSearchView.SearchViewListener {
             override fun onSearchViewShown() {
                 //Do some magic
             }
@@ -214,22 +219,6 @@ class ContactQueryFragment : BaseFragment<FragmentClientContactQueryBinding?>() 
                 postRequest.upString(requestMsg)
             }
 
-            3 -> {
-                try {
-                    val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                    //requestMsg = Base64.encode(requestMsg.toByteArray())
-                    val encryptCBC = SM4Crypt.encrypt(requestMsg.toByteArray(), sm4Key)
-                    requestMsg = ConvertTools.bytes2HexString(encryptCBC)
-                    Log.i(TAG, "requestMsg: $requestMsg")
-                } catch (e: Exception) {
-                    XToastUtils.error(getString(R.string.request_failed) + e.message)
-                    e.printStackTrace()
-                    Log.e(TAG, e.toString())
-                    return
-                }
-                postRequest.upString(requestMsg)
-            }
-
             else -> {
                 postRequest.upJson(requestMsg)
             }
@@ -248,13 +237,11 @@ class ContactQueryFragment : BaseFragment<FragmentClientContactQueryBinding?>() 
                         val publicKey = RSACrypt.getPublicKey(HttpServerUtils.clientSignKey)
                         json = RSACrypt.decryptByPublicKey(json, publicKey)
                         json = String(Base64.decode(json))
-                    } else if (HttpServerUtils.clientSafetyMeasures == 3) {
-                        val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                        val encryptCBC = ConvertTools.hexStringToByteArray(json)
-                        val decryptCBC = SM4Crypt.decrypt(encryptCBC, sm4Key)
-                        json = String(decryptCBC)
                     }
-                    val resp: BaseResponse<List<ContactInfo>?> = Gson().fromJson(json, object : TypeToken<BaseResponse<List<ContactInfo>?>>() {}.type)
+                    val resp: BaseResponse<List<ContactInfo>?> = Gson().fromJson(
+                        json,
+                        object : TypeToken<BaseResponse<List<ContactInfo>?>>() {}.type
+                    )
                     if (resp.code == 200) {
                         mAdapter!!.refresh(resp.data)
                         binding!!.refreshLayout.finishRefresh()

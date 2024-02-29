@@ -183,11 +183,6 @@
                         style="@style/rg_rb_style"
                         android:text="@string/safety_measures_rsa" />
 
-                    <RadioButton
-                        android:id="@+id/rb_safety_measures_sm4"
-                        style="@style/rg_rb_style"
-                        android:text="@string/safety_measures_sm4" />
-
                 </RadioGroup>
 
             </LinearLayout>
@@ -367,48 +362,6 @@
                     android:gravity="center"
                     android:padding="5dp"
                     android:text="@string/copy_public_key"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_mini"
-                    app:sb_color_unpressed="@color/colorPrimary"
-                    app:sb_ripple_color="@color/white"
-                    app:sb_ripple_duration="500"
-                    app:sb_shape_type="rectangle"
-                    tools:ignore="SmallSp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/layout_sm4_key"
-                style="@style/BarStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:ignore="RtlSymmetry">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/sm4_key"
-                    android:textStyle="bold" />
-
-                <com.xuexiang.xui.widget.edittext.materialedittext.MaterialEditText
-                    android:id="@+id/et_sm4_key"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_weight="1"
-                    android:hint="@string/sm4_key_tips"
-                    android:textSize="@dimen/text_size_mini"
-                    app:met_passWordButton="true" />
-
-                <com.xuexiang.xui.widget.button.shadowbutton.RippleShadowShadowButton
-                    android:id="@+id/btn_sm4_key"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="@string/generate_key"
                     android:textColor="@color/white"
                     android:textSize="@dimen/text_size_mini"
                     app:sb_color_unpressed="@color/colorPrimary"

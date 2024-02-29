@@ -25,7 +25,8 @@ import com.xuexiang.xui.widget.actionbar.TitleBar
 
 @Page(name = "Battery")
 @Suppress("PrivatePropertyName", "SameParameterValue")
-class BatteryFragment : BaseFragment<FragmentTasksConditionBatteryBinding?>(), View.OnClickListener {
+class BatteryFragment : BaseFragment<FragmentTasksConditionBatteryBinding?>(),
+    View.OnClickListener {
 
     private val TAG: String = BatteryFragment::class.java.simpleName
     private var titleBar: TitleBar? = null

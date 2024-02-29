@@ -84,7 +84,8 @@ class SocketFragment : BaseFragment<FragmentSendersSocketBinding?>(), View.OnCli
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, SettingUtils.requestTimeout)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -103,7 +104,8 @@ class SocketFragment : BaseFragment<FragmentSendersSocketBinding?>(), View.OnCli
 
         //编辑
         binding!!.btnDel.setText(R.string.del)
-        Core.sender.get(senderId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
+        Core.sender.get(senderId).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
             override fun onSubscribe(d: Disposable) {}
 
             override fun onError(e: Throwable) {
@@ -139,7 +141,8 @@ class SocketFragment : BaseFragment<FragmentSendersSocketBinding?>(), View.OnCli
                     binding!!.rgUriType.check(settingVo.getUriTypeCheckId())
                     binding!!.etPath.setText(settingVo.path)
                     binding!!.etClientId.setText(settingVo.clientId)
-                    binding!!.layoutMqtt.visibility = if (checkedId == R.id.rb_method_mqtt) View.VISIBLE else View.GONE
+                    binding!!.layoutMqtt.visibility =
+                        if (checkedId == R.id.rb_method_mqtt) View.VISIBLE else View.GONE
                 }
             }
         })
@@ -150,9 +153,11 @@ class SocketFragment : BaseFragment<FragmentSendersSocketBinding?>(), View.OnCli
         binding!!.btnDel.setOnClickListener(this)
         binding!!.btnSave.setOnClickListener(this)
         binding!!.rgMethod.setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
-            binding!!.layoutMqtt.visibility = if (checkedId == R.id.rb_method_mqtt) View.VISIBLE else View.GONE
+            binding!!.layoutMqtt.visibility =
+                if (checkedId == R.id.rb_method_mqtt) View.VISIBLE else View.GONE
         }
-        LiveEventBus.get(KEY_SENDER_TEST, String::class.java).observe(this) { mCountDownHelper?.finish() }
+        LiveEventBus.get(KEY_SENDER_TEST, String::class.java)
+            .observe(this) { mCountDownHelper?.finish() }
     }
 
     @SingleClick
@@ -165,13 +170,22 @@ class SocketFragment : BaseFragment<FragmentSendersSocketBinding?>(), View.OnCli
                         try {
                             val settingVo = checkSetting()
                             Log.d(TAG, settingVo.toString())
-                            val name = binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() } ?: getString(R.string.test_sender_name)
-                            val msgInfo = MsgInfo("sms", getString(R.string.test_phone_num), String.format(getString(R.string.test_sender_sms), name), Date(), getString(R.string.test_sim_info))
+                            val name =
+                                binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() }
+                                    ?: getString(R.string.test_sender_name)
+                            val msgInfo = MsgInfo(
+                                "sms",
+                                getString(R.string.test_phone_num),
+                                String.format(getString(R.string.test_sender_sms), name),
+                                Date(),
+                                getString(R.string.test_sim_info)
+                            )
                             SocketUtils.sendMsg(settingVo, msgInfo)
                         } catch (e: Exception) {
                             e.printStackTrace()
                             Log.e(TAG, "onClick: $e")
-                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java).post(e.message.toString())
+                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java)
+                                .post(e.message.toString())
                         }
                         LiveEventBus.get(KEY_SENDER_TEST, String::class.java).post("finish")
                     }.start()
@@ -184,11 +198,14 @@ class SocketFragment : BaseFragment<FragmentSendersSocketBinding?>(), View.OnCli
                         return
                     }
 
-                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title).content(R.string.delete_sender_tips).positiveText(R.string.lab_yes).negativeText(R.string.lab_no).onPositive { _: MaterialDialog?, _: DialogAction? ->
-                        viewModel.delete(senderId)
-                        XToastUtils.success(R.string.delete_sender_toast)
-                        popToBack()
-                    }.show()
+                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title)
+                        .content(R.string.delete_sender_tips).positiveText(R.string.lab_yes)
+                        .negativeText(R.string.lab_no)
+                        .onPositive { _: MaterialDialog?, _: DialogAction? ->
+                            viewModel.delete(senderId)
+                            XToastUtils.success(R.string.delete_sender_toast)
+                            popToBack()
+                        }.show()
                     return
                 }
 
@@ -201,7 +218,8 @@ class SocketFragment : BaseFragment<FragmentSendersSocketBinding?>(), View.OnCli
                     val status = if (binding!!.sbEnable.isChecked) 1 else 0
                     val settingVo = checkSetting()
                     if (isClone) senderId = 0
-                    val senderNew = Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
+                    val senderNew =
+                        Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
                     Log.d(TAG, senderNew.toString())
 
                     viewModel.insertOrUpdate(senderNew)
@@ -250,11 +268,30 @@ class SocketFragment : BaseFragment<FragmentSendersSocketBinding?>(), View.OnCli
         val path = binding!!.etPath.text.toString().trim()
         val clientId = binding!!.etClientId.text.toString().trim()
 
-        if (method == "MQTT" && (TextUtils.isEmpty(inMessageTopic) || TextUtils.isEmpty(outMessageTopic))) {
+        if (method == "MQTT" && (TextUtils.isEmpty(inMessageTopic) || TextUtils.isEmpty(
+                outMessageTopic
+            ))
+        ) {
             throw Exception(getString(R.string.invalid_mqtt_message_topic))
         }
 
-        return SocketSetting(method, address, port.toInt(), msgTemplate, secret, response, username, password, inCharset, outCharset, inMessageTopic, outMessageTopic, uriType, path, clientId)
+        return SocketSetting(
+            method,
+            address,
+            port.toInt(),
+            msgTemplate,
+            secret,
+            response,
+            username,
+            password,
+            inCharset,
+            outCharset,
+            inMessageTopic,
+            outMessageTopic,
+            uriType,
+            path,
+            clientId
+        )
     }
 
     override fun onDestroyView() {

@@ -2,7 +2,7 @@ package com.idormy.sms.forwarder.utils
 
 import android.graphics.Color
 import android.text.TextUtils
-import java.util.*
+import java.util.Random
 
 /**
  * <pre>

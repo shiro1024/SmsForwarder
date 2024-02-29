@@ -28,7 +28,12 @@ class UpdateLogsWorker(
                 return@withContext Result.failure()
             }
             if (sendResponse.status >= 0) {
-                val response = sendResponse.response + "\nAt " + DateUtils.getNowString(SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()))
+                val response = sendResponse.response + "\nAt " + DateUtils.getNowString(
+                    SimpleDateFormat(
+                        "yyyy-MM-dd HH:mm:ss",
+                        Locale.getDefault()
+                    )
+                )
                 Thread.sleep(100) //让status=-1的日志先更新
                 Core.logs.updateStatus(sendResponse.logId, sendResponse.status, response)
             } else {

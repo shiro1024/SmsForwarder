@@ -218,7 +218,8 @@ class SendersFragment : BaseFragment<FragmentSendersBinding?>(),
             @SuppressLint("InflateParams")
             @SingleClick
             override fun performAction(view: View) {
-                val bottomSheet: View = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_sender_bottom_sheet, null)
+                val bottomSheet: View = LayoutInflater.from(requireContext())
+                    .inflate(R.layout.dialog_sender_bottom_sheet, null)
                 val recyclerView: RecyclerView = bottomSheet.findViewById(R.id.recyclerView)
 
                 WidgetUtils.initGridRecyclerView(recyclerView, 4, DensityUtils.dp2px(1f))
@@ -226,7 +227,8 @@ class SendersFragment : BaseFragment<FragmentSendersBinding?>(),
                 widgetItemAdapter.setOnItemClickListener(that)
                 recyclerView.adapter = widgetItemAdapter
 
-                val bottomSheetCloseButton: XUIAlphaTextView = bottomSheet.findViewById(R.id.bottom_sheet_close_button)
+                val bottomSheetCloseButton: XUIAlphaTextView =
+                    bottomSheet.findViewById(R.id.bottom_sheet_close_button)
                 bottomSheetCloseButton.setOnClickListener { dialog.dismiss() }
 
                 dialog.setContentView(bottomSheet)
@@ -272,7 +274,11 @@ class SendersFragment : BaseFragment<FragmentSendersBinding?>(),
             refreshLayout.layout.postDelayed({
                 //adapter!!.refresh()
                 lifecycleScope.launch {
-                    viewModel.setStatus(currentStatus).allSenders.collectLatest { adapter.submitData(it) }
+                    viewModel.setStatus(currentStatus).allSenders.collectLatest {
+                        adapter.submitData(
+                            it
+                        )
+                    }
                 }
                 refreshLayout.finishRefresh()
             }, 200)

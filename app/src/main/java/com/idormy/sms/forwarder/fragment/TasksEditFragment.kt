@@ -50,8 +50,15 @@ import java.util.*
 
 
 @Page(name = "自动任务·编辑器")
-@Suppress("PrivatePropertyName", "DEPRECATION", "UNUSED_PARAMETER", "EmptyMethod", "NotifyDataSetChanged")
-class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClickListener, RecyclerViewHolder.OnItemClickListener<PageInfo> {
+@Suppress(
+    "PrivatePropertyName",
+    "DEPRECATION",
+    "UNUSED_PARAMETER",
+    "EmptyMethod",
+    "NotifyDataSetChanged"
+)
+class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClickListener,
+    RecyclerViewHolder.OnItemClickListener<PageInfo> {
 
     private val TAG: String = TasksEditFragment::class.java.simpleName
     private val that = this
@@ -165,13 +172,6 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
             "{\"\":\"\"}",
             CoreAnim.slide,
             R.drawable.auto_task_icon_settings
-        ),
-        PageInfo(
-            getString(R.string.task_frpc),
-            "com.idormy.sms.forwarder.fragment.action.FrpcFragment",
-            "{\"\":\"\"}",
-            CoreAnim.slide,
-            R.drawable.auto_task_icon_frpc
         ),
         PageInfo(
             getString(R.string.task_http_server),
@@ -306,9 +306,13 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
         try {
             when (v.id) {
                 R.id.layout_add_condition -> {
-                    val bottomSheet: View = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_task_condition_bottom_sheet, null)
+                    val bottomSheet: View = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.dialog_task_condition_bottom_sheet, null)
                     val tvTitle: TextView = bottomSheet.findViewById(R.id.tv_title)
-                    tvTitle.text = if (conditionsList.isEmpty()) getString(R.string.select_task_trigger) else getString(R.string.select_task_condition)
+                    tvTitle.text =
+                        if (conditionsList.isEmpty()) getString(R.string.select_task_trigger) else getString(
+                            R.string.select_task_condition
+                        )
 
                     val recyclerView: RecyclerView = bottomSheet.findViewById(R.id.recyclerView)
                     WidgetUtils.initGridRecyclerView(recyclerView, 4, DensityUtils.dp2px(1f))
@@ -316,7 +320,8 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
                     widgetItemAdapter.setOnItemClickListener(that)
                     recyclerView.adapter = widgetItemAdapter
 
-                    val bottomSheetCloseButton: XUIAlphaTextView = bottomSheet.findViewById(R.id.bottom_sheet_close_button)
+                    val bottomSheetCloseButton: XUIAlphaTextView =
+                        bottomSheet.findViewById(R.id.bottom_sheet_close_button)
                     bottomSheetCloseButton.setOnClickListener { dialog.dismiss() }
 
                     dialog.setContentView(bottomSheet)
@@ -327,7 +332,8 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
                 }
 
                 R.id.layout_add_action -> {
-                    val bottomSheet: View = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_task_action_bottom_sheet, null)
+                    val bottomSheet: View = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.dialog_task_action_bottom_sheet, null)
                     val recyclerView: RecyclerView = bottomSheet.findViewById(R.id.recyclerView)
 
                     WidgetUtils.initGridRecyclerView(recyclerView, 4, DensityUtils.dp2px(1f))
@@ -335,7 +341,8 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
                     widgetItemAdapter.setOnItemClickListener(that)
                     recyclerView.adapter = widgetItemAdapter
 
-                    val bottomSheetCloseButton: XUIAlphaTextView = bottomSheet.findViewById(R.id.bottom_sheet_close_button)
+                    val bottomSheetCloseButton: XUIAlphaTextView =
+                        bottomSheet.findViewById(R.id.bottom_sheet_close_button)
                     bottomSheetCloseButton.setOnClickListener { dialog.dismiss() }
 
                     dialog.setContentView(bottomSheet)
@@ -387,51 +394,58 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
 
     //初始化表单
     private fun initForm() {
-        Core.task.get(taskId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Task> {
-            override fun onSubscribe(d: Disposable) {}
+        Core.task.get(taskId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<Task> {
+                override fun onSubscribe(d: Disposable) {}
 
-            override fun onError(e: Throwable) {
-                e.printStackTrace()
-                Log.e(TAG, "initForm error: ${e.message}")
-            }
-
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onSuccess(task: Task) {
-                Log.d(TAG, task.toString())
-                if (isClone) {
-                    titleBar?.setSubTitle(getString(R.string.clone_task))
-                    binding!!.btnDel.setText(R.string.discard)
-                } else {
-                    titleBar?.setSubTitle(getString(R.string.edit_task))
-                }
-                binding!!.etName.setText(task.name)
-                binding!!.sbStatus.isChecked = task.status == STATUS_ON
-                try {
-                    if (task.conditions.isNotEmpty()) {
-                        val conditionList = Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
-                        for (condition in conditionList) {
-                            this@TasksEditFragment.conditionsList.add(condition)
-                        }
-                        Log.d(TAG, "conditionsList: ${this@TasksEditFragment.conditionsList}")
-                        conditionsAdapter.notifyDataSetChanged()
-                        binding!!.layoutAddCondition.visibility = if (this@TasksEditFragment.conditionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
-                    }
-                    if (task.actions.isNotEmpty()) {
-                        val actionList = Gson().fromJson(task.actions, Array<TaskSetting>::class.java).toMutableList()
-                        for (action in actionList) {
-                            this@TasksEditFragment.actionsList.add(action)
-                        }
-                        Log.d(TAG, "actionsList: ${this@TasksEditFragment.actionsList}")
-                        actionsAdapter.notifyDataSetChanged()
-                        binding!!.layoutAddAction.visibility = if (this@TasksEditFragment.actionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
-                    }
-                } catch (e: Exception) {
+                override fun onError(e: Throwable) {
                     e.printStackTrace()
                     Log.e(TAG, "initForm error: ${e.message}")
-                    XToastUtils.error(e.message.toString())
                 }
-            }
-        })
+
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onSuccess(task: Task) {
+                    Log.d(TAG, task.toString())
+                    if (isClone) {
+                        titleBar?.setSubTitle(getString(R.string.clone_task))
+                        binding!!.btnDel.setText(R.string.discard)
+                    } else {
+                        titleBar?.setSubTitle(getString(R.string.edit_task))
+                    }
+                    binding!!.etName.setText(task.name)
+                    binding!!.sbStatus.isChecked = task.status == STATUS_ON
+                    try {
+                        if (task.conditions.isNotEmpty()) {
+                            val conditionList =
+                                Gson().fromJson(task.conditions, Array<TaskSetting>::class.java)
+                                    .toMutableList()
+                            for (condition in conditionList) {
+                                this@TasksEditFragment.conditionsList.add(condition)
+                            }
+                            Log.d(TAG, "conditionsList: ${this@TasksEditFragment.conditionsList}")
+                            conditionsAdapter.notifyDataSetChanged()
+                            binding!!.layoutAddCondition.visibility =
+                                if (this@TasksEditFragment.conditionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
+                        }
+                        if (task.actions.isNotEmpty()) {
+                            val actionList =
+                                Gson().fromJson(task.actions, Array<TaskSetting>::class.java)
+                                    .toMutableList()
+                            for (action in actionList) {
+                                this@TasksEditFragment.actionsList.add(action)
+                            }
+                            Log.d(TAG, "actionsList: ${this@TasksEditFragment.actionsList}")
+                            actionsAdapter.notifyDataSetChanged()
+                            binding!!.layoutAddAction.visibility =
+                                if (this@TasksEditFragment.actionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Log.e(TAG, "initForm error: ${e.message}")
+                        XToastUtils.error(e.message.toString())
+                    }
+                }
+            })
     }
 
     //提交前检查表单
@@ -475,7 +489,15 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
 
         val status = if (binding!!.sbStatus.isChecked) STATUS_ON else STATUS_OFF
         return Task(
-            taskId, taskType, taskName, description.toString(), Gson().toJson(conditionsList), Gson().toJson(actionsList), status, lastExecTime, nextExecTime
+            taskId,
+            taskType,
+            taskName,
+            description.toString(),
+            Gson().toJson(conditionsList),
+            Gson().toJson(actionsList),
+            status,
+            lastExecTime,
+            nextExecTime
         )
     }
 
@@ -520,9 +542,11 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
                             .content(R.string.enable_location_dialog)
                             .cancelable(false)
                             .positiveText(R.string.lab_yes)
-                            .negativeText(R.string.lab_no).onPositive { _: MaterialDialog?, _: DialogAction? ->
+                            .negativeText(R.string.lab_no)
+                            .onPositive { _: MaterialDialog?, _: DialogAction? ->
                                 SettingUtils.enableLocation = true
-                                val serviceIntent = Intent(requireContext(), LocationService::class.java)
+                                val serviceIntent =
+                                    Intent(requireContext(), LocationService::class.java)
                                 serviceIntent.action = "START"
                                 requireContext().startService(serviceIntent)
                             }.show()
@@ -571,8 +595,10 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
                 val widgetInfoIndex = resultCode - KEY_BACK_CODE_CONDITION
                 if (widgetInfoIndex >= TASK_CONDITION_FRAGMENT_LIST.size) return
                 val widgetInfo = TASK_CONDITION_FRAGMENT_LIST[widgetInfoIndex]
-                description = extras.getString(KEY_BACK_DESCRIPTION_CONDITION) ?: widgetInfo.name.toString()
-                val taskSetting = TaskSetting(resultCode, widgetInfo.name, description, setting, requestCode)
+                description =
+                    extras.getString(KEY_BACK_DESCRIPTION_CONDITION) ?: widgetInfo.name.toString()
+                val taskSetting =
+                    TaskSetting(resultCode, widgetInfo.name, description, setting, requestCode)
                 //requestCode: 等于 conditionsList 的索引加1
                 if (requestCode == 0) {
                     taskSetting.position = conditionsList.size
@@ -583,15 +609,18 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
                     conditionsAdapter.notifyItemChanged(requestCode - 1)
                 }
                 //conditionsAdapter.notifyDataSetChanged()
-                binding!!.layoutAddCondition.visibility = if (conditionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
+                binding!!.layoutAddCondition.visibility =
+                    if (conditionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
             } else if (resultCode in KEY_BACK_CODE_ACTION..KEY_BACK_CODE_ACTION + 999) {
                 setting = extras.getString(KEY_BACK_DATA_ACTION) ?: return
                 //注意：TASK_ACTION_XXX 枚举值 等于 TASK_ACTION_FRAGMENT_LIST 索引加上 KEY_BACK_CODE_ACTION，不可改变
                 val widgetInfoIndex = resultCode - KEY_BACK_CODE_ACTION
                 if (widgetInfoIndex >= TASK_ACTION_FRAGMENT_LIST.size) return
                 val widgetInfo = TASK_ACTION_FRAGMENT_LIST[widgetInfoIndex]
-                description = extras.getString(KEY_BACK_DESCRIPTION_ACTION) ?: widgetInfo.name.toString()
-                val taskSetting = TaskSetting(resultCode, widgetInfo.name, description, setting, requestCode)
+                description =
+                    extras.getString(KEY_BACK_DESCRIPTION_ACTION) ?: widgetInfo.name.toString()
+                val taskSetting =
+                    TaskSetting(resultCode, widgetInfo.name, description, setting, requestCode)
                 //requestCode: 等于 actionsList 的索引加1
                 if (requestCode == 0) {
                     taskSetting.position = actionsList.size
@@ -602,16 +631,23 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
                     actionsAdapter.notifyItemChanged(requestCode - 1)
                 }
                 //actionsAdapter.notifyDataSetChanged()
-                binding!!.layoutAddAction.visibility = if (actionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
+                binding!!.layoutAddAction.visibility =
+                    if (actionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
             }
             Log.d(TAG, "requestCode:$requestCode resultCode:$resultCode setting:$setting")
         }
     }
 
     private fun initRecyclerViews() {
-        conditionsAdapter = TaskSettingAdapter(conditionsList, { position -> removeCondition(position) }, { position -> editCondition(position) })
+        conditionsAdapter = TaskSettingAdapter(
+            conditionsList,
+            { position -> removeCondition(position) },
+            { position -> editCondition(position) })
 
-        actionsAdapter = TaskSettingAdapter(actionsList, { position -> removeAction(position) }, { position -> editAction(position) })
+        actionsAdapter = TaskSettingAdapter(
+            actionsList,
+            { position -> removeAction(position) },
+            { position -> editAction(position) })
 
         conditionsRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -645,7 +681,8 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
         conditionsList.removeAt(position)
         conditionsAdapter.notifyItemRemoved(position)
         conditionsAdapter.notifyItemRangeChanged(position, conditionsList.size) // 更新索引
-        binding!!.layoutAddCondition.visibility = if (conditionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
+        binding!!.layoutAddCondition.visibility =
+            if (conditionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
     }
 
     private fun editAction(position: Int) {
@@ -669,6 +706,7 @@ class TasksEditFragment : BaseFragment<FragmentTasksEditBinding?>(), View.OnClic
         actionsList.removeAt(position)
         actionsAdapter.notifyItemRemoved(position)
         actionsAdapter.notifyItemRangeChanged(position, actionsList.size) // 更新索引
-        binding!!.layoutAddAction.visibility = if (actionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
+        binding!!.layoutAddAction.visibility =
+            if (actionsList.size >= MAX_SETTING_NUM) View.GONE else View.VISIBLE
     }
 }

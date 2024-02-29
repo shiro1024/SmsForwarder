@@ -37,7 +37,8 @@ class ServerchanUtils {
                 msgInfo.getContentForSend(SettingUtils.smsTemplate)
             }
 
-            val requestUrl: String = String.format("https://sctapi.ftqq.com/%s.send", setting.sendKey) //推送地址
+            val requestUrl: String =
+                String.format("https://sctapi.ftqq.com/%s.send", setting.sendKey) //推送地址
             Log.i(TAG, "requestUrl:$requestUrl")
 
             val request = XHttp.post(requestUrl)

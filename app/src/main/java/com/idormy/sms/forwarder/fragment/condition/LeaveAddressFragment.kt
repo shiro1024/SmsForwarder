@@ -32,7 +32,8 @@ import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog
 
 @Page(name = "LeaveAddress")
 @Suppress("PrivatePropertyName", "SameParameterValue")
-class LeaveAddressFragment : BaseFragment<FragmentTasksConditionLeaveAddressBinding?>(), View.OnClickListener {
+class LeaveAddressFragment : BaseFragment<FragmentTasksConditionLeaveAddressBinding?>(),
+    View.OnClickListener {
 
     private val TAG: String = LeaveAddressFragment::class.java.simpleName
     private var titleBar: TitleBar? = null
@@ -172,12 +173,18 @@ class LeaveAddressFragment : BaseFragment<FragmentTasksConditionLeaveAddressBind
             when (v.id) {
                 R.id.btn_current_coordinates -> {
                     if (!App.LocationClient.isStarted()) {
-                        MaterialDialog.Builder(requireContext()).iconRes(R.drawable.auto_task_icon_location).title(R.string.enable_location).content(R.string.enable_location_dialog).cancelable(false).positiveText(R.string.lab_yes).negativeText(R.string.lab_no).onPositive { _: MaterialDialog?, _: DialogAction? ->
-                            SettingUtils.enableLocation = true
-                            val serviceIntent = Intent(requireContext(), LocationService::class.java)
-                            serviceIntent.action = "START"
-                            requireContext().startService(serviceIntent)
-                        }.show()
+                        MaterialDialog.Builder(requireContext())
+                            .iconRes(R.drawable.auto_task_icon_location)
+                            .title(R.string.enable_location)
+                            .content(R.string.enable_location_dialog).cancelable(false)
+                            .positiveText(R.string.lab_yes).negativeText(R.string.lab_no)
+                            .onPositive { _: MaterialDialog?, _: DialogAction? ->
+                                SettingUtils.enableLocation = true
+                                val serviceIntent =
+                                    Intent(requireContext(), LocationService::class.java)
+                                serviceIntent.action = "START"
+                                requireContext().startService(serviceIntent)
+                            }.show()
                         return
                     }
 
@@ -189,7 +196,12 @@ class LeaveAddressFragment : BaseFragment<FragmentTasksConditionLeaveAddressBind
 
                     binding!!.etLatitude.setText(location.latitude.toString())
                     binding!!.etLongitude.setText(location.longitude.toString())
-                    XToastUtils.success(String.format(getString(R.string.current_address), location.address), 30000)
+                    XToastUtils.success(
+                        String.format(
+                            getString(R.string.current_address),
+                            location.address
+                        ), 30000
+                    )
                 }
 
                 R.id.btn_del -> {
@@ -227,7 +239,12 @@ class LeaveAddressFragment : BaseFragment<FragmentTasksConditionLeaveAddressBind
                 if (latitude.isNaN() || longitude.isNaN() || distance.isNaN()) {
                     throw Exception(getString(R.string.calc_type_distance_error))
                 }
-                description = String.format(getString(R.string.leave_address_distance_description), longitude, latitude, distance)
+                description = String.format(
+                    getString(R.string.leave_address_distance_description),
+                    longitude,
+                    latitude,
+                    distance
+                )
                 "distance"
             }
 
@@ -235,12 +252,14 @@ class LeaveAddressFragment : BaseFragment<FragmentTasksConditionLeaveAddressBind
                 if (address.isEmpty()) {
                     throw Exception(getString(R.string.calc_type_address_error))
                 }
-                description = String.format(getString(R.string.leave_address_keyword_description), address)
+                description =
+                    String.format(getString(R.string.leave_address_keyword_description), address)
                 "address"
             }
         }
 
-        val settingVo = LocationSetting(description, "leave", calcType, longitude, latitude, distance, address)
+        val settingVo =
+            LocationSetting(description, "leave", calcType, longitude, latitude, distance, address)
 
         if (updateView) {
             binding!!.tvDescription.text = description

@@ -2,13 +2,13 @@ package com.idormy.sms.forwarder.utils.sender
 
 import android.Manifest
 import android.content.pm.PackageManager
-import com.idormy.sms.forwarder.utils.Log
 import androidx.core.app.ActivityCompat
 import com.idormy.sms.forwarder.App
 import com.idormy.sms.forwarder.R
 import com.idormy.sms.forwarder.database.entity.Rule
 import com.idormy.sms.forwarder.entity.MsgInfo
 import com.idormy.sms.forwarder.entity.setting.SmsSetting
+import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.utils.PhoneUtils
 import com.idormy.sms.forwarder.utils.SendUtils
 import com.idormy.sms.forwarder.utils.SettingUtils
@@ -36,7 +36,11 @@ class SmsUtils {
                 return
             }
 
-            if (ActivityCompat.checkSelfPermission(XUtil.getContext(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(
+                    XUtil.getContext(),
+                    Manifest.permission.SEND_SMS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 SendUtils.updateLogs(logId, 0, getString(R.string.no_sms_sending_permission))
                 SendUtils.senderLogic(0, msgInfo, rule, senderIndex, msgId)
                 return

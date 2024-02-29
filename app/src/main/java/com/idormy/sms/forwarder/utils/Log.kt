@@ -51,7 +51,10 @@ object Log {
                 createLogFile()
                 logFile?.let { file ->
                     try {
-                        val logTimeStamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date())
+                        val logTimeStamp =
+                            SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(
+                                Date()
+                            )
                         val logWriter = FileWriter(file, true)
                         logWriter.append("$logTimeStamp | $level | $tag | $message\n\n")
                         logWriter.close()

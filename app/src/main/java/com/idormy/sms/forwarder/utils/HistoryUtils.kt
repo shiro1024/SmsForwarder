@@ -14,7 +14,8 @@ import kotlin.reflect.KProperty
  * @since 2022年5月9日
  */
 @Suppress("UNCHECKED_CAST", "unused")
-class HistoryUtils<T>(private val name: String, private val default: T) : ReadWriteProperty<Any?, T> {
+class HistoryUtils<T>(private val name: String, private val default: T) :
+    ReadWriteProperty<Any?, T> {
 
     companion object {
         lateinit var preference: SharedPreferences
@@ -22,7 +23,10 @@ class HistoryUtils<T>(private val name: String, private val default: T) : ReadWr
         fun init(context: Context) {
             preference = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 val directBootContext: Context = context.createDeviceProtectedStorageContext()
-                directBootContext.getSharedPreferences(context.packageName + ".history", Context.MODE_PRIVATE)
+                directBootContext.getSharedPreferences(
+                    context.packageName + ".history",
+                    Context.MODE_PRIVATE
+                )
             } else {
                 context.getSharedPreferences(context.packageName + ".history", Context.MODE_PRIVATE)
             }

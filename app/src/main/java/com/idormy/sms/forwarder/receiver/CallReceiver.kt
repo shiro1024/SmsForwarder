@@ -85,14 +85,16 @@ open class CallReceiver : PhoneStateReceiver() {
         }
 
         val contacts = PhoneUtils.getContactByNumber(phoneNumber)
-        val contactName = if (contacts.isNotEmpty()) contacts[0].name else getString(R.string.unknown_number)
+        val contactName =
+            if (contacts.isNotEmpty()) contacts[0].name else getString(R.string.unknown_number)
 
         val msg = StringBuilder()
         msg.append(getString(R.string.contact)).append(contactName).append("\n")
         msg.append(getString(R.string.mandatory_type))
         msg.append(CALL_TYPE_MAP[callType.toString()] ?: getString(R.string.unknown_call))
 
-        val msgInfo = MsgInfo("call", phoneNumber.toString(), msg.toString(), Date(), "", -1, 0, callType)
+        val msgInfo =
+            MsgInfo("call", phoneNumber.toString(), msg.toString(), Date(), "", -1, 0, callType)
         val request = OneTimeWorkRequestBuilder<SendWorker>().setInputData(
             workDataOf(
                 Worker.sendMsgInfo to Gson().toJson(msgInfo)
@@ -134,10 +136,20 @@ open class CallReceiver : PhoneStateReceiver() {
         //获取联系人姓名
         if (TextUtils.isEmpty(callInfo.name)) {
             val contacts = PhoneUtils.getContactByNumber(phoneNumber)
-            callInfo.name = if (contacts.isNotEmpty()) contacts[0].name else getString(R.string.unknown_number)
+            callInfo.name =
+                if (contacts.isNotEmpty()) contacts[0].name else getString(R.string.unknown_number)
         }
 
-        val msgInfo = MsgInfo("call", callInfo.number, PhoneUtils.getCallMsg(callInfo), Date(), simInfo, simSlot, callInfo.subId, callType)
+        val msgInfo = MsgInfo(
+            "call",
+            callInfo.number,
+            PhoneUtils.getCallMsg(callInfo),
+            Date(),
+            simInfo,
+            simSlot,
+            callInfo.subId,
+            callType
+        )
         val request = OneTimeWorkRequestBuilder<SendWorker>().setInputData(
             workDataOf(
                 Worker.sendMsgInfo to Gson().toJson(msgInfo)

@@ -44,7 +44,9 @@ class BatteryWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                         Log.d(TAG, "task = $task")
 
                         // 根据任务信息执行相应操作
-                        val conditionList = Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
+                        val conditionList =
+                            Gson().fromJson(task.conditions, Array<TaskSetting>::class.java)
+                                .toMutableList()
                         if (conditionList.isEmpty()) {
                             Log.d(TAG, "TASK-${task.id}：conditionList is empty")
                             continue
@@ -55,15 +57,20 @@ class BatteryWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                             continue
                         }
 
-                        val batterySetting = Gson().fromJson(firstCondition.setting, BatterySetting::class.java)
+                        val batterySetting =
+                            Gson().fromJson(firstCondition.setting, BatterySetting::class.java)
                         if (batterySetting == null) {
                             Log.d(TAG, "TASK-${task.id}：batterySetting is null")
                             continue
                         }
 
-                        val msg = batterySetting.getMsg(status, levelNew, levelOld, TaskUtils.batteryInfo)
+                        val msg =
+                            batterySetting.getMsg(status, levelNew, levelOld, TaskUtils.batteryInfo)
                         if (msg.isEmpty()) {
-                            Log.d(TAG, "TASK-${task.id}：msg is empty, batterySetting = $batterySetting, status = $status, levelNew = $levelNew, levelOld = $levelOld")
+                            Log.d(
+                                TAG,
+                                "TASK-${task.id}：msg is empty, batterySetting = $batterySetting, status = $status, levelNew = $levelNew, levelOld = $levelOld"
+                            )
                             continue
                         }
 
@@ -76,7 +83,9 @@ class BatteryWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                             .putString(TaskWorker.taskActions, task.actions)
                             .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo))
                             .build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     }
 
@@ -88,7 +97,10 @@ class BatteryWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                     val statusOld = inputData.getInt("status_old", -1)
                     val pluggedNew = inputData.getInt("plugged_new", -1)
                     val pluggedOld = inputData.getInt("plugged_old", -1)
-                    Log.d(TAG, "statusNew: $statusNew, statusOld: $statusOld, pluggedNew: $pluggedNew, pluggedOld: $pluggedOld")
+                    Log.d(
+                        TAG,
+                        "statusNew: $statusNew, statusOld: $statusOld, pluggedNew: $pluggedNew, pluggedOld: $pluggedOld"
+                    )
                     if (statusNew == -1 || statusOld == -1 || pluggedNew == -1 || pluggedOld == -1) {
                         Log.d(TAG, "statusNew or statusOld or pluggedNew or pluggedOld is -1")
                         return Result.failure()
@@ -99,7 +111,9 @@ class BatteryWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                         Log.d(TAG, "task = $task")
 
                         // 根据任务信息执行相应操作
-                        val conditionList = Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
+                        val conditionList =
+                            Gson().fromJson(task.conditions, Array<TaskSetting>::class.java)
+                                .toMutableList()
                         if (conditionList.isEmpty()) {
                             Log.d(TAG, "TASK-${task.id}：conditionList is empty")
                             continue
@@ -110,15 +124,25 @@ class BatteryWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                             continue
                         }
 
-                        val chargeSetting = Gson().fromJson(firstCondition.setting, ChargeSetting::class.java)
+                        val chargeSetting =
+                            Gson().fromJson(firstCondition.setting, ChargeSetting::class.java)
                         if (chargeSetting == null) {
                             Log.d(TAG, "TASK-${task.id}：chargeSetting is null")
                             continue
                         }
 
-                        val msg = chargeSetting.getMsg(statusNew, statusOld, pluggedNew, pluggedOld, TaskUtils.batteryInfo)
+                        val msg = chargeSetting.getMsg(
+                            statusNew,
+                            statusOld,
+                            pluggedNew,
+                            pluggedOld,
+                            TaskUtils.batteryInfo
+                        )
                         if (msg.isEmpty()) {
-                            Log.d(TAG, "TASK-${task.id}：msg is empty, chargeSetting = $chargeSetting, statusNew = $statusNew, statusOld = $statusOld, pluggedNew = $pluggedNew, pluggedOld = $pluggedOld")
+                            Log.d(
+                                TAG,
+                                "TASK-${task.id}：msg is empty, chargeSetting = $chargeSetting, statusNew = $statusNew, statusOld = $statusOld, pluggedNew = $pluggedNew, pluggedOld = $pluggedOld"
+                            )
                             continue
                         }
 
@@ -135,7 +159,9 @@ class BatteryWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                             .putString(TaskWorker.taskActions, task.actions)
                             .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo))
                             .build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     }
 

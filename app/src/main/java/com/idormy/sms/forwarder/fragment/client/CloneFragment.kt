@@ -33,7 +33,6 @@ import com.xuexiang.xui.utils.CountDownButtonHelper
 import com.xuexiang.xui.widget.actionbar.TitleBar
 import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog
-import com.xuexiang.xutil.data.ConvertTools
 import com.xuexiang.xutil.file.FileIOUtils
 import com.xuexiang.xutil.file.FileUtils
 import com.xuexiang.xutil.resource.ResUtils.getStringArray
@@ -75,7 +74,8 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
             .permission(Permission.MANAGE_EXTERNAL_STORAGE).request(object : OnPermissionCallback {
                 @SuppressLint("SetTextI18n")
                 override fun onGranted(permissions: List<String>, all: Boolean) {
-                    backupPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
+                    backupPath =
+                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
                     binding!!.tvBackupPath.text = backupPath + File.separator + backupFile
                 }
 
@@ -105,7 +105,8 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
 
         //按钮增加倒计时，避免重复点击
         pushCountDownHelper = CountDownButtonHelper(binding!!.btnPush, SettingUtils.requestTimeout)
-        pushCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        pushCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnPush.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -115,7 +116,8 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
             }
         })
         pullCountDownHelper = CountDownButtonHelper(binding!!.btnPull, SettingUtils.requestTimeout)
-        pullCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        pullCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnPull.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -125,7 +127,8 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
             }
         })
         exportCountDownHelper = CountDownButtonHelper(binding!!.btnExport, 3)
-        exportCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        exportCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnExport.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -135,7 +138,8 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
             }
         })
         importCountDownHelper = CountDownButtonHelper(binding!!.btnImport, 3)
-        importCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        importCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnImport.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -177,7 +181,12 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
                         XToastUtils.error(getString(R.string.export_failed))
                     }
                 } catch (e: Exception) {
-                    XToastUtils.error(String.format(getString(R.string.export_failed_tips), e.message))
+                    XToastUtils.error(
+                        String.format(
+                            getString(R.string.export_failed_tips),
+                            e.message
+                        )
+                    )
                 }
             }
             //导入配置
@@ -200,7 +209,9 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
 
                     //替换Date字段为当前时间
                     val builder = GsonBuilder()
-                    builder.registerTypeAdapter(Date::class.java, JsonDeserializer<Any?> { _, _, _ -> Date() })
+                    builder.registerTypeAdapter(
+                        Date::class.java,
+                        JsonDeserializer<Any?> { _, _, _ -> Date() })
                     val gson = builder.create()
                     val cloneInfo = gson.fromJson(jsonStr, CloneInfo::class.java)
                     Log.d(TAG, "cloneInfo = $cloneInfo")
@@ -225,7 +236,12 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
                         XToastUtils.error(getString(R.string.import_failed))
                     }
                 } catch (e: Exception) {
-                    XToastUtils.error(String.format(getString(R.string.import_failed_tips), e.message))
+                    XToastUtils.error(
+                        String.format(
+                            getString(R.string.import_failed_tips),
+                            e.message
+                        )
+                    )
                 }
             }
         }
@@ -255,7 +271,8 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
         var requestMsg: String = Gson().toJson(msgMap)
         Log.i(TAG, "requestMsg:$requestMsg")
 
-        val postRequest = XHttp.post(requestUrl).keepJson(true).timeOut((SettingUtils.requestTimeout * 1000).toLong()) //超时时间10s
+        val postRequest = XHttp.post(requestUrl).keepJson(true)
+            .timeOut((SettingUtils.requestTimeout * 1000).toLong()) //超时时间10s
             .cacheMode(CacheMode.NO_CACHE).timeStamp(true)
 
         when (HttpServerUtils.clientSafetyMeasures) {
@@ -264,22 +281,6 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
                 try {
                     requestMsg = Base64.encode(requestMsg.toByteArray())
                     requestMsg = RSACrypt.encryptByPublicKey(requestMsg, publicKey)
-                    Log.i(TAG, "requestMsg: $requestMsg")
-                } catch (e: Exception) {
-                    XToastUtils.error(getString(R.string.request_failed) + e.message)
-                    e.printStackTrace()
-                    Log.e(TAG, e.toString())
-                    return
-                }
-                postRequest.upString(requestMsg)
-            }
-
-            3 -> {
-                try {
-                    val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                    //requestMsg = Base64.encode(requestMsg.toByteArray())
-                    val encryptCBC = SM4Crypt.encrypt(requestMsg.toByteArray(), sm4Key)
-                    requestMsg = ConvertTools.bytes2HexString(encryptCBC)
                     Log.i(TAG, "requestMsg: $requestMsg")
                 } catch (e: Exception) {
                     XToastUtils.error(getString(R.string.request_failed) + e.message)
@@ -309,13 +310,9 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
                         val publicKey = RSACrypt.getPublicKey(HttpServerUtils.clientSignKey)
                         json = RSACrypt.decryptByPublicKey(json, publicKey)
                         json = String(Base64.decode(json))
-                    } else if (HttpServerUtils.clientSafetyMeasures == 3) {
-                        val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                        val encryptCBC = ConvertTools.hexStringToByteArray(json)
-                        val decryptCBC = SM4Crypt.decrypt(encryptCBC, sm4Key)
-                        json = String(decryptCBC)
                     }
-                    val resp: BaseResponse<String> = Gson().fromJson(json, object : TypeToken<BaseResponse<String>>() {}.type)
+                    val resp: BaseResponse<String> =
+                        Gson().fromJson(json, object : TypeToken<BaseResponse<String>>() {}.type)
                     if (resp.code == 200) {
                         XToastUtils.success(getString(R.string.request_succeeded))
                     } else {
@@ -377,22 +374,6 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
                 postRequest.upString(requestMsg)
             }
 
-            3 -> {
-                try {
-                    val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                    //requestMsg = Base64.encode(requestMsg.toByteArray())
-                    val encryptCBC = SM4Crypt.encrypt(requestMsg.toByteArray(), sm4Key)
-                    requestMsg = ConvertTools.bytes2HexString(encryptCBC)
-                    Log.i(TAG, "requestMsg: $requestMsg")
-                } catch (e: Exception) {
-                    XToastUtils.error(getString(R.string.request_failed) + e.message)
-                    e.printStackTrace()
-                    Log.e(TAG, e.toString())
-                    return
-                }
-                postRequest.upString(requestMsg)
-            }
-
             else -> {
                 postRequest.upJson(requestMsg)
             }
@@ -412,18 +393,16 @@ class CloneFragment : BaseFragment<FragmentClientCloneBinding?>(), View.OnClickL
                         val publicKey = RSACrypt.getPublicKey(HttpServerUtils.clientSignKey)
                         json = RSACrypt.decryptByPublicKey(json, publicKey)
                         json = String(Base64.decode(json))
-                    } else if (HttpServerUtils.clientSafetyMeasures == 3) {
-                        val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                        val encryptCBC = ConvertTools.hexStringToByteArray(json)
-                        val decryptCBC = SM4Crypt.decrypt(encryptCBC, sm4Key)
-                        json = String(decryptCBC)
                     }
 
                     //替换Date字段为当前时间
                     val builder = GsonBuilder()
-                    builder.registerTypeAdapter(Date::class.java, JsonDeserializer<Any?> { _, _, _ -> Date() })
+                    builder.registerTypeAdapter(
+                        Date::class.java,
+                        JsonDeserializer<Any?> { _, _, _ -> Date() })
                     val gson = builder.create()
-                    val resp: BaseResponse<CloneInfo> = gson.fromJson(json, object : TypeToken<BaseResponse<CloneInfo>>() {}.type)
+                    val resp: BaseResponse<CloneInfo> =
+                        gson.fromJson(json, object : TypeToken<BaseResponse<CloneInfo>>() {}.type)
                     if (resp.code == 200) {
                         val cloneInfo = resp.data
                         Log.d(TAG, "cloneInfo = $cloneInfo")

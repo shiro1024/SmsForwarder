@@ -37,7 +37,12 @@ class SocketUtils {
         private val TAG: String = SocketUtils::class.java.simpleName
 
         fun sendMsg(
-            setting: SocketSetting, msgInfo: MsgInfo, rule: Rule? = null, senderIndex: Int = 0, logId: Long = 0L, msgId: Long = 0L
+            setting: SocketSetting,
+            msgInfo: MsgInfo,
+            rule: Rule? = null,
+            senderIndex: Int = 0,
+            logId: Long = 0L,
+            msgId: Long = 0L
         ) {
             val from: String = msgInfo.from
             val content: String = if (rule != null) {
@@ -51,21 +56,45 @@ class SocketUtils {
             val deviceMark: String = SettingUtils.extraDeviceMark
             val appVersion: String = AppUtils.getAppVersionName()
             val simInfo: String = msgInfo.simInfo
-            @SuppressLint("SimpleDateFormat") val receiveTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date()) //smsVo.getDate()
+            @SuppressLint("SimpleDateFormat") val receiveTime =
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date()) //smsVo.getDate()
             var sign = ""
             if (!TextUtils.isEmpty(setting.secret)) {
                 val stringToSign = "$timestamp\n" + setting.secret
                 val mac = Mac.getInstance("HmacSHA256")
-                mac.init(SecretKeySpec(setting.secret?.toByteArray(StandardCharsets.UTF_8), "HmacSHA256"))
+                mac.init(
+                    SecretKeySpec(
+                        setting.secret?.toByteArray(StandardCharsets.UTF_8),
+                        "HmacSHA256"
+                    )
+                )
                 val signData = mac.doFinal(stringToSign.toByteArray(StandardCharsets.UTF_8))
                 sign = URLEncoder.encode(String(Base64.encode(signData, Base64.NO_WRAP)), "UTF-8")
             }
 
-            var message = if (TextUtils.isEmpty(setting.msgTemplate)) "{\"msg\": \"[msg]\"}" else setting.msgTemplate
+            var message =
+                if (TextUtils.isEmpty(setting.msgTemplate)) "{\"msg\": \"[msg]\"}" else setting.msgTemplate
             message = if (message.startsWith("{")) {
-                message.replace("[from]", from).replace("[content]", escapeJson(content)).replace("[msg]", escapeJson(content)).replace("[org_content]", escapeJson(orgContent)).replace("[device_mark]", escapeJson(deviceMark)).replace("[app_version]", appVersion).replace("[title]", escapeJson(simInfo)).replace("[card_slot]", escapeJson(simInfo)).replace("[receive_time]", receiveTime).replace("[timestamp]", timestamp.toString()).replace("[sign]", sign)
+                message.replace("[from]", from).replace("[content]", escapeJson(content))
+                    .replace("[msg]", escapeJson(content))
+                    .replace("[org_content]", escapeJson(orgContent))
+                    .replace("[device_mark]", escapeJson(deviceMark))
+                    .replace("[app_version]", appVersion).replace("[title]", escapeJson(simInfo))
+                    .replace("[card_slot]", escapeJson(simInfo))
+                    .replace("[receive_time]", receiveTime)
+                    .replace("[timestamp]", timestamp.toString()).replace("[sign]", sign)
             } else {
-                message.replace("[from]", URLEncoder.encode(from, "UTF-8")).replace("[content]", URLEncoder.encode(content, "UTF-8")).replace("[msg]", URLEncoder.encode(content, "UTF-8")).replace("[org_content]", URLEncoder.encode(orgContent, "UTF-8")).replace("[device_mark]", URLEncoder.encode(deviceMark, "UTF-8")).replace("[app_version]", URLEncoder.encode(appVersion, "UTF-8")).replace("[title]", URLEncoder.encode(simInfo, "UTF-8")).replace("[card_slot]", URLEncoder.encode(simInfo, "UTF-8")).replace("[receive_time]", URLEncoder.encode(receiveTime, "UTF-8")).replace("\n", "%0A").replace("[timestamp]", timestamp.toString()).replace("[sign]", sign)
+                message.replace("[from]", URLEncoder.encode(from, "UTF-8"))
+                    .replace("[content]", URLEncoder.encode(content, "UTF-8"))
+                    .replace("[msg]", URLEncoder.encode(content, "UTF-8"))
+                    .replace("[org_content]", URLEncoder.encode(orgContent, "UTF-8"))
+                    .replace("[device_mark]", URLEncoder.encode(deviceMark, "UTF-8"))
+                    .replace("[app_version]", URLEncoder.encode(appVersion, "UTF-8"))
+                    .replace("[title]", URLEncoder.encode(simInfo, "UTF-8"))
+                    .replace("[card_slot]", URLEncoder.encode(simInfo, "UTF-8"))
+                    .replace("[receive_time]", URLEncoder.encode(receiveTime, "UTF-8"))
+                    .replace("\n", "%0A").replace("[timestamp]", timestamp.toString())
+                    .replace("[sign]", sign)
             }
 
             if (setting.method == "TCP" || setting.method == "UDP") {
@@ -74,8 +103,18 @@ class SocketUtils {
                 Log.d(TAG, "连接到服务器: ${setting.address}:${setting.port}")
                 try {
                     // 获取输入流和输出流，设置字符集为UTF-8
-                    val input = BufferedReader(InputStreamReader(socket.getInputStream(), Charset.forName(setting.inCharset)))
-                    val output = BufferedWriter(OutputStreamWriter(socket.getOutputStream(), Charset.forName(setting.outCharset)))
+                    val input = BufferedReader(
+                        InputStreamReader(
+                            socket.getInputStream(),
+                            Charset.forName(setting.inCharset)
+                        )
+                    )
+                    val output = BufferedWriter(
+                        OutputStreamWriter(
+                            socket.getOutputStream(),
+                            Charset.forName(setting.outCharset)
+                        )
+                    )
 
                     // 向服务器发送数据
                     output.write(message)
@@ -86,7 +125,8 @@ class SocketUtils {
                     // 从服务器接收响应
                     val response = input.readLine()
                     Log.d(TAG, "从服务器接收的响应: $response")
-                    val status = if (!setting.response.isNullOrEmpty() && !response.contains(setting.response)) 0 else 2
+                    val status =
+                        if (!setting.response.isNullOrEmpty() && !response.contains(setting.response)) 0 else 2
                     SendUtils.updateLogs(logId, status, response)
                     SendUtils.senderLogic(status, msgInfo, rule, senderIndex, msgId)
                 } catch (e: Exception) {
@@ -108,7 +148,8 @@ class SocketUtils {
                     brokerUrl.plus(setting.path)
                 }
                 Log.d(TAG, "MQTT brokerUrl: $brokerUrl")
-                val clientId = if (TextUtils.isEmpty(setting.clientId)) UUID.randomUUID().toString() else setting.clientId
+                val clientId = if (TextUtils.isEmpty(setting.clientId)) UUID.randomUUID()
+                    .toString() else setting.clientId
                 val mqttClient = MqttClient(brokerUrl, clientId, MemoryPersistence())
                 try {
                     val options = MqttConnectOptions()
@@ -140,9 +181,11 @@ class SocketUtils {
                         }
 
                         override fun messageArrived(topic: String?, inMessage: MqttMessage?) {
-                            val payload = inMessage?.payload?.toString(Charset.forName(setting.inCharset))
+                            val payload =
+                                inMessage?.payload?.toString(Charset.forName(setting.inCharset))
                             Log.d(TAG, "Received message on topic $topic: $payload")
-                            val status = if (!setting.response.isNullOrEmpty() && !payload?.contains(setting.response)!!) 0 else 2
+                            val status =
+                                if (!setting.response.isNullOrEmpty() && !payload?.contains(setting.response)!!) 0 else 2
                             SendUtils.updateLogs(logId, status, payload.toString())
                             SendUtils.senderLogic(status, msgInfo, rule, senderIndex, msgId)
                         }

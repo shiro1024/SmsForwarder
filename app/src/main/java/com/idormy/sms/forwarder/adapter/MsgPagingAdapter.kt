@@ -19,10 +19,15 @@ import com.idormy.sms.forwarder.databinding.AdapterLogsCardViewListItemBinding
 import com.xuexiang.xutil.data.DateUtils
 
 @Suppress("EmptyMethod")
-class MsgPagingAdapter(private val itemClickListener: OnItemClickListener) : PagingDataAdapter<MsgAndLogs, MyViewHolder>(diffCallback) {
+class MsgPagingAdapter(private val itemClickListener: OnItemClickListener) :
+    PagingDataAdapter<MsgAndLogs, MyViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val binding = AdapterLogsCardViewListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = AdapterLogsCardViewListItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return MyViewHolder(binding)
     }
 
@@ -38,7 +43,8 @@ class MsgPagingAdapter(private val itemClickListener: OnItemClickListener) : Pag
 
             holder.binding.layoutLogs.removeAllViews()
             for (logs in item.logsList) {
-                val layoutSenderItem = View.inflate(App.context, R.layout.item_logs, null) as LinearLayout
+                val layoutSenderItem =
+                    View.inflate(App.context, R.layout.item_logs, null) as LinearLayout
                 val ivSenderImage = layoutSenderItem.findViewById<ImageView>(R.id.iv_sender_image)
                 val ivSenderStatus = layoutSenderItem.findViewById<ImageView>(R.id.iv_sender_status)
                 val tvSenderName = layoutSenderItem.findViewById<TextView>(R.id.tv_sender_name)
@@ -57,7 +63,9 @@ class MsgPagingAdapter(private val itemClickListener: OnItemClickListener) : Pag
         }
     }
 
-    class MyViewHolder(val binding: AdapterLogsCardViewListItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class MyViewHolder(val binding: AdapterLogsCardViewListItemBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
     interface OnItemClickListener {
         fun onItemClicked(view: View?, item: MsgAndLogs)
         fun onLogsClicked(view: View?, item: LogsDetail)
@@ -65,15 +73,16 @@ class MsgPagingAdapter(private val itemClickListener: OnItemClickListener) : Pag
     }
 
     companion object {
-        var diffCallback: DiffUtil.ItemCallback<MsgAndLogs> = object : DiffUtil.ItemCallback<MsgAndLogs>() {
-            override fun areItemsTheSame(oldItem: MsgAndLogs, newItem: MsgAndLogs): Boolean {
-                return oldItem.msg.id == newItem.msg.id
-            }
+        var diffCallback: DiffUtil.ItemCallback<MsgAndLogs> =
+            object : DiffUtil.ItemCallback<MsgAndLogs>() {
+                override fun areItemsTheSame(oldItem: MsgAndLogs, newItem: MsgAndLogs): Boolean {
+                    return oldItem.msg.id == newItem.msg.id
+                }
 
-            @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(oldItem: MsgAndLogs, newItem: MsgAndLogs): Boolean {
-                return oldItem.msg === newItem.msg
+                @SuppressLint("DiffUtilEquals")
+                override fun areContentsTheSame(oldItem: MsgAndLogs, newItem: MsgAndLogs): Boolean {
+                    return oldItem.msg === newItem.msg
+                }
             }
-        }
     }
 }

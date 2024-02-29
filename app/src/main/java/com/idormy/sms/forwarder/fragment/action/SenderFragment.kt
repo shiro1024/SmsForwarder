@@ -92,7 +92,8 @@ class SenderFragment : BaseFragment<FragmentTasksActionSenderBinding?>(), View.O
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, 1)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -141,11 +142,27 @@ class SenderFragment : BaseFragment<FragmentTasksActionSenderBinding?>(), View.O
                     try {
                         val settingVo = checkSetting()
                         Log.d(TAG, settingVo.toString())
-                        val taskAction = TaskSetting(TASK_ACTION_SENDER, getString(R.string.task_sender), settingVo.description, Gson().toJson(settingVo), requestCode)
+                        val taskAction = TaskSetting(
+                            TASK_ACTION_SENDER,
+                            getString(R.string.task_sender),
+                            settingVo.description,
+                            Gson().toJson(settingVo),
+                            requestCode
+                        )
                         val taskActionsJson = Gson().toJson(arrayListOf(taskAction))
-                        val msgInfo = MsgInfo("task", getString(R.string.task_sender), settingVo.description, Date(), getString(R.string.task_sender))
-                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0).putString(TaskWorker.taskActions, taskActionsJson).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val msgInfo = MsgInfo(
+                            "task",
+                            getString(R.string.task_sender),
+                            settingVo.description,
+                            Date(),
+                            getString(R.string.task_sender)
+                        )
+                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0)
+                            .putString(TaskWorker.taskActions, taskActionsJson)
+                            .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     } catch (e: Exception) {
                         mCountDownHelper?.finish()
@@ -239,44 +256,58 @@ class SenderFragment : BaseFragment<FragmentTasksActionSenderBinding?>(), View.O
 
     //获取发送通道列表
     private fun getSenderList() {
-        Core.sender.getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<List<Sender>> {
-            override fun onSubscribe(d: Disposable) {}
+        Core.sender.getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<List<Sender>> {
+                override fun onSubscribe(d: Disposable) {}
 
-            override fun onError(e: Throwable) {
-                e.printStackTrace()
-                Log.e(TAG, "getSenderList error: ${e.message}")
-            }
-
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onSuccess(senderList: List<Sender>) {
-                if (senderList.isEmpty()) {
-                    XToastUtils.error(R.string.add_sender_first)
-                    return
+                override fun onError(e: Throwable) {
+                    e.printStackTrace()
+                    Log.e(TAG, "getSenderList error: ${e.message}")
                 }
 
-                senderSpinnerList.clear()
-                senderListAll = senderList as MutableList<Sender>
-                for (sender in senderList) {
-                    val name = if (sender.name.length > 20) sender.name.substring(0, 19) else sender.name
-                    senderSpinnerList.add(SenderSpinnerItem(name, getDrawable(sender.imageId), sender.id, sender.status))
-                }
-                senderSpinnerAdapter = SenderSpinnerAdapter(senderSpinnerList).setIsFilterKey(true).setFilterColor("#EF5362").setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
-                binding!!.spSender.setAdapter(senderSpinnerAdapter)
-                //senderSpinnerAdapter.notifyDataSetChanged()
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onSuccess(senderList: List<Sender>) {
+                    if (senderList.isEmpty()) {
+                        XToastUtils.error(R.string.add_sender_first)
+                        return
+                    }
 
-                //更新senderListSelected的状态与名称
-                senderListSelected.forEach {
-                    senderListAll.forEach { sender ->
-                        if (it.id == sender.id) {
-                            it.name = sender.name
-                            it.status = sender.status
+                    senderSpinnerList.clear()
+                    senderListAll = senderList as MutableList<Sender>
+                    for (sender in senderList) {
+                        val name = if (sender.name.length > 20) sender.name.substring(
+                            0,
+                            19
+                        ) else sender.name
+                        senderSpinnerList.add(
+                            SenderSpinnerItem(
+                                name,
+                                getDrawable(sender.imageId),
+                                sender.id,
+                                sender.status
+                            )
+                        )
+                    }
+                    senderSpinnerAdapter =
+                        SenderSpinnerAdapter(senderSpinnerList).setIsFilterKey(true)
+                            .setFilterColor("#EF5362")
+                            .setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
+                    binding!!.spSender.setAdapter(senderSpinnerAdapter)
+                    //senderSpinnerAdapter.notifyDataSetChanged()
+
+                    //更新senderListSelected的状态与名称
+                    senderListSelected.forEach {
+                        senderListAll.forEach { sender ->
+                            if (it.id == sender.id) {
+                                it.name = sender.name
+                                it.status = sender.status
+                            }
                         }
                     }
-                }
-                senderRecyclerAdapter.notifyDataSetChanged()
+                    senderRecyclerAdapter.notifyDataSetChanged()
 
-            }
-        })
+                }
+            })
     }
 
     //检查设置
@@ -295,7 +326,8 @@ class SenderFragment : BaseFragment<FragmentTasksActionSenderBinding?>(), View.O
             status = 0
             description.append(getString(R.string.disable))
         }
-        description.append(getString(R.string.menu_senders)).append(", ").append(getString(R.string.specified_sender)).append(": ")
+        description.append(getString(R.string.menu_senders)).append(", ")
+            .append(getString(R.string.specified_sender)).append(": ")
         description.append(senderListSelected.joinToString(",") { it.name })
 
         return SenderSetting(description.toString(), status, senderListSelected)

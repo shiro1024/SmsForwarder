@@ -65,7 +65,8 @@ class TaskSpinnerAdapter<T> : BaseEditSpinnerAdapter<T>, EditSpinnerFilter {
         var convertView = convertView
         val holder: ViewHolder
         if (convertView == null) {
-            convertView = LayoutInflater.from(parent.context).inflate(R.layout.item_spinner_with_icon, parent, false)
+            convertView = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_spinner_with_icon, parent, false)
             holder = ViewHolder(convertView, mTextColor, mTextSize, mBackgroundSelector)
             convertView.tag = holder
         } else {
@@ -101,7 +102,12 @@ class TaskSpinnerAdapter<T> : BaseEditSpinnerAdapter<T>, EditSpinnerFilter {
                     if (getDataSourceString(i).contains(keyword, ignoreCase = true)) {
                         mIndexs[mDisplayData.size] = i
                         if (mIsFilterKey) {
-                            mDisplayData.add(getDataSourceString(i).replaceFirst(keyword.toRegex(), "<font color=\"$mFilterColor\">$keyword</font>"))
+                            mDisplayData.add(
+                                getDataSourceString(i).replaceFirst(
+                                    keyword.toRegex(),
+                                    "<font color=\"$mFilterColor\">$keyword</font>"
+                                )
+                            )
                         } else {
                             mDisplayData.add(getDataSourceString(i))
                         }
@@ -143,7 +149,12 @@ class TaskSpinnerAdapter<T> : BaseEditSpinnerAdapter<T>, EditSpinnerFilter {
     }
 
     @SuppressLint("ObsoleteSdkInt")
-    private class ViewHolder(convertView: View, @ColorInt textColor: Int, textSize: Float, @DrawableRes backgroundSelector: Int) {
+    private class ViewHolder(
+        convertView: View,
+        @ColorInt textColor: Int,
+        textSize: Float,
+        @DrawableRes backgroundSelector: Int
+    ) {
         val iconView: ImageView = convertView.findViewById(R.id.iv_icon)
         val statusView: ImageView = convertView.findViewById(R.id.iv_status)
         val titleView: TextView = convertView.findViewById(R.id.tv_title)

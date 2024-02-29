@@ -6,7 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
 @Suppress("LeakingThis", "UNCHECKED_CAST")
-class DrawerAdapter(private val items: List<DrawerItem<out ViewHolder>>) : RecyclerView.Adapter<DrawerAdapter.ViewHolder>() {
+class DrawerAdapter(private val items: List<DrawerItem<out ViewHolder>>) :
+    RecyclerView.Adapter<DrawerAdapter.ViewHolder>() {
 
     private val viewTypes: MutableMap<Class<out DrawerItem<*>>, Int> = HashMap()
     private val holderFactories = SparseArray<DrawerItem<*>>()
@@ -65,7 +66,8 @@ class DrawerAdapter(private val items: List<DrawerItem<out ViewHolder>>) : Recyc
     }
 
     @Suppress("DEPRECATION")
-    abstract class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    abstract class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
         var adapter: DrawerAdapter? = null
 
         init {

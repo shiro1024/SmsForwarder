@@ -87,7 +87,8 @@ class WebhookFragment : BaseFragment<FragmentSendersWebhookBinding?>(), View.OnC
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, SettingUtils.requestTimeout)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -106,7 +107,8 @@ class WebhookFragment : BaseFragment<FragmentSendersWebhookBinding?>(), View.OnC
 
         //编辑
         binding!!.btnDel.setText(R.string.del)
-        Core.sender.get(senderId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
+        Core.sender.get(senderId).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
             override fun onSubscribe(d: Disposable) {}
 
             override fun onError(e: Throwable) {
@@ -151,7 +153,8 @@ class WebhookFragment : BaseFragment<FragmentSendersWebhookBinding?>(), View.OnC
         binding!!.btnAddHeader.setOnClickListener {
             addHeaderItemLinearLayout(headerItemMap, binding!!.layoutHeaders, null, null)
         }
-        LiveEventBus.get(KEY_SENDER_TEST, String::class.java).observe(this) { mCountDownHelper?.finish() }
+        LiveEventBus.get(KEY_SENDER_TEST, String::class.java)
+            .observe(this) { mCountDownHelper?.finish() }
     }
 
     @SingleClick
@@ -164,13 +167,22 @@ class WebhookFragment : BaseFragment<FragmentSendersWebhookBinding?>(), View.OnC
                         try {
                             val settingVo = checkSetting()
                             Log.d(TAG, settingVo.toString())
-                            val name = binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() } ?: getString(R.string.test_sender_name)
-                            val msgInfo = MsgInfo("sms", getString(R.string.test_phone_num), String.format(getString(R.string.test_sender_sms), name), Date(), getString(R.string.test_sim_info))
+                            val name =
+                                binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() }
+                                    ?: getString(R.string.test_sender_name)
+                            val msgInfo = MsgInfo(
+                                "sms",
+                                getString(R.string.test_phone_num),
+                                String.format(getString(R.string.test_sender_sms), name),
+                                Date(),
+                                getString(R.string.test_sim_info)
+                            )
                             WebhookUtils.sendMsg(settingVo, msgInfo)
                         } catch (e: Exception) {
                             e.printStackTrace()
                             Log.e(TAG, "onClick: $e")
-                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java).post(e.message.toString())
+                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java)
+                                .post(e.message.toString())
                         }
                         LiveEventBus.get(KEY_SENDER_TEST, String::class.java).post("finish")
                     }.start()
@@ -183,11 +195,14 @@ class WebhookFragment : BaseFragment<FragmentSendersWebhookBinding?>(), View.OnC
                         return
                     }
 
-                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title).content(R.string.delete_sender_tips).positiveText(R.string.lab_yes).negativeText(R.string.lab_no).onPositive { _: MaterialDialog?, _: DialogAction? ->
-                        viewModel.delete(senderId)
-                        XToastUtils.success(R.string.delete_sender_toast)
-                        popToBack()
-                    }.show()
+                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title)
+                        .content(R.string.delete_sender_tips).positiveText(R.string.lab_yes)
+                        .negativeText(R.string.lab_no)
+                        .onPositive { _: MaterialDialog?, _: DialogAction? ->
+                            viewModel.delete(senderId)
+                            XToastUtils.success(R.string.delete_sender_toast)
+                            popToBack()
+                        }.show()
                     return
                 }
 
@@ -200,7 +215,8 @@ class WebhookFragment : BaseFragment<FragmentSendersWebhookBinding?>(), View.OnC
                     val status = if (binding!!.sbEnable.isChecked) 1 else 0
                     val settingVo = checkSetting()
                     if (isClone) senderId = 0
-                    val senderNew = Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
+                    val senderNew =
+                        Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
                     Log.d(TAG, senderNew.toString())
 
                     viewModel.insertOrUpdate(senderNew)
@@ -249,13 +265,20 @@ class WebhookFragment : BaseFragment<FragmentSendersWebhookBinding?>(), View.OnC
      * @param value                        header的value，为空则不设置
      */
     private fun addHeaderItemLinearLayout(
-        headerItemMap: MutableMap<Int, LinearLayout>, linearLayoutWebNotifyHeaders: LinearLayout, key: String?, value: String?
+        headerItemMap: MutableMap<Int, LinearLayout>,
+        linearLayoutWebNotifyHeaders: LinearLayout,
+        key: String?,
+        value: String?
     ) {
-        val linearLayoutItemAddHeader = View.inflate(requireContext(), R.layout.item_add_header, null) as LinearLayout
-        val imageViewRemoveHeader = linearLayoutItemAddHeader.findViewById<ImageView>(R.id.imageViewRemoveHeader)
+        val linearLayoutItemAddHeader =
+            View.inflate(requireContext(), R.layout.item_add_header, null) as LinearLayout
+        val imageViewRemoveHeader =
+            linearLayoutItemAddHeader.findViewById<ImageView>(R.id.imageViewRemoveHeader)
         if (key != null && value != null) {
-            val editTextHeaderKey = linearLayoutItemAddHeader.findViewById<EditText>(R.id.editTextHeaderKey)
-            val editTextHeaderValue = linearLayoutItemAddHeader.findViewById<EditText>(R.id.editTextHeaderValue)
+            val editTextHeaderKey =
+                linearLayoutItemAddHeader.findViewById<EditText>(R.id.editTextHeaderKey)
+            val editTextHeaderValue =
+                linearLayoutItemAddHeader.findViewById<EditText>(R.id.editTextHeaderValue)
             editTextHeaderKey.setText(key)
             editTextHeaderValue.setText(value)
         }

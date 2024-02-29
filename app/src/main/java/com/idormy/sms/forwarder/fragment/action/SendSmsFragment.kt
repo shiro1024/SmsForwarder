@@ -81,7 +81,8 @@ class SendSmsFragment : BaseFragment<FragmentTasksActionSendSmsBinding?>(), View
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, 1)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -94,7 +95,8 @@ class SendSmsFragment : BaseFragment<FragmentTasksActionSendSmsBinding?>(), View
         //卡槽信息
         val serverConfigStr = HttpServerUtils.serverConfig
         if (!TextUtils.isEmpty(serverConfigStr)) {
-            val serverConfig: ConfigData = Gson().fromJson(serverConfigStr, object : TypeToken<ConfigData>() {}.type)
+            val serverConfig: ConfigData =
+                Gson().fromJson(serverConfigStr, object : TypeToken<ConfigData>() {}.type)
             binding!!.rbSimSlot1.text = "SIM1：" + serverConfig.extraSim1
             binding!!.rbSimSlot2.text = "SIM2：" + serverConfig.extraSim2
         }
@@ -127,9 +129,10 @@ class SendSmsFragment : BaseFragment<FragmentTasksActionSendSmsBinding?>(), View
         LiveEventBus.get(EVENT_KEY_SIM_SLOT, Int::class.java).observeSticky(this) { value: Int ->
             binding!!.rgSimSlot.check(if (value == 1) R.id.rb_sim_slot_2 else R.id.rb_sim_slot_1)
         }
-        LiveEventBus.get(EVENT_KEY_PHONE_NUMBERS, String::class.java).observeSticky(this) { value: String ->
-            binding!!.etPhoneNumbers.setText(value)
-        }
+        LiveEventBus.get(EVENT_KEY_PHONE_NUMBERS, String::class.java)
+            .observeSticky(this) { value: String ->
+                binding!!.etPhoneNumbers.setText(value)
+            }
     }
 
     @SingleClick
@@ -148,11 +151,29 @@ class SendSmsFragment : BaseFragment<FragmentTasksActionSendSmsBinding?>(), View
                                 try {
                                     val settingVo = checkSetting()
                                     Log.d(TAG, settingVo.toString())
-                                    val taskAction = TaskSetting(TASK_ACTION_SENDSMS, getString(R.string.task_sendsms), settingVo.description, Gson().toJson(settingVo), requestCode)
+                                    val taskAction = TaskSetting(
+                                        TASK_ACTION_SENDSMS,
+                                        getString(R.string.task_sendsms),
+                                        settingVo.description,
+                                        Gson().toJson(settingVo),
+                                        requestCode
+                                    )
                                     val taskActionsJson = Gson().toJson(arrayListOf(taskAction))
-                                    val msgInfo = MsgInfo("task", getString(R.string.task_sendsms), settingVo.description, Date(), getString(R.string.task_sendsms))
-                                    val actionData = Data.Builder().putLong(TaskWorker.taskId, 0).putString(TaskWorker.taskActions, taskActionsJson).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                                    val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                                    val msgInfo = MsgInfo(
+                                        "task",
+                                        getString(R.string.task_sendsms),
+                                        settingVo.description,
+                                        Date(),
+                                        getString(R.string.task_sendsms)
+                                    )
+                                    val actionData = Data.Builder().putLong(TaskWorker.taskId, 0)
+                                        .putString(TaskWorker.taskActions, taskActionsJson)
+                                        .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo))
+                                        .build()
+                                    val actionRequest =
+                                        OneTimeWorkRequestBuilder<ActionWorker>().setInputData(
+                                            actionData
+                                        ).build()
                                     WorkManager.getInstance().enqueue(actionRequest)
                                 } catch (e: Exception) {
                                     mCountDownHelper?.finish()
@@ -164,7 +185,10 @@ class SendSmsFragment : BaseFragment<FragmentTasksActionSendSmsBinding?>(), View
                             }
 
                             override fun onDenied(permissions: List<String>, never: Boolean) {
-                                XToastUtils.error(getString(R.string.no_sms_sending_permission), 30000)
+                                XToastUtils.error(
+                                    getString(R.string.no_sms_sending_permission),
+                                    30000
+                                )
                             }
                         })
                     return

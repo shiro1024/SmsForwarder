@@ -65,7 +65,8 @@ class ResendFragment : BaseFragment<FragmentTasksActionResendBinding?>(), View.O
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, 1)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -107,11 +108,27 @@ class ResendFragment : BaseFragment<FragmentTasksActionResendBinding?>(), View.O
                     try {
                         val settingVo = checkSetting()
                         Log.d(TAG, settingVo.toString())
-                        val taskAction = TaskSetting(TASK_ACTION_RESEND, getString(R.string.task_resend), settingVo.description, Gson().toJson(settingVo), requestCode)
+                        val taskAction = TaskSetting(
+                            TASK_ACTION_RESEND,
+                            getString(R.string.task_resend),
+                            settingVo.description,
+                            Gson().toJson(settingVo),
+                            requestCode
+                        )
                         val taskActionsJson = Gson().toJson(arrayListOf(taskAction))
-                        val msgInfo = MsgInfo("task", getString(R.string.task_resend), settingVo.description, Date(), getString(R.string.task_resend))
-                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0).putString(TaskWorker.taskActions, taskActionsJson).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val msgInfo = MsgInfo(
+                            "task",
+                            getString(R.string.task_resend),
+                            settingVo.description,
+                            Date(),
+                            getString(R.string.task_resend)
+                        )
+                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0)
+                            .putString(TaskWorker.taskActions, taskActionsJson)
+                            .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     } catch (e: Exception) {
                         mCountDownHelper?.finish()
@@ -165,7 +182,11 @@ class ResendFragment : BaseFragment<FragmentTasksActionResendBinding?>(), View.O
         if (statusList.isEmpty()) {
             throw Exception(getString(R.string.task_resend_error))
         }
-        val description = String.format(getString(R.string.task_resend_desc), hours, statusStrList.joinToString("/"))
+        val description = String.format(
+            getString(R.string.task_resend_desc),
+            hours,
+            statusStrList.joinToString("/")
+        )
         return ResendSetting(description, hours, statusList)
     }
 }

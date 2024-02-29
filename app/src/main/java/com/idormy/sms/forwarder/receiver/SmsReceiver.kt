@@ -165,7 +165,8 @@ class SmsReceiver : BroadcastReceiver() {
                 // 遍历 MMS 的各个部分
                 parts?.forEach { part ->
                     // 获取部分的内容类型
-                    val contentType = part?.javaClass?.getMethod("getContentType")?.invoke(part) as? String
+                    val contentType =
+                        part?.javaClass?.getMethod("getContentType")?.invoke(part) as? String
 
                     // 处理文本部分
                     if (contentType?.startsWith("text/plain") == true) {
@@ -179,7 +180,8 @@ class SmsReceiver : BroadcastReceiver() {
 
                     // 处理图像部分
                     if (contentType?.startsWith("image/") == true) {
-                        val imageData = part.javaClass.getMethod("getData").invoke(part) as? ByteArray
+                        val imageData =
+                            part.javaClass.getMethod("getData").invoke(part) as? ByteArray
                         // 处理图像信息
                         if (imageData != null) {
                             // 在这里你可以保存图像数据或进行其他处理

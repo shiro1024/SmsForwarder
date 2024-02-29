@@ -76,8 +76,16 @@ object RuleLineUtils {
         if (currentRuleLine.getChildRuleLine() != null) {
             logg(" child:" + currentRuleLine.getChildRuleLine())
             currentAll = when (currentRuleLine.getChildRuleLine()!!.conjunction) {
-                RuleLine.CONJUNCTION_AND -> currentAll && checkRuleTree(msg, currentRuleLine.getChildRuleLine())
-                RuleLine.CONJUNCTION_OR -> currentAll || checkRuleTree(msg, currentRuleLine.getChildRuleLine())
+                RuleLine.CONJUNCTION_AND -> currentAll && checkRuleTree(
+                    msg,
+                    currentRuleLine.getChildRuleLine()
+                )
+
+                RuleLine.CONJUNCTION_OR -> currentAll || checkRuleTree(
+                    msg,
+                    currentRuleLine.getChildRuleLine()
+                )
+
                 else -> throw Exception("child wrong conjunction")
             }
         }
@@ -86,8 +94,16 @@ object RuleLineUtils {
         if (currentRuleLine.getNextRuleLine() != null) {
             logg("next:" + currentRuleLine.getNextRuleLine())
             currentAll = when (currentRuleLine.getNextRuleLine()!!.conjunction) {
-                RuleLine.CONJUNCTION_AND -> currentAll && checkRuleTree(msg, currentRuleLine.getNextRuleLine())
-                RuleLine.CONJUNCTION_OR -> currentAll || checkRuleTree(msg, currentRuleLine.getNextRuleLine())
+                RuleLine.CONJUNCTION_AND -> currentAll && checkRuleTree(
+                    msg,
+                    currentRuleLine.getNextRuleLine()
+                )
+
+                RuleLine.CONJUNCTION_OR -> currentAll || checkRuleTree(
+                    msg,
+                    currentRuleLine.getNextRuleLine()
+                )
+
                 else -> throw Exception("next wrong conjunction")
             }
         }

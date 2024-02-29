@@ -38,7 +38,8 @@ import java.util.Date
 
 @Page(name = "HttpServer")
 @Suppress("PrivatePropertyName", "DEPRECATION")
-class HttpServerFragment : BaseFragment<FragmentTasksActionHttpServerBinding?>(), View.OnClickListener {
+class HttpServerFragment : BaseFragment<FragmentTasksActionHttpServerBinding?>(),
+    View.OnClickListener {
 
     private val TAG: String = HttpServerFragment::class.java.simpleName
     private var titleBar: TitleBar? = null
@@ -70,7 +71,8 @@ class HttpServerFragment : BaseFragment<FragmentTasksActionHttpServerBinding?>()
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, 1)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -147,11 +149,27 @@ class HttpServerFragment : BaseFragment<FragmentTasksActionHttpServerBinding?>()
                     try {
                         val settingVo = checkSetting()
                         Log.d(TAG, settingVo.toString())
-                        val taskAction = TaskSetting(TASK_ACTION_HTTPSERVER, getString(R.string.task_http_server), settingVo.description, Gson().toJson(settingVo), requestCode)
+                        val taskAction = TaskSetting(
+                            TASK_ACTION_HTTPSERVER,
+                            getString(R.string.task_http_server),
+                            settingVo.description,
+                            Gson().toJson(settingVo),
+                            requestCode
+                        )
                         val taskActionsJson = Gson().toJson(arrayListOf(taskAction))
-                        val msgInfo = MsgInfo("task", getString(R.string.task_http_server), settingVo.description, Date(), getString(R.string.task_http_server))
-                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0).putString(TaskWorker.taskActions, taskActionsJson).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val msgInfo = MsgInfo(
+                            "task",
+                            getString(R.string.task_http_server),
+                            settingVo.description,
+                            Date(),
+                            getString(R.string.task_http_server)
+                        )
+                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0)
+                            .putString(TaskWorker.taskActions, taskActionsJson)
+                            .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     } catch (e: Exception) {
                         mCountDownHelper?.finish()
@@ -191,40 +209,62 @@ class HttpServerFragment : BaseFragment<FragmentTasksActionHttpServerBinding?>()
         val disableList = mutableListOf<String>()
 
         val enableApiClone = binding!!.sbApiClone.isChecked
-        if (enableApiClone) enableList.add(getString(R.string.api_clone)) else disableList.add(getString(R.string.api_clone))
+        if (enableApiClone) enableList.add(getString(R.string.api_clone)) else disableList.add(
+            getString(R.string.api_clone)
+        )
 
         val enableApiSmsSend = binding!!.sbApiSendSms.isChecked
-        if (enableApiSmsSend) enableList.add(getString(R.string.api_sms_query)) else disableList.add(getString(R.string.api_sms_query))
+        if (enableApiSmsSend) enableList.add(getString(R.string.api_sms_query)) else disableList.add(
+            getString(R.string.api_sms_query)
+        )
 
         val enableApiSmsQuery = binding!!.sbApiQuerySms.isChecked
-        if (enableApiSmsQuery) enableList.add(getString(R.string.api_sms_send)) else disableList.add(getString(R.string.api_sms_send))
+        if (enableApiSmsQuery) enableList.add(getString(R.string.api_sms_send)) else disableList.add(
+            getString(R.string.api_sms_send)
+        )
 
         val enableApiCallQuery = binding!!.sbApiQueryCall.isChecked
-        if (enableApiCallQuery) enableList.add(getString(R.string.api_call_query)) else disableList.add(getString(R.string.api_call_query))
+        if (enableApiCallQuery) enableList.add(getString(R.string.api_call_query)) else disableList.add(
+            getString(R.string.api_call_query)
+        )
 
         val enableApiContactQuery = binding!!.sbApiQueryContacts.isChecked
-        if (enableApiContactQuery) enableList.add(getString(R.string.api_contact_query)) else disableList.add(getString(R.string.api_contact_query))
+        if (enableApiContactQuery) enableList.add(getString(R.string.api_contact_query)) else disableList.add(
+            getString(R.string.api_contact_query)
+        )
 
         val enableApiContactAdd = binding!!.sbApiAddContacts.isChecked
-        if (enableApiContactAdd) enableList.add(getString(R.string.api_contact_add)) else disableList.add(getString(R.string.api_contact_add))
+        if (enableApiContactAdd) enableList.add(getString(R.string.api_contact_add)) else disableList.add(
+            getString(R.string.api_contact_add)
+        )
 
         val enableApiWol = binding!!.sbApiWol.isChecked
-        if (enableApiWol) enableList.add(getString(R.string.api_wol)) else disableList.add(getString(R.string.api_wol))
+        if (enableApiWol) enableList.add(getString(R.string.api_wol)) else disableList.add(
+            getString(
+                R.string.api_wol
+            )
+        )
 
         val enableApiLocation = binding!!.sbApiLocation.isChecked
-        if (enableApiLocation) enableList.add(getString(R.string.api_location)) else disableList.add(getString(R.string.api_location))
+        if (enableApiLocation) enableList.add(getString(R.string.api_location)) else disableList.add(
+            getString(R.string.api_location)
+        )
 
         val enableApiBatteryQuery = binding!!.sbApiQueryBattery.isChecked
-        if (enableApiBatteryQuery) enableList.add(getString(R.string.api_battery_query)) else disableList.add(getString(R.string.api_battery_query))
+        if (enableApiBatteryQuery) enableList.add(getString(R.string.api_battery_query)) else disableList.add(
+            getString(R.string.api_battery_query)
+        )
 
         val description = StringBuilder()
         val action = if (binding!!.rgHttpServerState.checkedRadioButtonId == R.id.rb_start_server) {
             description.append(getString(R.string.start_server))
             if (enableList.isNotEmpty()) {
-                description.append(", ").append(getString(R.string.enable_function)).append(": ").append(enableList.joinToString(","))
+                description.append(", ").append(getString(R.string.enable_function)).append(": ")
+                    .append(enableList.joinToString(","))
             }
             if (disableList.isNotEmpty()) {
-                description.append(", ").append(getString(R.string.disable_function)).append(": ").append(disableList.joinToString(","))
+                description.append(", ").append(getString(R.string.disable_function)).append(": ")
+                    .append(disableList.joinToString(","))
             }
             "start"
         } else {
@@ -232,7 +272,19 @@ class HttpServerFragment : BaseFragment<FragmentTasksActionHttpServerBinding?>()
             "stop"
         }
 
-        return HttpServerSetting(description.toString(), action, enableApiClone, enableApiSmsSend, enableApiSmsQuery, enableApiCallQuery, enableApiContactQuery, enableApiContactAdd, enableApiWol, enableApiLocation, enableApiBatteryQuery)
+        return HttpServerSetting(
+            description.toString(),
+            action,
+            enableApiClone,
+            enableApiSmsSend,
+            enableApiSmsQuery,
+            enableApiCallQuery,
+            enableApiContactQuery,
+            enableApiContactAdd,
+            enableApiWol,
+            enableApiLocation,
+            enableApiBatteryQuery
+        )
     }
 
     //发送短信权限
@@ -308,22 +360,23 @@ class HttpServerFragment : BaseFragment<FragmentTasksActionHttpServerBinding?>()
 
     //联系人权限
     private fun checkContactsPermission() {
-        XXPermissions.with(this).permission(*Permission.Group.CONTACTS).request(object : OnPermissionCallback {
-            override fun onGranted(permissions: List<String>, all: Boolean) {
-            }
-
-            override fun onDenied(permissions: List<String>, never: Boolean) {
-                if (never) {
-                    XToastUtils.error(R.string.toast_denied_never)
-                    // 如果是被永久拒绝就跳转到应用权限系统设置页面
-                    XXPermissions.startPermissionActivity(requireContext(), permissions)
-                } else {
-                    XToastUtils.error(R.string.toast_denied)
+        XXPermissions.with(this).permission(*Permission.Group.CONTACTS)
+            .request(object : OnPermissionCallback {
+                override fun onGranted(permissions: List<String>, all: Boolean) {
                 }
-                binding!!.sbApiQueryContacts.isChecked = false
-                binding!!.sbApiAddContacts.isChecked = false
-            }
-        })
+
+                override fun onDenied(permissions: List<String>, never: Boolean) {
+                    if (never) {
+                        XToastUtils.error(R.string.toast_denied_never)
+                        // 如果是被永久拒绝就跳转到应用权限系统设置页面
+                        XXPermissions.startPermissionActivity(requireContext(), permissions)
+                    } else {
+                        XToastUtils.error(R.string.toast_denied)
+                    }
+                    binding!!.sbApiQueryContacts.isChecked = false
+                    binding!!.sbApiAddContacts.isChecked = false
+                }
+            })
     }
 
 }

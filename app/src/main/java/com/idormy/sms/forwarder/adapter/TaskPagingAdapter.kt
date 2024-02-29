@@ -19,10 +19,15 @@ import com.idormy.sms.forwarder.entity.TaskSetting
 import com.xuexiang.xutil.data.DateUtils
 
 @Suppress("EmptyMethod")
-class TaskPagingAdapter(private val itemClickListener: OnItemClickListener) : PagingDataAdapter<Task, MyViewHolder>(diffCallback) {
+class TaskPagingAdapter(private val itemClickListener: OnItemClickListener) :
+    PagingDataAdapter<Task, MyViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val binding = AdapterTasksCardViewListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = AdapterTasksCardViewListItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return MyViewHolder(binding)
     }
 
@@ -33,15 +38,20 @@ class TaskPagingAdapter(private val itemClickListener: OnItemClickListener) : Pa
             if (item.type >= 1000) {
                 holder.binding.layoutImage.visibility = View.GONE
 
-                holder.binding.tvTime.text = DateUtils.getFriendlyTimeSpanByNow(item.lastExecTime.time)
+                holder.binding.tvTime.text =
+                    DateUtils.getFriendlyTimeSpanByNow(item.lastExecTime.time)
 
                 //遍历conditions显示图标
                 holder.binding.layoutConditionsIcons.removeAllViews()
                 if (item.conditions.isNotEmpty()) {
-                    val conditionList = Gson().fromJson(item.conditions, Array<TaskSetting>::class.java).toMutableList()
+                    val conditionList =
+                        Gson().fromJson(item.conditions, Array<TaskSetting>::class.java)
+                            .toMutableList()
                     for (condition in conditionList) {
-                        val layoutConditionItem = View.inflate(App.context, R.layout.item_setting, null) as LinearLayout
-                        val ivConditionIcon = layoutConditionItem.findViewById<ImageView>(R.id.iv_setting_icon)
+                        val layoutConditionItem =
+                            View.inflate(App.context, R.layout.item_setting, null) as LinearLayout
+                        val ivConditionIcon =
+                            layoutConditionItem.findViewById<ImageView>(R.id.iv_setting_icon)
                         if (item.status == 0) {
                             ivConditionIcon.setImageResource(condition.greyIconId)
                         } else {
@@ -54,10 +64,13 @@ class TaskPagingAdapter(private val itemClickListener: OnItemClickListener) : Pa
                 //遍历actions显示图标
                 holder.binding.layoutActionsIcons.removeAllViews()
                 if (item.actions.isNotEmpty()) {
-                    val actionList = Gson().fromJson(item.actions, Array<TaskSetting>::class.java).toMutableList()
+                    val actionList = Gson().fromJson(item.actions, Array<TaskSetting>::class.java)
+                        .toMutableList()
                     for (action in actionList) {
-                        val layoutActionItem = View.inflate(App.context, R.layout.item_setting, null) as LinearLayout
-                        val ivActionIcon = layoutActionItem.findViewById<ImageView>(R.id.iv_setting_icon)
+                        val layoutActionItem =
+                            View.inflate(App.context, R.layout.item_setting, null) as LinearLayout
+                        val ivActionIcon =
+                            layoutActionItem.findViewById<ImageView>(R.id.iv_setting_icon)
                         if (item.status == 0) {
                             ivActionIcon.setImageResource(action.greyIconId)
                         } else {
@@ -112,7 +125,9 @@ class TaskPagingAdapter(private val itemClickListener: OnItemClickListener) : Pa
         }
     }
 
-    class MyViewHolder(val binding: AdapterTasksCardViewListItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class MyViewHolder(val binding: AdapterTasksCardViewListItemBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
     interface OnItemClickListener {
         fun onItemClicked(view: View?, item: Task)
         fun onItemRemove(view: View?, id: Int)

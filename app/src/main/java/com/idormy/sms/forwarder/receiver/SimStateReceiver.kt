@@ -4,12 +4,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.telephony.TelephonyManager
-import com.idormy.sms.forwarder.utils.Log
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.idormy.sms.forwarder.R
 import com.idormy.sms.forwarder.utils.DELAY_TIME_AFTER_SIM_READY
+import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.utils.SettingUtils
 import com.idormy.sms.forwarder.utils.TASK_CONDITION_SIM
 import com.idormy.sms.forwarder.utils.TaskWorker
@@ -32,7 +32,8 @@ class SimStateReceiver : BroadcastReceiver() {
 
         // 处理 SIM 卡状态变化的逻辑
         val simStateOld = TaskUtils.simState
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
         // 获取当前 SIM 卡状态
         val simStateNew = telephonyManager.simState

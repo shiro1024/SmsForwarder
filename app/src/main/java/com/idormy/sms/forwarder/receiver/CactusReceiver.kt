@@ -3,9 +3,9 @@ package com.idormy.sms.forwarder.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.idormy.sms.forwarder.utils.Log
 import com.gyf.cactus.Cactus
 import com.idormy.sms.forwarder.App
+import com.idormy.sms.forwarder.utils.Log
 
 //接收Cactus广播
 class CactusReceiver : BroadcastReceiver() {
@@ -18,12 +18,15 @@ class CactusReceiver : BroadcastReceiver() {
                         this + "--" + intent.getIntExtra(Cactus.CACTUS_TIMES, 0)
                     )
                 }
+
                 Cactus.CACTUS_STOP -> {
                     Log.d(App.TAG, this)
                 }
+
                 Cactus.CACTUS_BACKGROUND -> {
                     Log.d(App.TAG, this)
                 }
+
                 Cactus.CACTUS_FOREGROUND -> {
                     Log.d(App.TAG, this)
                 }

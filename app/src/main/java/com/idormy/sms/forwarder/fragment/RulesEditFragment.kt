@@ -54,7 +54,8 @@ import java.util.*
 
 @Page(name = "转发规则·编辑器")
 @Suppress("PrivatePropertyName")
-class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClickListener,
+    CompoundButton.OnCheckedChangeListener {
 
     private val TAG: String = RulesEditFragment::class.java.simpleName
     private var titleBar: TitleBar? = null
@@ -145,7 +146,8 @@ class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClic
                 //初始化APP下拉列表
                 initAppSpinner()
                 //监听已安装App信息列表加载完成事件
-                LiveEventBus.get(EVENT_LOAD_APP_LIST, String::class.java).observeStickyForever(appListObserver)
+                LiveEventBus.get(EVENT_LOAD_APP_LIST, String::class.java)
+                    .observeStickyForever(appListObserver)
             }
 
             "call" -> {
@@ -222,7 +224,8 @@ class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClic
 
         binding!!.rgFiled.setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
             if (ruleType == "app" && appListSpinnerList.isNotEmpty()) {
-                binding!!.layoutAppList.visibility = if (checkedId == R.id.rb_inform_content) View.GONE else View.VISIBLE
+                binding!!.layoutAppList.visibility =
+                    if (checkedId == R.id.rb_inform_content) View.GONE else View.VISIBLE
             }
             when (checkedId) {
                 R.id.rb_transpond_all -> {
@@ -310,61 +313,91 @@ class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClic
             val etSmsTemplate: EditText = binding!!.etSmsTemplate
             when (v.id) {
                 R.id.btn_silent_period -> {
-                    OptionsPickerBuilder(context, OnOptionsSelectListener { _: View?, options1: Int, options2: Int, _: Int ->
-                        silentPeriodStart = options1
-                        silentPeriodEnd = options2
-                        val txt = mTimeOption[options1] + " ~ " + mTimeOption[options2]
-                        binding!!.tvSilentPeriod.text = txt
-                        XToastUtils.toast(txt)
-                        return@OnOptionsSelectListener false
-                    }).setTitleText(getString(R.string.select_time_period)).setSelectOptions(silentPeriodStart, silentPeriodEnd).build<Any>().also {
+                    OptionsPickerBuilder(
+                        context,
+                        OnOptionsSelectListener { _: View?, options1: Int, options2: Int, _: Int ->
+                            silentPeriodStart = options1
+                            silentPeriodEnd = options2
+                            val txt = mTimeOption[options1] + " ~ " + mTimeOption[options2]
+                            binding!!.tvSilentPeriod.text = txt
+                            XToastUtils.toast(txt)
+                            return@OnOptionsSelectListener false
+                        }).setTitleText(getString(R.string.select_time_period))
+                        .setSelectOptions(silentPeriodStart, silentPeriodEnd).build<Any>().also {
                         it.setNPicker(mTimeOption, mTimeOption)
                         it.show()
                     }
                 }
 
                 R.id.bt_insert_sender -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_from))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_from)
+                    )
                     return
                 }
 
                 R.id.bt_insert_content -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_sms))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_sms)
+                    )
                     return
                 }
 
                 R.id.bt_insert_sender_app -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_package_name))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_package_name)
+                    )
                     return
                 }
 
                 R.id.bt_insert_uid -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_uid))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_uid)
+                    )
                     return
                 }
 
                 R.id.bt_insert_title_app -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_title))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_title)
+                    )
                     return
                 }
 
                 R.id.bt_insert_content_app -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_msg))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_msg)
+                    )
                     return
                 }
 
                 R.id.bt_insert_extra -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_card_slot))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_card_slot)
+                    )
                     return
                 }
 
                 R.id.bt_insert_time -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_receive_time))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_receive_time)
+                    )
                     return
                 }
 
                 R.id.bt_insert_device_name -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_device_name))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_device_name)
+                    )
                     return
                 }
 
@@ -380,11 +413,14 @@ class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClic
                         return
                     }
 
-                    MaterialDialog.Builder(requireContext()).title(R.string.delete_rule_title).content(R.string.delete_rule_tips).positiveText(R.string.lab_yes).negativeText(R.string.lab_no).onPositive { _: MaterialDialog?, _: DialogAction? ->
-                        viewModel.delete(ruleId)
-                        XToastUtils.success(R.string.delete_rule_toast)
-                        popToBack()
-                    }.show()
+                    MaterialDialog.Builder(requireContext()).title(R.string.delete_rule_title)
+                        .content(R.string.delete_rule_tips).positiveText(R.string.lab_yes)
+                        .negativeText(R.string.lab_no)
+                        .onPositive { _: MaterialDialog?, _: DialogAction? ->
+                            viewModel.delete(ruleId)
+                            XToastUtils.success(R.string.delete_rule_toast)
+                            popToBack()
+                        }.show()
                     return
                 }
 
@@ -409,7 +445,8 @@ class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClic
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     private fun initSenderSpinner() {
         //免打扰(禁用转发)时间段
-        binding!!.tvSilentPeriod.text = mTimeOption[silentPeriodStart] + " ~ " + mTimeOption[silentPeriodEnd]
+        binding!!.tvSilentPeriod.text =
+            mTimeOption[silentPeriodStart] + " ~ " + mTimeOption[silentPeriodEnd]
 
         //初始化发送通道下拉框
         binding!!.spSender.setOnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
@@ -477,44 +514,58 @@ class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClic
 
     //获取发送通道列表
     private fun getSenderList() {
-        Core.sender.getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<List<Sender>> {
-            override fun onSubscribe(d: Disposable) {}
+        Core.sender.getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<List<Sender>> {
+                override fun onSubscribe(d: Disposable) {}
 
-            override fun onError(e: Throwable) {
-                e.printStackTrace()
-                Log.e(TAG, "getSenderList error: ${e.message}")
-            }
-
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onSuccess(senderList: List<Sender>) {
-                if (senderList.isEmpty()) {
-                    XToastUtils.error(R.string.add_sender_first)
-                    return
+                override fun onError(e: Throwable) {
+                    e.printStackTrace()
+                    Log.e(TAG, "getSenderList error: ${e.message}")
                 }
 
-                senderSpinnerList.clear()
-                senderListAll = senderList as MutableList<Sender>
-                for (sender in senderList) {
-                    val name = if (sender.name.length > 20) sender.name.substring(0, 19) else sender.name
-                    senderSpinnerList.add(SenderSpinnerItem(name, getDrawable(sender.imageId), sender.id, sender.status))
-                }
-                senderSpinnerAdapter = SenderSpinnerAdapter(senderSpinnerList).setIsFilterKey(true).setFilterColor("#EF5362").setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
-                binding!!.spSender.setAdapter(senderSpinnerAdapter)
-                //senderSpinnerAdapter.notifyDataSetChanged()
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onSuccess(senderList: List<Sender>) {
+                    if (senderList.isEmpty()) {
+                        XToastUtils.error(R.string.add_sender_first)
+                        return
+                    }
 
-                //更新senderListSelected的状态与名称
-                senderListSelected.forEach {
-                    senderListAll.forEach { sender ->
-                        if (it.id == sender.id) {
-                            it.name = sender.name
-                            it.status = sender.status
+                    senderSpinnerList.clear()
+                    senderListAll = senderList as MutableList<Sender>
+                    for (sender in senderList) {
+                        val name = if (sender.name.length > 20) sender.name.substring(
+                            0,
+                            19
+                        ) else sender.name
+                        senderSpinnerList.add(
+                            SenderSpinnerItem(
+                                name,
+                                getDrawable(sender.imageId),
+                                sender.id,
+                                sender.status
+                            )
+                        )
+                    }
+                    senderSpinnerAdapter =
+                        SenderSpinnerAdapter(senderSpinnerList).setIsFilterKey(true)
+                            .setFilterColor("#EF5362")
+                            .setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
+                    binding!!.spSender.setAdapter(senderSpinnerAdapter)
+                    //senderSpinnerAdapter.notifyDataSetChanged()
+
+                    //更新senderListSelected的状态与名称
+                    senderListSelected.forEach {
+                        senderListAll.forEach { sender ->
+                            if (it.id == sender.id) {
+                                it.name = sender.name
+                                it.status = sender.status
+                            }
                         }
                     }
-                }
-                senderRecyclerAdapter.notifyDataSetChanged()
+                    senderRecyclerAdapter.notifyDataSetChanged()
 
-            }
-        })
+                }
+            })
     }
 
     //初始化APP下拉列表
@@ -535,25 +586,42 @@ class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClic
         if (SettingUtils.enableLoadUserAppList) {
             for (appInfo in App.UserAppList) {
                 if (TextUtils.isEmpty(appInfo.packageName)) continue
-                appListSpinnerList.add(AppListAdapterItem(appInfo.name, appInfo.icon, appInfo.packageName))
+                appListSpinnerList.add(
+                    AppListAdapterItem(
+                        appInfo.name,
+                        appInfo.icon,
+                        appInfo.packageName
+                    )
+                )
             }
         }
         if (SettingUtils.enableLoadSystemAppList) {
             for (appInfo in App.SystemAppList) {
                 if (TextUtils.isEmpty(appInfo.packageName)) continue
-                appListSpinnerList.add(AppListAdapterItem(appInfo.name, appInfo.icon, appInfo.packageName))
+                appListSpinnerList.add(
+                    AppListAdapterItem(
+                        appInfo.name,
+                        appInfo.icon,
+                        appInfo.packageName
+                    )
+                )
             }
         }
 
         //列表为空也不显示下拉框
         if (appListSpinnerList.isEmpty()) return
 
-        appListSpinnerAdapter = AppListSpinnerAdapter(appListSpinnerList).setIsFilterKey(true).setFilterColor("#EF5362").setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
+        appListSpinnerAdapter =
+            AppListSpinnerAdapter(appListSpinnerList).setIsFilterKey(true).setFilterColor("#EF5362")
+                .setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
         binding!!.spApp.setAdapter(appListSpinnerAdapter)
         binding!!.spApp.setOnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
             try {
                 val appInfo = appListSpinnerAdapter.getItemSource(position) as AppListAdapterItem
-                CommonUtils.insertOrReplaceText2Cursor(binding!!.etValue, appInfo.packageName.toString())
+                CommonUtils.insertOrReplaceText2Cursor(
+                    binding!!.etValue,
+                    appInfo.packageName.toString()
+                )
             } catch (e: Exception) {
                 XToastUtils.error(e.message.toString())
             }
@@ -564,57 +632,59 @@ class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClic
 
     //初始化表单
     private fun initForm() {
-        Core.rule.get(ruleId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Rule> {
-            override fun onSubscribe(d: Disposable) {}
+        Core.rule.get(ruleId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<Rule> {
+                override fun onSubscribe(d: Disposable) {}
 
-            override fun onError(e: Throwable) {
-                e.printStackTrace()
-                Log.e(TAG, e.toString())
-            }
-
-            override fun onSuccess(rule: Rule) {
-                Log.d(TAG, rule.senderList.toString())
-                rule.senderList.forEach {
-                    senderId = it.id
-                    senderListSelected.add(it)
-                    Log.d(TAG, it.toString())
+                override fun onError(e: Throwable) {
+                    e.printStackTrace()
+                    Log.e(TAG, e.toString())
                 }
 
-                if (isClone) {
-                    titleBar?.setSubTitle(getString(R.string.clone_rule))
-                    binding!!.btnDel.setText(R.string.discard)
-                } else {
-                    titleBar?.setSubTitle(getString(R.string.edit_rule))
-                }
-                Log.d(TAG, rule.toString())
+                override fun onSuccess(rule: Rule) {
+                    Log.d(TAG, rule.senderList.toString())
+                    rule.senderList.forEach {
+                        senderId = it.id
+                        senderListSelected.add(it)
+                        Log.d(TAG, it.toString())
+                    }
 
-                checkSenderLogicShow()
-                binding!!.rgSenderLogic.check(rule.getSenderLogicCheckId())
-                binding!!.rgSimSlot.check(rule.getSimSlotCheckId())
-                binding!!.rgFiled.check(rule.getFiledCheckId())
-                val checkId = rule.getCheckCheckId()
-                if (checkId == R.id.rb_is || checkId == R.id.rb_contain || checkId == R.id.rb_not_contain) {
-                    binding!!.rgCheck.check(checkId)
-                } else {
-                    binding!!.rgCheck2.check(checkId)
+                    if (isClone) {
+                        titleBar?.setSubTitle(getString(R.string.clone_rule))
+                        binding!!.btnDel.setText(R.string.discard)
+                    } else {
+                        titleBar?.setSubTitle(getString(R.string.edit_rule))
+                    }
+                    Log.d(TAG, rule.toString())
+
+                    checkSenderLogicShow()
+                    binding!!.rgSenderLogic.check(rule.getSenderLogicCheckId())
+                    binding!!.rgSimSlot.check(rule.getSimSlotCheckId())
+                    binding!!.rgFiled.check(rule.getFiledCheckId())
+                    val checkId = rule.getCheckCheckId()
+                    if (checkId == R.id.rb_is || checkId == R.id.rb_contain || checkId == R.id.rb_not_contain) {
+                        binding!!.rgCheck.check(checkId)
+                    } else {
+                        binding!!.rgCheck2.check(checkId)
+                    }
+                    binding!!.etValue.setText(rule.value)
+                    if (ruleType == "call" && rule.filed == FILED_CALL_TYPE) {
+                        callType = rule.value.toInt()
+                        callTypeIndex = callType - 1
+                        binding!!.spCallType.selectedIndex = callTypeIndex
+                    }
+                    binding!!.sbSmsTemplate.isChecked = !TextUtils.isEmpty(rule.smsTemplate.trim())
+                    binding!!.etSmsTemplate.setText(rule.smsTemplate.trim())
+                    binding!!.sbRegexReplace.isChecked =
+                        !TextUtils.isEmpty(rule.regexReplace.trim())
+                    binding!!.etRegexReplace.setText(rule.regexReplace.trim())
+                    binding!!.sbStatus.isChecked = rule.statusChecked
+                    silentPeriodStart = rule.silentPeriodStart
+                    silentPeriodEnd = rule.silentPeriodEnd
+                    //初始化发送通道下拉框
+                    initSenderSpinner()
                 }
-                binding!!.etValue.setText(rule.value)
-                if (ruleType == "call" && rule.filed == FILED_CALL_TYPE) {
-                    callType = rule.value.toInt()
-                    callTypeIndex = callType - 1
-                    binding!!.spCallType.selectedIndex = callTypeIndex
-                }
-                binding!!.sbSmsTemplate.isChecked = !TextUtils.isEmpty(rule.smsTemplate.trim())
-                binding!!.etSmsTemplate.setText(rule.smsTemplate.trim())
-                binding!!.sbRegexReplace.isChecked = !TextUtils.isEmpty(rule.regexReplace.trim())
-                binding!!.etRegexReplace.setText(rule.regexReplace.trim())
-                binding!!.sbStatus.isChecked = rule.statusChecked
-                silentPeriodStart = rule.silentPeriodStart
-                silentPeriodEnd = rule.silentPeriodEnd
-                //初始化发送通道下拉框
-                initSenderSpinner()
-            }
-        })
+            })
     }
 
     private fun checkSenderLogicShow() {
@@ -641,7 +711,10 @@ class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClic
             R.id.rb_multi_match -> FILED_MULTI_MATCH
             else -> FILED_TRANSPOND_ALL
         }
-        val check = when (kotlin.math.max(binding!!.rgCheck.checkedRadioButtonId, binding!!.rgCheck2.checkedRadioButtonId)) {
+        val check = when (kotlin.math.max(
+            binding!!.rgCheck.checkedRadioButtonId,
+            binding!!.rgCheck2.checkedRadioButtonId
+        )) {
             R.id.rb_contain -> CHECK_CONTAIN
             R.id.rb_not_contain -> CHECK_NOT_CONTAIN
             R.id.rb_start_with -> CHECK_START_WITH
@@ -779,64 +852,83 @@ class RulesEditFragment : BaseFragment<FragmentRulesEditBinding?>(), View.OnClic
             spCallType.selectedIndex = callTypeIndexTest
         }
 
-        MaterialDialog.Builder(requireContext()).iconRes(android.R.drawable.ic_dialog_email).title(R.string.rule_tester).customView(dialogTest, true).cancelable(false).autoDismiss(false).neutralText(R.string.action_back).neutralColor(getColors(R.color.darkGrey)).onNeutral { dialog: MaterialDialog?, _: DialogAction? ->
-            dialog?.dismiss()
-        }.positiveText(R.string.action_test).onPositive { _: MaterialDialog?, _: DialogAction? ->
-            try {
-                val simSlot = when (if (ruleType == "app") -1 else rgSimSlot.checkedRadioButtonId) {
-                    R.id.rb_sim_slot_1 -> 0
-                    R.id.rb_sim_slot_2 -> 1
-                    else -> -1
-                }
+        MaterialDialog.Builder(requireContext()).iconRes(android.R.drawable.ic_dialog_email)
+            .title(R.string.rule_tester).customView(dialogTest, true).cancelable(false)
+            .autoDismiss(false).neutralText(R.string.action_back)
+            .neutralColor(getColors(R.color.darkGrey))
+            .onNeutral { dialog: MaterialDialog?, _: DialogAction? ->
+                dialog?.dismiss()
+            }.positiveText(R.string.action_test)
+            .onPositive { _: MaterialDialog?, _: DialogAction? ->
+                try {
+                    val simSlot =
+                        when (if (ruleType == "app") -1 else rgSimSlot.checkedRadioButtonId) {
+                            R.id.rb_sim_slot_1 -> 0
+                            R.id.rb_sim_slot_2 -> 1
+                            else -> -1
+                        }
 
-                val testSim = "SIM" + (simSlot + 1)
-                val ruleSim: String = rule.simSlot
-                if (ruleSim != "ALL" && ruleSim != testSim) {
-                    throw Exception(getString(R.string.card_slot_does_not_match))
-                }
-
-                //获取卡槽信息
-                val simInfo = when (simSlot) {
-                    0 -> "SIM1_" + SettingUtils.extraSim1
-                    1 -> "SIM2_" + SettingUtils.extraSim2
-                    else -> etTitle.text.toString()
-                }
-                val subId = when (simSlot) {
-                    0 -> SettingUtils.subidSim1
-                    1 -> SettingUtils.subidSim2
-                    else -> 0
-                }
-
-                val msg = StringBuilder()
-                if (ruleType == "call") {
-                    val phoneNumber = etFrom.text.toString()
-                    val contacts = PhoneUtils.getContactByNumber(phoneNumber)
-                    val contactName = if (contacts.isNotEmpty()) contacts[0].name else getString(R.string.unknown_number)
-                    msg.append(getString(R.string.contact)).append(contactName).append("\n")
-                    msg.append(getString(R.string.mandatory_type))
-                    msg.append(CALL_TYPE_MAP[callType.toString()] ?: getString(R.string.unknown_call))
-                } else {
-                    msg.append(etContent.text.toString())
-                }
-
-                val msgInfo = MsgInfo(ruleType, etFrom.text.toString(), msg.toString(), Date(), simInfo, simSlot, subId, callTypeTest)
-                if (!rule.checkMsg(msgInfo)) {
-                    throw Exception(getString(R.string.unmatched_rule))
-                }
-
-                Thread {
-                    try {
-                        SendUtils.sendMsgSender(msgInfo, rule)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        Log.e(TAG, e.toString())
-                        LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java).post(e.message.toString())
+                    val testSim = "SIM" + (simSlot + 1)
+                    val ruleSim: String = rule.simSlot
+                    if (ruleSim != "ALL" && ruleSim != testSim) {
+                        throw Exception(getString(R.string.card_slot_does_not_match))
                     }
-                }.start()
 
-            } catch (e: Exception) {
-                XToastUtils.error(e.message.toString())
-            }
-        }.show()
+                    //获取卡槽信息
+                    val simInfo = when (simSlot) {
+                        0 -> "SIM1_" + SettingUtils.extraSim1
+                        1 -> "SIM2_" + SettingUtils.extraSim2
+                        else -> etTitle.text.toString()
+                    }
+                    val subId = when (simSlot) {
+                        0 -> SettingUtils.subidSim1
+                        1 -> SettingUtils.subidSim2
+                        else -> 0
+                    }
+
+                    val msg = StringBuilder()
+                    if (ruleType == "call") {
+                        val phoneNumber = etFrom.text.toString()
+                        val contacts = PhoneUtils.getContactByNumber(phoneNumber)
+                        val contactName =
+                            if (contacts.isNotEmpty()) contacts[0].name else getString(R.string.unknown_number)
+                        msg.append(getString(R.string.contact)).append(contactName).append("\n")
+                        msg.append(getString(R.string.mandatory_type))
+                        msg.append(
+                            CALL_TYPE_MAP[callType.toString()] ?: getString(R.string.unknown_call)
+                        )
+                    } else {
+                        msg.append(etContent.text.toString())
+                    }
+
+                    val msgInfo = MsgInfo(
+                        ruleType,
+                        etFrom.text.toString(),
+                        msg.toString(),
+                        Date(),
+                        simInfo,
+                        simSlot,
+                        subId,
+                        callTypeTest
+                    )
+                    if (!rule.checkMsg(msgInfo)) {
+                        throw Exception(getString(R.string.unmatched_rule))
+                    }
+
+                    Thread {
+                        try {
+                            SendUtils.sendMsgSender(msgInfo, rule)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            Log.e(TAG, e.toString())
+                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java)
+                                .post(e.message.toString())
+                        }
+                    }.start()
+
+                } catch (e: Exception) {
+                    XToastUtils.error(e.message.toString())
+                }
+            }.show()
     }
 }

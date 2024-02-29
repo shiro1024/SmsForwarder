@@ -15,7 +15,8 @@ data class ContactInfo(
 
     val firstLetter: String
         get() {
-            return if (name.matches(Patterns.PHONE.toRegex())) "#" else name[0].toString().uppercase(Locale.getDefault())
+            return if (name.matches(Patterns.PHONE.toRegex())) "#" else name[0].toString()
+                .uppercase(Locale.getDefault())
         }
 
     override fun toString(): String {

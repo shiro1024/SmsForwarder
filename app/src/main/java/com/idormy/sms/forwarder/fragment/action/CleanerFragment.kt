@@ -65,7 +65,8 @@ class CleanerFragment : BaseFragment<FragmentTasksActionCleanerBinding?>(), View
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, 1)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -100,11 +101,27 @@ class CleanerFragment : BaseFragment<FragmentTasksActionCleanerBinding?>(), View
                     try {
                         val settingVo = checkSetting()
                         Log.d(TAG, settingVo.toString())
-                        val taskAction = TaskSetting(TASK_ACTION_CLEANER, getString(R.string.task_cleaner), settingVo.description, Gson().toJson(settingVo), requestCode)
+                        val taskAction = TaskSetting(
+                            TASK_ACTION_CLEANER,
+                            getString(R.string.task_cleaner),
+                            settingVo.description,
+                            Gson().toJson(settingVo),
+                            requestCode
+                        )
                         val taskActionsJson = Gson().toJson(arrayListOf(taskAction))
-                        val msgInfo = MsgInfo("task", getString(R.string.task_cleaner), settingVo.description, Date(), getString(R.string.task_cleaner))
-                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0).putString(TaskWorker.taskActions, taskActionsJson).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val msgInfo = MsgInfo(
+                            "task",
+                            getString(R.string.task_cleaner),
+                            settingVo.description,
+                            Date(),
+                            getString(R.string.task_cleaner)
+                        )
+                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0)
+                            .putString(TaskWorker.taskActions, taskActionsJson)
+                            .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     } catch (e: Exception) {
                         mCountDownHelper?.finish()

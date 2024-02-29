@@ -74,7 +74,8 @@ class AlarmFragment : BaseFragment<FragmentTasksActionAlarmBinding?>(), View.OnC
         appContext = requireActivity().application as App
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, 2)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -122,7 +123,8 @@ class AlarmFragment : BaseFragment<FragmentTasksActionAlarmBinding?>(), View.OnC
             checkSetting(true)
         }
         binding!!.rgAlarmState.setOnCheckedChangeListener { _, checkedId ->
-            binding!!.layoutAlarmSettings.visibility = if (checkedId == R.id.rb_start_alarm) View.VISIBLE else View.GONE
+            binding!!.layoutAlarmSettings.visibility =
+                if (checkedId == R.id.rb_start_alarm) View.VISIBLE else View.GONE
             checkSetting(true)
         }
     }
@@ -134,70 +136,111 @@ class AlarmFragment : BaseFragment<FragmentTasksActionAlarmBinding?>(), View.OnC
 
                 R.id.btn_file_picker -> {
                     // 申请储存权限
-                    XXPermissions.with(this).permission(Permission.MANAGE_EXTERNAL_STORAGE).request(object : OnPermissionCallback {
-                        @SuppressLint("SetTextI18n")
-                        override fun onGranted(permissions: List<String>, all: Boolean) {
-                            val downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
-                            val fileList = findAudioFiles(downloadPath)
-                            if (fileList.isEmpty()) {
-                                XToastUtils.error(String.format(getString(R.string.download_music_first), downloadPath))
-                                return
+                    XXPermissions.with(this).permission(Permission.MANAGE_EXTERNAL_STORAGE)
+                        .request(object : OnPermissionCallback {
+                            @SuppressLint("SetTextI18n")
+                            override fun onGranted(permissions: List<String>, all: Boolean) {
+                                val downloadPath =
+                                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
+                                val fileList = findAudioFiles(downloadPath)
+                                if (fileList.isEmpty()) {
+                                    XToastUtils.error(
+                                        String.format(
+                                            getString(R.string.download_music_first),
+                                            downloadPath
+                                        )
+                                    )
+                                    return
+                                }
+                                MaterialDialog.Builder(requireContext())
+                                    .title(getString(R.string.alarm_music)).content(
+                                    String.format(
+                                        getString(R.string.root_directory),
+                                        downloadPath
+                                    )
+                                ).items(fileList)
+                                    .itemsCallbackSingleChoice(0) { _: MaterialDialog?, _: View?, _: Int, text: CharSequence ->
+                                        val webPath = "$downloadPath/$text"
+                                        binding!!.etMusicPath.setText(webPath)
+                                        checkSetting(true)
+                                        true // allow selection
+                                    }.positiveText(R.string.select).negativeText(R.string.cancel)
+                                    .show()
                             }
-                            MaterialDialog.Builder(requireContext()).title(getString(R.string.alarm_music)).content(String.format(getString(R.string.root_directory), downloadPath)).items(fileList).itemsCallbackSingleChoice(0) { _: MaterialDialog?, _: View?, _: Int, text: CharSequence ->
-                                val webPath = "$downloadPath/$text"
-                                binding!!.etMusicPath.setText(webPath)
-                                checkSetting(true)
-                                true // allow selection
-                            }.positiveText(R.string.select).negativeText(R.string.cancel).show()
-                        }
 
-                        override fun onDenied(permissions: List<String>, never: Boolean) {
-                            if (never) {
-                                XToastUtils.error(R.string.toast_denied_never)
-                                // 如果是被永久拒绝就跳转到应用权限系统设置页面
-                                XXPermissions.startPermissionActivity(requireContext(), permissions)
-                            } else {
-                                XToastUtils.error(R.string.toast_denied)
+                            override fun onDenied(permissions: List<String>, never: Boolean) {
+                                if (never) {
+                                    XToastUtils.error(R.string.toast_denied_never)
+                                    // 如果是被永久拒绝就跳转到应用权限系统设置页面
+                                    XXPermissions.startPermissionActivity(
+                                        requireContext(),
+                                        permissions
+                                    )
+                                } else {
+                                    XToastUtils.error(R.string.toast_denied)
+                                }
+                                binding!!.etMusicPath.setText(getString(R.string.storage_permission_tips))
                             }
-                            binding!!.etMusicPath.setText(getString(R.string.storage_permission_tips))
-                        }
-                    })
+                        })
                 }
 
                 R.id.btn_test -> {
                     // 申请修改系统设置权限
-                    XXPermissions.with(this).permission(Permission.WRITE_SETTINGS).request(object : OnPermissionCallback {
-                        @SuppressLint("SetTextI18n")
-                        override fun onGranted(permissions: List<String>, all: Boolean) {
-                            mCountDownHelper?.start()
-                            try {
-                                val settingVo = checkSetting()
-                                Log.d(TAG, settingVo.toString())
-                                val taskAction = TaskSetting(TASK_ACTION_ALARM, getString(R.string.task_alarm), settingVo.description, Gson().toJson(settingVo), requestCode)
-                                val taskActionsJson = Gson().toJson(arrayListOf(taskAction))
-                                val msgInfo = MsgInfo("task", getString(R.string.task_alarm), settingVo.description, Date(), getString(R.string.task_alarm))
-                                val actionData = Data.Builder().putLong(TaskWorker.taskId, 0).putString(TaskWorker.taskActions, taskActionsJson).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                                val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
-                                WorkManager.getInstance().enqueue(actionRequest)
-                            } catch (e: Exception) {
-                                mCountDownHelper?.finish()
-                                e.printStackTrace()
-                                Log.e(TAG, "onClick error: ${e.message}")
-                                XToastUtils.error(e.message.toString(), 30000)
+                    XXPermissions.with(this).permission(Permission.WRITE_SETTINGS)
+                        .request(object : OnPermissionCallback {
+                            @SuppressLint("SetTextI18n")
+                            override fun onGranted(permissions: List<String>, all: Boolean) {
+                                mCountDownHelper?.start()
+                                try {
+                                    val settingVo = checkSetting()
+                                    Log.d(TAG, settingVo.toString())
+                                    val taskAction = TaskSetting(
+                                        TASK_ACTION_ALARM,
+                                        getString(R.string.task_alarm),
+                                        settingVo.description,
+                                        Gson().toJson(settingVo),
+                                        requestCode
+                                    )
+                                    val taskActionsJson = Gson().toJson(arrayListOf(taskAction))
+                                    val msgInfo = MsgInfo(
+                                        "task",
+                                        getString(R.string.task_alarm),
+                                        settingVo.description,
+                                        Date(),
+                                        getString(R.string.task_alarm)
+                                    )
+                                    val actionData = Data.Builder().putLong(TaskWorker.taskId, 0)
+                                        .putString(TaskWorker.taskActions, taskActionsJson)
+                                        .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo))
+                                        .build()
+                                    val actionRequest =
+                                        OneTimeWorkRequestBuilder<ActionWorker>().setInputData(
+                                            actionData
+                                        ).build()
+                                    WorkManager.getInstance().enqueue(actionRequest)
+                                } catch (e: Exception) {
+                                    mCountDownHelper?.finish()
+                                    e.printStackTrace()
+                                    Log.e(TAG, "onClick error: ${e.message}")
+                                    XToastUtils.error(e.message.toString(), 30000)
+                                }
                             }
-                        }
 
-                        override fun onDenied(permissions: List<String>, never: Boolean) {
-                            if (never) {
-                                XToastUtils.error(R.string.toast_denied_never)
-                                // 如果是被永久拒绝就跳转到应用权限系统设置页面
-                                XXPermissions.startPermissionActivity(requireContext(), permissions)
-                            } else {
-                                XToastUtils.error(R.string.toast_denied)
+                            override fun onDenied(permissions: List<String>, never: Boolean) {
+                                if (never) {
+                                    XToastUtils.error(R.string.toast_denied_never)
+                                    // 如果是被永久拒绝就跳转到应用权限系统设置页面
+                                    XXPermissions.startPermissionActivity(
+                                        requireContext(),
+                                        permissions
+                                    )
+                                } else {
+                                    XToastUtils.error(R.string.toast_denied)
+                                }
+                                binding!!.tvDescription.text =
+                                    getString(R.string.write_settings_permission_tips)
                             }
-                            binding!!.tvDescription.text = getString(R.string.write_settings_permission_tips)
-                        }
-                    })
+                        })
                     return
                 }
 
@@ -208,28 +251,33 @@ class AlarmFragment : BaseFragment<FragmentTasksActionAlarmBinding?>(), View.OnC
 
                 R.id.btn_save -> {
                     // 申请修改系统设置权限
-                    XXPermissions.with(this).permission(Permission.WRITE_SETTINGS).request(object : OnPermissionCallback {
-                        @SuppressLint("SetTextI18n")
-                        override fun onGranted(permissions: List<String>, all: Boolean) {
-                            val settingVo = checkSetting()
-                            val intent = Intent()
-                            intent.putExtra(KEY_BACK_DESCRIPTION_ACTION, settingVo.description)
-                            intent.putExtra(KEY_BACK_DATA_ACTION, Gson().toJson(settingVo))
-                            setFragmentResult(TASK_ACTION_ALARM, intent)
-                            popToBack()
-                        }
-
-                        override fun onDenied(permissions: List<String>, never: Boolean) {
-                            if (never) {
-                                XToastUtils.error(R.string.toast_denied_never)
-                                // 如果是被永久拒绝就跳转到应用权限系统设置页面
-                                XXPermissions.startPermissionActivity(requireContext(), permissions)
-                            } else {
-                                XToastUtils.error(R.string.toast_denied)
+                    XXPermissions.with(this).permission(Permission.WRITE_SETTINGS)
+                        .request(object : OnPermissionCallback {
+                            @SuppressLint("SetTextI18n")
+                            override fun onGranted(permissions: List<String>, all: Boolean) {
+                                val settingVo = checkSetting()
+                                val intent = Intent()
+                                intent.putExtra(KEY_BACK_DESCRIPTION_ACTION, settingVo.description)
+                                intent.putExtra(KEY_BACK_DATA_ACTION, Gson().toJson(settingVo))
+                                setFragmentResult(TASK_ACTION_ALARM, intent)
+                                popToBack()
                             }
-                            binding!!.tvDescription.text = getString(R.string.write_settings_permission_tips)
-                        }
-                    })
+
+                            override fun onDenied(permissions: List<String>, never: Boolean) {
+                                if (never) {
+                                    XToastUtils.error(R.string.toast_denied_never)
+                                    // 如果是被永久拒绝就跳转到应用权限系统设置页面
+                                    XXPermissions.startPermissionActivity(
+                                        requireContext(),
+                                        permissions
+                                    )
+                                } else {
+                                    XToastUtils.error(R.string.toast_denied)
+                                }
+                                binding!!.tvDescription.text =
+                                    getString(R.string.write_settings_permission_tips)
+                            }
+                        })
                     return
                 }
             }
@@ -249,10 +297,13 @@ class AlarmFragment : BaseFragment<FragmentTasksActionAlarmBinding?>(), View.OnC
         val description = StringBuilder()
         val action = if (binding!!.rgAlarmState.checkedRadioButtonId == R.id.rb_start_alarm) {
             description.append(getString(R.string.start_alarm))
-            description.append(", ").append(getString(R.string.alarm_volume)).append(":").append(volume).append("%")
-            description.append(", ").append(getString(R.string.alarm_play_times)).append(":").append(loopTimes)
+            description.append(", ").append(getString(R.string.alarm_volume)).append(":")
+                .append(volume).append("%")
+            description.append(", ").append(getString(R.string.alarm_play_times)).append(":")
+                .append(loopTimes)
             if (music.isNotEmpty()) {
-                description.append(", ").append(getString(R.string.alarm_music)).append(":").append(music)
+                description.append(", ").append(getString(R.string.alarm_music)).append(":")
+                    .append(music)
             }
             "start"
         } else {
@@ -274,7 +325,8 @@ class AlarmFragment : BaseFragment<FragmentTasksActionAlarmBinding?>(), View.OnC
         if (directory.exists() && directory.isDirectory) {
             directory.listFiles()?.let { files ->
                 // 筛选出支持的音频文件
-                files.filter { it.isFile && isSupportedAudioFile(it) }.forEach { audioFiles.add(it.name) }
+                files.filter { it.isFile && isSupportedAudioFile(it) }
+                    .forEach { audioFiles.add(it.name) }
             }
         }
 

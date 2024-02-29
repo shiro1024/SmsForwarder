@@ -12,10 +12,15 @@ import com.idormy.sms.forwarder.database.entity.Sender
 import com.idormy.sms.forwarder.databinding.AdapterSendersCardViewListItemBinding
 
 @Suppress("EmptyMethod")
-class SenderPagingAdapter(private val itemClickListener: OnItemClickListener) : PagingDataAdapter<Sender, MyViewHolder>(diffCallback) {
+class SenderPagingAdapter(private val itemClickListener: OnItemClickListener) :
+    PagingDataAdapter<Sender, MyViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val binding = AdapterSendersCardViewListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = AdapterSendersCardViewListItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return MyViewHolder(binding)
     }
 
@@ -38,7 +43,9 @@ class SenderPagingAdapter(private val itemClickListener: OnItemClickListener) : 
         }
     }
 
-    class MyViewHolder(val binding: AdapterSendersCardViewListItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class MyViewHolder(val binding: AdapterSendersCardViewListItemBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
     interface OnItemClickListener {
         fun onItemClicked(view: View?, item: Sender)
         fun onItemRemove(view: View?, id: Int)

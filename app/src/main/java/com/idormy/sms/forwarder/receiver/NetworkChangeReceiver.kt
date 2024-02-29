@@ -54,7 +54,8 @@ class NetworkChangeReceiver : BroadcastReceiver() {
         val networkStateOld = TaskUtils.networkState
         val dataSimSlotOld = TaskUtils.dataSimSlot
         val wifiSsidOld = TaskUtils.wifiSsid
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         if (networkInfo != null && networkInfo.isConnected) {
             Log.d(TAG, "Network Connected")
@@ -69,7 +70,8 @@ class NetworkChangeReceiver : BroadcastReceiver() {
                 //WiFi网络
                 TaskUtils.networkState = 2
                 //获取WiFi名称
-                val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                val wifiManager =
+                    context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
                 val wifiInfo = wifiManager.connectionInfo
                 TaskUtils.wifiSsid = wifiInfo.ssid.replace("\"", "")
             }
@@ -98,7 +100,8 @@ class NetworkChangeReceiver : BroadcastReceiver() {
     }
 
     private fun handleWifiStateChanged(context: Context, intent: Intent) {
-        val wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN)
+        val wifiState =
+            intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN)
         Log.d(TAG, "WiFi State Changed: $wifiState")
 
         when (wifiState) {
@@ -188,8 +191,10 @@ class NetworkChangeReceiver : BroadcastReceiver() {
         } else {
             try {
                 val cls = Class.forName("android.telephony.SubscriptionManager")
-                val methodName = if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP) "getSlotId" else "getSlotIndex"
-                val getSubId = cls.getDeclaredMethod("getDefaultDataSubId") ?: cls.getDeclaredMethod("getDefaultDataSubscriptionId")
+                val methodName =
+                    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP) "getSlotId" else "getSlotIndex"
+                val getSubId = cls.getDeclaredMethod("getDefaultDataSubId")
+                    ?: cls.getDeclaredMethod("getDefaultDataSubscriptionId")
                 val subId = getSubId.invoke(null) as? Int ?: return -1
                 val getSlotId = cls.getDeclaredMethod(methodName, Int::class.javaPrimitiveType)
                 return getSlotId.invoke(null, subId) as? Int ?: -1

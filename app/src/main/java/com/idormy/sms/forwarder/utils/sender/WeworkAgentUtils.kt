@@ -44,7 +44,8 @@ class WeworkAgentUtils private constructor() {
                 return sendTextMsg(setting, msgInfo, rule, senderIndex, logId, msgId)
             }
 
-            val customApi = if (TextUtils.isEmpty(setting.customizeAPI)) "https://qyapi.weixin.qq.com" else setting.customizeAPI
+            val customApi =
+                if (TextUtils.isEmpty(setting.customizeAPI)) "https://qyapi.weixin.qq.com" else setting.customizeAPI
             var getTokenUrl = "$customApi/cgi-bin/gettoken?"
             getTokenUrl += "corpid=" + setting.corpID
             getTokenUrl += "&corpsecret=" + setting.secret
@@ -53,10 +54,16 @@ class WeworkAgentUtils private constructor() {
             val request = XHttp.get(getTokenUrl)
 
             //设置代理
-            if ((setting.proxyType == Proxy.Type.HTTP || setting.proxyType == Proxy.Type.SOCKS) && !TextUtils.isEmpty(setting.proxyHost) && !TextUtils.isEmpty(setting.proxyPort)) {
+            if ((setting.proxyType == Proxy.Type.HTTP || setting.proxyType == Proxy.Type.SOCKS) && !TextUtils.isEmpty(
+                    setting.proxyHost
+                ) && !TextUtils.isEmpty(setting.proxyPort)
+            ) {
                 //代理服务器的IP和端口号
                 Log.d(TAG, "proxyHost = ${setting.proxyHost}, proxyPort = ${setting.proxyPort}")
-                val proxyHost = if (NetworkUtils.isIP(setting.proxyHost)) setting.proxyHost else NetworkUtils.getDomainAddress(setting.proxyHost)
+                val proxyHost =
+                    if (NetworkUtils.isIP(setting.proxyHost)) setting.proxyHost else NetworkUtils.getDomainAddress(
+                        setting.proxyHost
+                    )
                 if (!NetworkUtils.isIP(proxyHost)) {
                     throw Exception("代理服务器主机名解析失败：proxyHost=$proxyHost")
                 }
@@ -66,19 +73,32 @@ class WeworkAgentUtils private constructor() {
                 request.okproxy(Proxy(setting.proxyType, InetSocketAddress(proxyHost, proxyPort)))
 
                 //代理的鉴权账号密码
-                if (setting.proxyAuthenticator == true && (!TextUtils.isEmpty(setting.proxyUsername) || !TextUtils.isEmpty(setting.proxyPassword))) {
-                    Log.i(TAG, "proxyUsername = ${setting.proxyUsername}, proxyPassword = ${setting.proxyPassword}")
+                if (setting.proxyAuthenticator == true && (!TextUtils.isEmpty(setting.proxyUsername) || !TextUtils.isEmpty(
+                        setting.proxyPassword
+                    ))
+                ) {
+                    Log.i(
+                        TAG,
+                        "proxyUsername = ${setting.proxyUsername}, proxyPassword = ${setting.proxyPassword}"
+                    )
 
                     if (setting.proxyType == Proxy.Type.HTTP) {
                         request.okproxyAuthenticator { _: Route?, response: Response ->
                             //设置代理服务器账号密码
-                            val credential = Credentials.basic(setting.proxyUsername.toString(), setting.proxyPassword.toString())
-                            response.request().newBuilder().header("Proxy-Authorization", credential).build()
+                            val credential = Credentials.basic(
+                                setting.proxyUsername.toString(),
+                                setting.proxyPassword.toString()
+                            )
+                            response.request().newBuilder()
+                                .header("Proxy-Authorization", credential).build()
                         }
                     } else {
                         Authenticator.setDefault(object : Authenticator() {
                             override fun getPasswordAuthentication(): PasswordAuthentication {
-                                return PasswordAuthentication(setting.proxyUsername.toString(), setting.proxyPassword?.toCharArray())
+                                return PasswordAuthentication(
+                                    setting.proxyUsername.toString(),
+                                    setting.proxyPassword?.toCharArray()
+                                )
                             }
                         })
                     }
@@ -107,10 +127,15 @@ class WeworkAgentUtils private constructor() {
                         val resp = Gson().fromJson(response, WeworkAgentResult::class.java)
                         if (resp?.errcode == 0L) {
                             accessToken = resp.access_token.toString()
-                            expiresIn = System.currentTimeMillis() + ((resp.expires_in ?: 7200) - 120) * 1000L //提前2分钟过期
+                            expiresIn = System.currentTimeMillis() + ((resp.expires_in
+                                ?: 7200) - 120) * 1000L //提前2分钟过期
                             sendTextMsg(setting, msgInfo, rule, senderIndex, logId, msgId)
                         } else {
-                            SendUtils.updateLogs(logId, 0, String.format(getString(R.string.request_failed_tips), response))
+                            SendUtils.updateLogs(
+                                logId,
+                                0,
+                                String.format(getString(R.string.request_failed_tips), response)
+                            )
                             SendUtils.senderLogic(0, msgInfo, rule, senderIndex, msgId)
                         }
                     }
@@ -144,7 +169,8 @@ class WeworkAgentUtils private constructor() {
             textText["content"] = content
             textMsgMap["text"] = textText
             val accessToken: String by SharedPreference("access_token_" + setting.agentID, "")
-            val customApi = if (TextUtils.isEmpty(setting.customizeAPI)) "https://qyapi.weixin.qq.com" else setting.customizeAPI
+            val customApi =
+                if (TextUtils.isEmpty(setting.customizeAPI)) "https://qyapi.weixin.qq.com" else setting.customizeAPI
             val requestUrl = "$customApi/cgi-bin/message/send?access_token=$accessToken"
             Log.i(TAG, "requestUrl:$requestUrl")
             val requestMsg: String = Gson().toJson(textMsgMap)
@@ -153,10 +179,16 @@ class WeworkAgentUtils private constructor() {
             val request = XHttp.post(requestUrl)
 
             //设置代理
-            if ((setting.proxyType == Proxy.Type.HTTP || setting.proxyType == Proxy.Type.SOCKS) && !TextUtils.isEmpty(setting.proxyHost) && !TextUtils.isEmpty(setting.proxyPort)) {
+            if ((setting.proxyType == Proxy.Type.HTTP || setting.proxyType == Proxy.Type.SOCKS) && !TextUtils.isEmpty(
+                    setting.proxyHost
+                ) && !TextUtils.isEmpty(setting.proxyPort)
+            ) {
                 //代理服务器的IP和端口号
                 Log.d(TAG, "proxyHost = ${setting.proxyHost}, proxyPort = ${setting.proxyPort}")
-                val proxyHost = if (NetworkUtils.isIP(setting.proxyHost)) setting.proxyHost else NetworkUtils.getDomainAddress(setting.proxyHost)
+                val proxyHost =
+                    if (NetworkUtils.isIP(setting.proxyHost)) setting.proxyHost else NetworkUtils.getDomainAddress(
+                        setting.proxyHost
+                    )
                 if (!NetworkUtils.isIP(proxyHost)) {
                     throw Exception("代理服务器主机名解析失败：proxyHost=$proxyHost")
                 }
@@ -166,19 +198,32 @@ class WeworkAgentUtils private constructor() {
                 request.okproxy(Proxy(setting.proxyType, InetSocketAddress(proxyHost, proxyPort)))
 
                 //代理的鉴权账号密码
-                if (setting.proxyAuthenticator == true && (!TextUtils.isEmpty(setting.proxyUsername) || !TextUtils.isEmpty(setting.proxyPassword))) {
-                    Log.i(TAG, "proxyUsername = ${setting.proxyUsername}, proxyPassword = ${setting.proxyPassword}")
+                if (setting.proxyAuthenticator == true && (!TextUtils.isEmpty(setting.proxyUsername) || !TextUtils.isEmpty(
+                        setting.proxyPassword
+                    ))
+                ) {
+                    Log.i(
+                        TAG,
+                        "proxyUsername = ${setting.proxyUsername}, proxyPassword = ${setting.proxyPassword}"
+                    )
 
                     if (setting.proxyType == Proxy.Type.HTTP) {
                         request.okproxyAuthenticator { _: Route?, response: Response ->
                             //设置代理服务器账号密码
-                            val credential = Credentials.basic(setting.proxyUsername.toString(), setting.proxyPassword.toString())
-                            response.request().newBuilder().header("Proxy-Authorization", credential).build()
+                            val credential = Credentials.basic(
+                                setting.proxyUsername.toString(),
+                                setting.proxyPassword.toString()
+                            )
+                            response.request().newBuilder()
+                                .header("Proxy-Authorization", credential).build()
                         }
                     } else {
                         Authenticator.setDefault(object : Authenticator() {
                             override fun getPasswordAuthentication(): PasswordAuthentication {
-                                return PasswordAuthentication(setting.proxyUsername.toString(), setting.proxyPassword?.toCharArray())
+                                return PasswordAuthentication(
+                                    setting.proxyUsername.toString(),
+                                    setting.proxyPassword?.toCharArray()
+                                )
                             }
                         })
                     }

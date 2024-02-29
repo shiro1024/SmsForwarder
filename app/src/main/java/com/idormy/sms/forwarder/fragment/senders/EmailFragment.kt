@@ -87,7 +87,8 @@ class EmailFragment : BaseFragment<FragmentSendersEmailBinding?>(), View.OnClick
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, SettingUtils.requestTimeout)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -102,7 +103,8 @@ class EmailFragment : BaseFragment<FragmentSendersEmailBinding?>(), View.OnClick
         binding!!.spMailType.setOnItemSelectedListener { _: MaterialSpinner?, position: Int, _: Long, item: Any ->
             mailType = item.toString()
             //XToastUtils.warning(mailType)
-            binding!!.layoutServiceSetting.visibility = if (position == mailTypeArray.size - 1) View.VISIBLE else View.GONE
+            binding!!.layoutServiceSetting.visibility =
+                if (position == mailTypeArray.size - 1) View.VISIBLE else View.GONE
         }
         binding!!.spMailType.setOnNothingSelectedListener {
             mailType = mailTypeArray[mailTypeArray.size - 1]
@@ -121,7 +123,8 @@ class EmailFragment : BaseFragment<FragmentSendersEmailBinding?>(), View.OnClick
 
         //编辑
         binding!!.btnDel.setText(R.string.del)
-        Core.sender.get(senderId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
+        Core.sender.get(senderId).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
             override fun onSubscribe(d: Disposable) {}
 
             override fun onError(e: Throwable) {
@@ -174,7 +177,8 @@ class EmailFragment : BaseFragment<FragmentSendersEmailBinding?>(), View.OnClick
         binding!!.btnTest.setOnClickListener(this)
         binding!!.btnDel.setOnClickListener(this)
         binding!!.btnSave.setOnClickListener(this)
-        LiveEventBus.get(KEY_SENDER_TEST, String::class.java).observe(this) { mCountDownHelper?.finish() }
+        LiveEventBus.get(KEY_SENDER_TEST, String::class.java)
+            .observe(this) { mCountDownHelper?.finish() }
     }
 
     @SingleClick
@@ -189,37 +193,58 @@ class EmailFragment : BaseFragment<FragmentSendersEmailBinding?>(), View.OnClick
                 }
 
                 R.id.bt_insert_extra_to_nickname -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etNickname, getString(R.string.tag_card_slot))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etNickname,
+                        getString(R.string.tag_card_slot)
+                    )
                     return
                 }
 
                 R.id.bt_insert_time_to_nickname -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etNickname, getString(R.string.tag_receive_time))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etNickname,
+                        getString(R.string.tag_receive_time)
+                    )
                     return
                 }
 
                 R.id.bt_insert_device_name_to_nickname -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etNickname, getString(R.string.tag_device_name))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etNickname,
+                        getString(R.string.tag_device_name)
+                    )
                     return
                 }
 
                 R.id.bt_insert_sender -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_from))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_from)
+                    )
                     return
                 }
 
                 R.id.bt_insert_extra -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_card_slot))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_card_slot)
+                    )
                     return
                 }
 
                 R.id.bt_insert_time -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_receive_time))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_receive_time)
+                    )
                     return
                 }
 
                 R.id.bt_insert_device_name -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_device_name))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_device_name)
+                    )
                     return
                 }
 
@@ -229,13 +254,22 @@ class EmailFragment : BaseFragment<FragmentSendersEmailBinding?>(), View.OnClick
                         try {
                             val settingVo = checkSetting()
                             Log.d(TAG, settingVo.toString())
-                            val name = binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() } ?: getString(R.string.test_sender_name)
-                            val msgInfo = MsgInfo("sms", getString(R.string.test_phone_num), String.format(getString(R.string.test_sender_sms), name), Date(), getString(R.string.test_sim_info))
+                            val name =
+                                binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() }
+                                    ?: getString(R.string.test_sender_name)
+                            val msgInfo = MsgInfo(
+                                "sms",
+                                getString(R.string.test_phone_num),
+                                String.format(getString(R.string.test_sender_sms), name),
+                                Date(),
+                                getString(R.string.test_sim_info)
+                            )
                             EmailUtils.sendMsg(settingVo, msgInfo)
                         } catch (e: Exception) {
                             e.printStackTrace()
                             Log.e(TAG, "onClick error:$e")
-                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java).post(e.message.toString())
+                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java)
+                                .post(e.message.toString())
                         }
                         LiveEventBus.get(KEY_SENDER_TEST, String::class.java).post("finish")
                     }.start()
@@ -248,11 +282,14 @@ class EmailFragment : BaseFragment<FragmentSendersEmailBinding?>(), View.OnClick
                         return
                     }
 
-                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title).content(R.string.delete_sender_tips).positiveText(R.string.lab_yes).negativeText(R.string.lab_no).onPositive { _: MaterialDialog?, _: DialogAction? ->
-                        viewModel.delete(senderId)
-                        XToastUtils.success(R.string.delete_sender_toast)
-                        popToBack()
-                    }.show()
+                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title)
+                        .content(R.string.delete_sender_tips).positiveText(R.string.lab_yes)
+                        .negativeText(R.string.lab_no)
+                        .onPositive { _: MaterialDialog?, _: DialogAction? ->
+                            viewModel.delete(senderId)
+                            XToastUtils.success(R.string.delete_sender_toast)
+                            popToBack()
+                        }.show()
                     return
                 }
 
@@ -265,7 +302,8 @@ class EmailFragment : BaseFragment<FragmentSendersEmailBinding?>(), View.OnClick
                     val status = if (binding!!.sbEnable.isChecked) 1 else 0
                     val settingVo = checkSetting()
                     if (isClone) senderId = 0
-                    val senderNew = Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
+                    val senderNew =
+                        Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
                     Log.d(TAG, senderNew.toString())
 
                     viewModel.insertOrUpdate(senderNew)
@@ -294,11 +332,25 @@ class EmailFragment : BaseFragment<FragmentSendersEmailBinding?>(), View.OnClick
         if (TextUtils.isEmpty(fromEmail) || TextUtils.isEmpty(pwd) || TextUtils.isEmpty(toEmail)) {
             throw Exception(getString(R.string.invalid_email))
         }
-        if (mailType == getString(R.string.other_mail_type) && (TextUtils.isEmpty(host) || TextUtils.isEmpty(port))) {
+        if (mailType == getString(R.string.other_mail_type) && (TextUtils.isEmpty(host) || TextUtils.isEmpty(
+                port
+            ))
+        ) {
             throw Exception(getString(R.string.invalid_email_server))
         }
 
-        return EmailSetting(mailType, fromEmail, pwd, nickname, host, port, ssl, startTls, toEmail, title)
+        return EmailSetting(
+            mailType,
+            fromEmail,
+            pwd,
+            nickname,
+            host,
+            port,
+            ssl,
+            startTls,
+            toEmail,
+            title
+        )
     }
 
     override fun onDestroyView() {

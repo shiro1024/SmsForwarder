@@ -114,11 +114,6 @@
                         style="@style/rg_rb_style"
                         android:text="@string/safety_measures_rsa" />
 
-                    <RadioButton
-                        android:id="@+id/rb_safety_measures_sm4"
-                        style="@style/rg_rb_style"
-                        android:text="@string/safety_measures_sm4" />
-
                 </RadioGroup>
 
             </LinearLayout>

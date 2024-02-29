@@ -21,14 +21,19 @@ class SendLogicWorker(
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
 
         val msgInfoJson = inputData.getString(Worker.sendMsgInfo)
-        val msgInfo = Gson().fromJson(msgInfoJson, MsgInfo::class.java) ?: return@withContext Result.failure()
+        val msgInfo =
+            Gson().fromJson(msgInfoJson, MsgInfo::class.java) ?: return@withContext Result.failure()
         //val ruleId = inputData.getLong(Worker.ruleId, 0L)
         val ruleJson = inputData.getString(Worker.rule)
         val senderIndex = inputData.getInt(Worker.senderIndex, 0)
         val msgId = inputData.getLong(Worker.msgId, 0L)
-        Log.d("SendLogicWorker", "msgInfoJson: $msgInfoJson, ruleJson: $ruleJson, senderIndex: $senderIndex, msgId: $msgId")
+        Log.d(
+            "SendLogicWorker",
+            "msgInfoJson: $msgInfoJson, ruleJson: $ruleJson, senderIndex: $senderIndex, msgId: $msgId"
+        )
 
-        val rule = Gson().fromJson(ruleJson, Rule::class.java) ?: return@withContext Result.failure()
+        val rule =
+            Gson().fromJson(ruleJson, Rule::class.java) ?: return@withContext Result.failure()
         if (senderIndex >= rule.senderList.size) return@withContext Result.failure()
         val sender = rule.senderList[senderIndex]
         var logId = 0L

@@ -23,7 +23,8 @@ object LocationUtils {
 
     fun isLocationEnabled(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+            val locationManager =
+                context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
             Log.d("LocationUtils", "isLocationEnabled: ${locationManager?.isLocationEnabled}")
             locationManager?.isLocationEnabled == true
         } else {
@@ -50,11 +51,17 @@ object LocationUtils {
         }
 
         // 检查是否有定位能力
-        val hasGpsProvider = locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER) == true
-        val hasNetworkProvider = locationManager?.isProviderEnabled(LocationManager.NETWORK_PROVIDER) == true
-        val hasPassiveProvider = locationManager?.isProviderEnabled(LocationManager.PASSIVE_PROVIDER) == true
+        val hasGpsProvider =
+            locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER) == true
+        val hasNetworkProvider =
+            locationManager?.isProviderEnabled(LocationManager.NETWORK_PROVIDER) == true
+        val hasPassiveProvider =
+            locationManager?.isProviderEnabled(LocationManager.PASSIVE_PROVIDER) == true
 
-        Log.d("LocationUtils", "hasLocationCapability: hasGpsProvider=$hasGpsProvider, hasNetworkProvider=$hasNetworkProvider, hasPassiveProvider=$hasPassiveProvider")
+        Log.d(
+            "LocationUtils",
+            "hasLocationCapability: hasGpsProvider=$hasGpsProvider, hasNetworkProvider=$hasNetworkProvider, hasPassiveProvider=$hasPassiveProvider"
+        )
         return hasGpsProvider || hasNetworkProvider || hasPassiveProvider
     }
 }

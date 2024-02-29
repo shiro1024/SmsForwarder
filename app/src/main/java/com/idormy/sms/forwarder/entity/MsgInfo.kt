@@ -68,16 +68,31 @@ data class MsgInfo(
             .replace(getString(R.string.tag_title), title)
             .replace(getString(R.string.tag_scheme), scheme)
             .replace(getString(R.string.tag_uid), uid.toString())
-            .replace(getString(R.string.tag_receive_time), SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date))
-            .replace(getString(R.string.tag_current_time), SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date()))
+            .replace(
+                getString(R.string.tag_receive_time),
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date)
+            )
+            .replace(
+                getString(R.string.tag_current_time),
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
+            )
             .replace(getString(R.string.tag_device_name), deviceMark)
             .replace(getString(R.string.tag_app_version), versionName)
-            .replace(getString(R.string.tag_call_type), callTypeMap[callType.toString()] ?: getString(R.string.unknown_call))
+            .replace(
+                getString(R.string.tag_call_type),
+                callTypeMap[callType.toString()] ?: getString(R.string.unknown_call)
+            )
             .replace(getString(R.string.tag_ipv4), TaskUtils.ipv4)
             .replace(getString(R.string.tag_ipv6), TaskUtils.ipv6)
             .replace(getString(R.string.tag_battery_pct), "%.2f".format(TaskUtils.batteryPct))
-            .replace(getString(R.string.tag_battery_status), BatteryUtils.getStatus(TaskUtils.batteryStatus))
-            .replace(getString(R.string.tag_battery_plugged), BatteryUtils.getPlugged(TaskUtils.batteryPlugged))
+            .replace(
+                getString(R.string.tag_battery_status),
+                BatteryUtils.getStatus(TaskUtils.batteryStatus)
+            )
+            .replace(
+                getString(R.string.tag_battery_plugged),
+                BatteryUtils.getPlugged(TaskUtils.batteryPlugged)
+            )
             .replace(getString(R.string.tag_battery_info), TaskUtils.batteryInfo)
             .trim()
         return replaceLocationTag(replaceAppName(regexReplace(titleForSend, regexReplace), from))
@@ -123,16 +138,31 @@ data class MsgInfo(
             .replace(getString(R.string.tag_title), title)
             .replace(getString(R.string.tag_scheme), scheme)
             .replace(getString(R.string.tag_uid), uid.toString())
-            .replace(getString(R.string.tag_receive_time), SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date))
-            .replace(getString(R.string.tag_current_time), SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date()))
+            .replace(
+                getString(R.string.tag_receive_time),
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date)
+            )
+            .replace(
+                getString(R.string.tag_current_time),
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
+            )
             .replace(getString(R.string.tag_device_name), deviceMark)
             .replace(getString(R.string.tag_app_version), versionName)
-            .replace(getString(R.string.tag_call_type), callTypeMap[callType.toString()] ?: getString(R.string.unknown_call))
+            .replace(
+                getString(R.string.tag_call_type),
+                callTypeMap[callType.toString()] ?: getString(R.string.unknown_call)
+            )
             .replace(getString(R.string.tag_ipv4), TaskUtils.ipv4)
             .replace(getString(R.string.tag_ipv6), TaskUtils.ipv6)
             .replace(getString(R.string.tag_battery_pct), "%.2f".format(TaskUtils.batteryPct))
-            .replace(getString(R.string.tag_battery_status), BatteryUtils.getStatus(TaskUtils.batteryStatus))
-            .replace(getString(R.string.tag_battery_plugged), BatteryUtils.getPlugged(TaskUtils.batteryPlugged))
+            .replace(
+                getString(R.string.tag_battery_status),
+                BatteryUtils.getStatus(TaskUtils.batteryStatus)
+            )
+            .replace(
+                getString(R.string.tag_battery_plugged),
+                BatteryUtils.getPlugged(TaskUtils.batteryPlugged)
+            )
             .replace(getString(R.string.tag_battery_info), TaskUtils.batteryInfo)
             .trim()
         return replaceLocationTag(replaceAppName(regexReplace(smsVoForSend, regexReplace), from))
@@ -161,16 +191,34 @@ data class MsgInfo(
             .replace(getString(R.string.tag_title), title)
             .replace(getString(R.string.tag_scheme), scheme)
             .replace(getString(R.string.tag_uid), uid.toString())
-            .replace(getString(R.string.tag_receive_time), jsonInnerStr(SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date)))
-            .replace(getString(R.string.tag_current_time), jsonInnerStr(SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())))
+            .replace(
+                getString(R.string.tag_receive_time),
+                jsonInnerStr(SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date))
+            )
+            .replace(
+                getString(R.string.tag_current_time),
+                jsonInnerStr(SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date()))
+            )
             .replace(getString(R.string.tag_device_name), jsonInnerStr(deviceMark))
             .replace(getString(R.string.tag_app_version), jsonInnerStr(versionName))
-            .replace(getString(R.string.tag_call_type), jsonInnerStr(callTypeMap[callType.toString()] ?: getString(R.string.unknown_call)))
+            .replace(
+                getString(R.string.tag_call_type),
+                jsonInnerStr(callTypeMap[callType.toString()] ?: getString(R.string.unknown_call))
+            )
             .replace(getString(R.string.tag_ipv4), jsonInnerStr(TaskUtils.ipv4))
             .replace(getString(R.string.tag_ipv6), jsonInnerStr(TaskUtils.ipv6))
-            .replace(getString(R.string.tag_battery_pct), jsonInnerStr("%.2f".format(TaskUtils.batteryPct)))
-            .replace(getString(R.string.tag_battery_status), jsonInnerStr(BatteryUtils.getStatus(TaskUtils.batteryStatus)))
-            .replace(getString(R.string.tag_battery_plugged), jsonInnerStr(BatteryUtils.getPlugged(TaskUtils.batteryPlugged)))
+            .replace(
+                getString(R.string.tag_battery_pct),
+                jsonInnerStr("%.2f".format(TaskUtils.batteryPct))
+            )
+            .replace(
+                getString(R.string.tag_battery_status),
+                jsonInnerStr(BatteryUtils.getStatus(TaskUtils.batteryStatus))
+            )
+            .replace(
+                getString(R.string.tag_battery_plugged),
+                jsonInnerStr(BatteryUtils.getPlugged(TaskUtils.batteryPlugged))
+            )
             .replace(getString(R.string.tag_battery_info), jsonInnerStr(TaskUtils.batteryInfo))
             .trim()
         return replaceLocationTag(replaceAppName(msgForSend, from, true), true)
@@ -185,7 +233,10 @@ data class MsgInfo(
                 val lineSplit = line.split("===".toRegex()).toTypedArray()
                 if (lineSplit.isNotEmpty()) {
                     val regex = lineSplit[0]
-                    val replacement = if (lineSplit.size >= 2) lineSplit[1].replace("\\\\n".toRegex(), "\n") else ""
+                    val replacement = if (lineSplit.size >= 2) lineSplit[1].replace(
+                        "\\\\n".toRegex(),
+                        "\n"
+                    ) else ""
                     newContent = newContent.replace(regex.toRegex(), replacement)
                 }
             }
@@ -197,7 +248,11 @@ data class MsgInfo(
     }
 
     //替换{{APP名称}}标签
-    private fun replaceAppName(content: String, packageName: String, needJson: Boolean = false): String {
+    private fun replaceAppName(
+        content: String,
+        packageName: String,
+        needJson: Boolean = false
+    ): String {
         if (TextUtils.isEmpty(content)) return content
         if (content.indexOf(getString(R.string.tag_app_name)) == -1) return content
 

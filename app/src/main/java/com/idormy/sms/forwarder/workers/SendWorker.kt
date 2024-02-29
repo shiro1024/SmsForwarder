@@ -46,8 +46,10 @@ class SendWorker(
 
                     val dateFmt = SimpleDateFormat("yyyy-MM-dd")
                     val mTimeOption = DataProvider.timePeriodOption
-                    val periodStartStr = dateFmt.format(periodStartDay) + " " + mTimeOption[SettingUtils.silentPeriodStart] + ":00"
-                    val periodEndStr = dateFmt.format(periodStartEnd) + " " + mTimeOption[SettingUtils.silentPeriodEnd] + ":00"
+                    val periodStartStr =
+                        dateFmt.format(periodStartDay) + " " + mTimeOption[SettingUtils.silentPeriodStart] + ":00"
+                    val periodEndStr =
+                        dateFmt.format(periodStartEnd) + " " + mTimeOption[SettingUtils.silentPeriodEnd] + ":00"
 
                     val timeFmt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                     val periodStart = timeFmt.parse(periodStartStr, ParsePosition(0))?.time
@@ -73,7 +75,10 @@ class SendWorker(
                     val key = CipherUtils.md5(msgInfo.type + msgInfo.from + msgInfo.content)
                     val timestamp: Long = System.currentTimeMillis()
                     var timestampPrev: Long by HistoryUtils(key, timestamp)
-                    Log.d("SendWorker", "duplicateMessagesLimits=$duplicateMessagesLimits, timestamp=$timestamp, timestampPrev=$timestampPrev, msgInfo=$msgInfo")
+                    Log.d(
+                        "SendWorker",
+                        "duplicateMessagesLimits=$duplicateMessagesLimits, timestamp=$timestamp, timestampPrev=$timestampPrev, msgInfo=$msgInfo"
+                    )
                     if (timestampPrev != timestamp && timestamp - timestampPrev <= duplicateMessagesLimits) {
                         Log.e("SendWorker", "过滤重复消息机制")
                         timestampPrev = timestamp
@@ -98,12 +103,29 @@ class SendWorker(
                     return@withContext Result.failure(workDataOf("send" to "failed"))
                 }
 
-                val msg = Msg(0, msgInfo.type, msgInfo.from, msgInfo.content, msgInfo.simSlot, msgInfo.simInfo, msgInfo.subId, msgInfo.callType)
+                val msg = Msg(
+                    0,
+                    msgInfo.type,
+                    msgInfo.from,
+                    msgInfo.content,
+                    msgInfo.simSlot,
+                    msgInfo.simInfo,
+                    msgInfo.subId,
+                    msgInfo.callType
+                )
                 val msgId = Core.msg.insert(msg)
                 for (rule in ruleListMatched) {
                     val sender = rule.senderList[0]
                     if (isSilentPeriod) {
-                        val log = Logs(0, msgInfo.type, msgId, rule.id, sender.id, 0, ResUtils.getString(R.string.silent_time_period))
+                        val log = Logs(
+                            0,
+                            msgInfo.type,
+                            msgId,
+                            rule.id,
+                            sender.id,
+                            0,
+                            ResUtils.getString(R.string.silent_time_period)
+                        )
                         Core.logs.insert(log)
                         continue
                     }

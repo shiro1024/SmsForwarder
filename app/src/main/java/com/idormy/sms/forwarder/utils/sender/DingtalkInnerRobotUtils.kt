@@ -56,10 +56,16 @@ class DingtalkInnerRobotUtils private constructor() {
             val request = XHttp.post(requestUrl)
 
             //设置代理
-            if ((setting.proxyType == Proxy.Type.HTTP || setting.proxyType == Proxy.Type.SOCKS) && !TextUtils.isEmpty(setting.proxyHost) && !TextUtils.isEmpty(setting.proxyPort)) {
+            if ((setting.proxyType == Proxy.Type.HTTP || setting.proxyType == Proxy.Type.SOCKS) && !TextUtils.isEmpty(
+                    setting.proxyHost
+                ) && !TextUtils.isEmpty(setting.proxyPort)
+            ) {
                 //代理服务器的IP和端口号
                 Log.d(TAG, "proxyHost = ${setting.proxyHost}, proxyPort = ${setting.proxyPort}")
-                val proxyHost = if (NetworkUtils.isIP(setting.proxyHost)) setting.proxyHost else NetworkUtils.getDomainAddress(setting.proxyHost)
+                val proxyHost =
+                    if (NetworkUtils.isIP(setting.proxyHost)) setting.proxyHost else NetworkUtils.getDomainAddress(
+                        setting.proxyHost
+                    )
                 if (!NetworkUtils.isIP(proxyHost)) {
                     throw Exception("代理服务器主机名解析失败：proxyHost=$proxyHost")
                 }
@@ -69,19 +75,32 @@ class DingtalkInnerRobotUtils private constructor() {
                 request.okproxy(Proxy(setting.proxyType, InetSocketAddress(proxyHost, proxyPort)))
 
                 //代理的鉴权账号密码
-                if (setting.proxyAuthenticator == true && (!TextUtils.isEmpty(setting.proxyUsername) || !TextUtils.isEmpty(setting.proxyPassword))) {
-                    Log.i(TAG, "proxyUsername = ${setting.proxyUsername}, proxyPassword = ${setting.proxyPassword}")
+                if (setting.proxyAuthenticator == true && (!TextUtils.isEmpty(setting.proxyUsername) || !TextUtils.isEmpty(
+                        setting.proxyPassword
+                    ))
+                ) {
+                    Log.i(
+                        TAG,
+                        "proxyUsername = ${setting.proxyUsername}, proxyPassword = ${setting.proxyPassword}"
+                    )
 
                     if (setting.proxyType == Proxy.Type.HTTP) {
                         request.okproxyAuthenticator { _: Route?, response: Response ->
                             //设置代理服务器账号密码
-                            val credential = Credentials.basic(setting.proxyUsername.toString(), setting.proxyPassword.toString())
-                            response.request().newBuilder().header("Proxy-Authorization", credential).build()
+                            val credential = Credentials.basic(
+                                setting.proxyUsername.toString(),
+                                setting.proxyPassword.toString()
+                            )
+                            response.request().newBuilder()
+                                .header("Proxy-Authorization", credential).build()
                         }
                     } else {
                         Authenticator.setDefault(object : Authenticator() {
                             override fun getPasswordAuthentication(): PasswordAuthentication {
-                                return PasswordAuthentication(setting.proxyUsername.toString(), setting.proxyPassword?.toCharArray())
+                                return PasswordAuthentication(
+                                    setting.proxyUsername.toString(),
+                                    setting.proxyPassword?.toCharArray()
+                                )
                             }
                         })
                     }
@@ -111,10 +130,15 @@ class DingtalkInnerRobotUtils private constructor() {
                         val resp = Gson().fromJson(response, DingtalkInnerRobotResult::class.java)
                         if (!TextUtils.isEmpty(resp?.accessToken)) {
                             accessToken = resp.accessToken.toString()
-                            expiresIn = System.currentTimeMillis() + ((resp.expireIn ?: 7200) - 120) * 1000L //提前2分钟过期
+                            expiresIn = System.currentTimeMillis() + ((resp.expireIn
+                                ?: 7200) - 120) * 1000L //提前2分钟过期
                             sendTextMsg(setting, msgInfo, rule, senderIndex, logId, msgId)
                         } else {
-                            SendUtils.updateLogs(logId, 0, String.format(getString(R.string.request_failed_tips), response))
+                            SendUtils.updateLogs(
+                                logId,
+                                0,
+                                String.format(getString(R.string.request_failed_tips), response)
+                            )
                             SendUtils.senderLogic(0, msgInfo, rule, senderIndex, msgId)
                         }
                     }
@@ -155,7 +179,9 @@ class DingtalkInnerRobotUtils private constructor() {
 
             val textMsgMap: MutableMap<String, Any> = mutableMapOf()
             textMsgMap["robotCode"] = setting.appKey
-            textMsgMap["userIds"] = setting.userIds.replace("[,，;；|]".toRegex(), "|").trim('|').split('|').toTypedArray()
+            textMsgMap["userIds"] =
+                setting.userIds.replace("[,，;；|]".toRegex(), "|").trim('|').split('|')
+                    .toTypedArray()
             textMsgMap["msgKey"] = setting.msgKey
             textMsgMap["msgParam"] = Gson().toJson(msgParam)
 
@@ -165,10 +191,16 @@ class DingtalkInnerRobotUtils private constructor() {
             val request = XHttp.post(requestUrl)
 
             //设置代理
-            if ((setting.proxyType == Proxy.Type.HTTP || setting.proxyType == Proxy.Type.SOCKS) && !TextUtils.isEmpty(setting.proxyHost) && !TextUtils.isEmpty(setting.proxyPort)) {
+            if ((setting.proxyType == Proxy.Type.HTTP || setting.proxyType == Proxy.Type.SOCKS) && !TextUtils.isEmpty(
+                    setting.proxyHost
+                ) && !TextUtils.isEmpty(setting.proxyPort)
+            ) {
                 //代理服务器的IP和端口号
                 Log.d(TAG, "proxyHost = ${setting.proxyHost}, proxyPort = ${setting.proxyPort}")
-                val proxyHost = if (NetworkUtils.isIP(setting.proxyHost)) setting.proxyHost else NetworkUtils.getDomainAddress(setting.proxyHost)
+                val proxyHost =
+                    if (NetworkUtils.isIP(setting.proxyHost)) setting.proxyHost else NetworkUtils.getDomainAddress(
+                        setting.proxyHost
+                    )
                 if (!NetworkUtils.isIP(proxyHost)) {
                     throw Exception("代理服务器主机名解析失败：proxyHost=$proxyHost")
                 }
@@ -178,19 +210,32 @@ class DingtalkInnerRobotUtils private constructor() {
                 request.okproxy(Proxy(setting.proxyType, InetSocketAddress(proxyHost, proxyPort)))
 
                 //代理的鉴权账号密码
-                if (setting.proxyAuthenticator == true && (!TextUtils.isEmpty(setting.proxyUsername) || !TextUtils.isEmpty(setting.proxyPassword))) {
-                    Log.i(TAG, "proxyUsername = ${setting.proxyUsername}, proxyPassword = ${setting.proxyPassword}")
+                if (setting.proxyAuthenticator == true && (!TextUtils.isEmpty(setting.proxyUsername) || !TextUtils.isEmpty(
+                        setting.proxyPassword
+                    ))
+                ) {
+                    Log.i(
+                        TAG,
+                        "proxyUsername = ${setting.proxyUsername}, proxyPassword = ${setting.proxyPassword}"
+                    )
 
                     if (setting.proxyType == Proxy.Type.HTTP) {
                         request.okproxyAuthenticator { _: Route?, response: Response ->
                             //设置代理服务器账号密码
-                            val credential = Credentials.basic(setting.proxyUsername.toString(), setting.proxyPassword.toString())
-                            response.request().newBuilder().header("Proxy-Authorization", credential).build()
+                            val credential = Credentials.basic(
+                                setting.proxyUsername.toString(),
+                                setting.proxyPassword.toString()
+                            )
+                            response.request().newBuilder()
+                                .header("Proxy-Authorization", credential).build()
                         }
                     } else {
                         Authenticator.setDefault(object : Authenticator() {
                             override fun getPasswordAuthentication(): PasswordAuthentication {
-                                return PasswordAuthentication(setting.proxyUsername.toString(), setting.proxyPassword?.toCharArray())
+                                return PasswordAuthentication(
+                                    setting.proxyUsername.toString(),
+                                    setting.proxyPassword?.toCharArray()
+                                )
                             }
                         })
                     }

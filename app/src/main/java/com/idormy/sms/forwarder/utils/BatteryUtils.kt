@@ -25,7 +25,8 @@ object BatteryUtils {
         batteryInfo.level = "$level%"
         if (scale > 0) batteryInfo.scale = "$scale%"
         if (voltage > 0) batteryInfo.voltage = "${String.format("%.2f", voltage / 1000f)}V"
-        if (temperature > 0) batteryInfo.temperature = "${String.format("%.2f", temperature / 10f)}℃"
+        if (temperature > 0) batteryInfo.temperature =
+            "${String.format("%.2f", temperature / 10f)}℃"
         batteryInfo.status = getStatus(status)
         batteryInfo.health = getHealth(health)
         batteryInfo.plugged = getPlugged(plugged)

@@ -39,7 +39,8 @@ class UrlSchemeUtils private constructor() {
             val deviceMark: String = SettingUtils.extraDeviceMark
             val appVersion: String = AppUtils.getAppVersionName()
             val simInfo: String = msgInfo.simInfo
-            @SuppressLint("SimpleDateFormat") val receiveTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date()) //smsVo.getDate()
+            @SuppressLint("SimpleDateFormat") val receiveTime =
+                SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date()) //smsVo.getDate()
 
             var urlScheme = setting.urlScheme
             Log.i(TAG, "urlScheme:$urlScheme")

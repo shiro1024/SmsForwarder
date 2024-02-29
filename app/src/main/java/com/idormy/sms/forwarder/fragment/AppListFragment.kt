@@ -66,7 +66,11 @@ class AppListFragment : BaseFragment<FragmentAppListBinding?>() {
      * 初始化控件
      */
     override fun initViews() {
-        WidgetUtils.initRecyclerView(binding!!.recyclerView, DensityUtils.dp2px(5f), ThemeUtils.resolveColor(context, R.attr.xui_config_color_background))
+        WidgetUtils.initRecyclerView(
+            binding!!.recyclerView,
+            DensityUtils.dp2px(5f),
+            ThemeUtils.resolveColor(context, R.attr.xui_config_color_background)
+        )
         binding!!.recyclerView.adapter = AppListAdapter(true).also { appListAdapter = it }
 
         binding!!.tabBar.setTabTitles(getStringArray(R.array.app_type_option))
@@ -98,7 +102,8 @@ class AppListFragment : BaseFragment<FragmentAppListBinding?>() {
             }
         })
         appListAdapter?.setOnItemClickListener { _, item, _ ->
-            val cm = requireContext().getSystemService(AppCompatActivity.CLIPBOARD_SERVICE) as ClipboardManager
+            val cm =
+                requireContext().getSystemService(AppCompatActivity.CLIPBOARD_SERVICE) as ClipboardManager
             val mClipData = ClipData.newPlainText("pkgName", item?.packageName)
             cm.setPrimaryClip(mClipData)
             XToastUtils.toast(getString(R.string.package_name_copied) + item?.packageName, 2000)
@@ -110,7 +115,8 @@ class AppListFragment : BaseFragment<FragmentAppListBinding?>() {
         appListAdapter?.refresh(getAppsList(false))
         binding!!.refreshLayout.finishRefresh()
         //监听已安装App信息列表加载完成事件
-        LiveEventBus.get(EVENT_LOAD_APP_LIST, String::class.java).observeStickyForever(appListObserver)
+        LiveEventBus.get(EVENT_LOAD_APP_LIST, String::class.java)
+            .observeStickyForever(appListObserver)
     }
 
     override fun onDestroyView() {

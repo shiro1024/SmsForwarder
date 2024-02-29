@@ -44,11 +44,21 @@ abstract class PhoneStateReceiver : BroadcastReceiver() {
 
     protected abstract fun onIncomingCallAnswered(context: Context, number: String?, start: Date)
 
-    protected abstract fun onIncomingCallEnded(context: Context, number: String?, start: Date, end: Date)
+    protected abstract fun onIncomingCallEnded(
+        context: Context,
+        number: String?,
+        start: Date,
+        end: Date
+    )
 
     protected abstract fun onOutgoingCallStarted(context: Context, number: String?, start: Date)
 
-    protected abstract fun onOutgoingCallEnded(context: Context, number: String?, start: Date, end: Date)
+    protected abstract fun onOutgoingCallEnded(
+        context: Context,
+        number: String?,
+        start: Date,
+        end: Date
+    )
 
     protected abstract fun onMissedCall(context: Context, number: String?, start: Date)
 
@@ -106,6 +116,7 @@ abstract class PhoneStateReceiver : BroadcastReceiver() {
         private var lastState = TelephonyManager.CALL_STATE_IDLE
         private var callStartTime: Date = Date()
         private var isIncoming: Boolean = false
-        private var savedNumber: String? = null  //because the passed incoming is only valid in ringing
+        private var savedNumber: String? =
+            null  //because the passed incoming is only valid in ringing
     }
 }

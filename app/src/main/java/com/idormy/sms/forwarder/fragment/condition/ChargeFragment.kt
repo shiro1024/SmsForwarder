@@ -106,7 +106,8 @@ class ChargeFragment : BaseFragment<FragmentTasksConditionChargeBinding?>(), Vie
     private fun checkSetting(updateView: Boolean = false): ChargeSetting {
         val statusCheckId = binding!!.rgStatus.checkedRadioButtonId
         val pluggedCheckId = binding!!.rgPlugged.checkedRadioButtonId
-        val settingVo = ChargeSetting(statusCheckId = statusCheckId, pluggedCheckId = pluggedCheckId)
+        val settingVo =
+            ChargeSetting(statusCheckId = statusCheckId, pluggedCheckId = pluggedCheckId)
 
         if (updateView) {
             binding!!.tvDescription.text = settingVo.description

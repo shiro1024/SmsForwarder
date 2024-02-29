@@ -38,7 +38,8 @@ class CronWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
             }
 
             // 根据任务信息执行相应操作
-            val conditionList = Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
+            val conditionList =
+                Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
             if (conditionList.isEmpty()) {
                 Log.d(TAG, "TASK-${task.id}：conditionList is empty")
                 return Result.failure()
@@ -68,7 +69,10 @@ class CronWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
             // 将 nextExecTime 的毫秒部分设置为 0，避免因为毫秒部分不同导致的任务重复执行
             nextExecTime.time = nextExecTime.time / 1000 * 1000
             task.nextExecTime = nextExecTime
-            Log.d(TAG, "TASK-${task.id}：lastExecTime = ${task.lastExecTime}, nextExecTime = ${task.nextExecTime}")
+            Log.d(
+                TAG,
+                "TASK-${task.id}：lastExecTime = ${task.lastExecTime}, nextExecTime = ${task.nextExecTime}"
+            )
 
             // 自动禁用任务
             if (task.nextExecTime.time / 1000 < now.time / 1000) {
@@ -85,8 +89,11 @@ class CronWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
 
             //TODO: 组装消息体 && 执行具体任务
             val msgInfo = MsgInfo("task", task.name, task.description, Date(), task.name)
-            val actionData = Data.Builder().putLong(TaskWorker.taskId, task.id).putString(TaskWorker.taskActions, task.actions).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-            val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+            val actionData = Data.Builder().putLong(TaskWorker.taskId, task.id)
+                .putString(TaskWorker.taskActions, task.actions)
+                .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+            val actionRequest =
+                OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
             WorkManager.getInstance().enqueue(actionRequest)
 
             // 为新的 nextExecTime 调度下一次任务执行

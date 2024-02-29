@@ -46,7 +46,8 @@ import java.util.*
 
 @Page(name = "Notification")
 @Suppress("PrivatePropertyName", "DEPRECATION")
-class NotificationFragment : BaseFragment<FragmentTasksActionNotificationBinding?>(), View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+class NotificationFragment : BaseFragment<FragmentTasksActionNotificationBinding?>(),
+    View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private val TAG: String = NotificationFragment::class.java.simpleName
     private var titleBar: TitleBar? = null
@@ -100,7 +101,8 @@ class NotificationFragment : BaseFragment<FragmentTasksActionNotificationBinding
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, 2)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -199,61 +201,91 @@ class NotificationFragment : BaseFragment<FragmentTasksActionNotificationBinding
             val etSmsTemplate: EditText = binding!!.etSmsTemplate
             when (v.id) {
                 R.id.btn_silent_period -> {
-                    OptionsPickerBuilder(context, OnOptionsSelectListener { _: View?, options1: Int, options2: Int, _: Int ->
-                        silentPeriodStart = options1
-                        silentPeriodEnd = options2
-                        val txt = mTimeOption[options1] + " ~ " + mTimeOption[options2]
-                        binding!!.tvSilentPeriod.text = txt
-                        XToastUtils.toast(txt)
-                        return@OnOptionsSelectListener false
-                    }).setTitleText(getString(R.string.select_time_period)).setSelectOptions(silentPeriodStart, silentPeriodEnd).build<Any>().also {
+                    OptionsPickerBuilder(
+                        context,
+                        OnOptionsSelectListener { _: View?, options1: Int, options2: Int, _: Int ->
+                            silentPeriodStart = options1
+                            silentPeriodEnd = options2
+                            val txt = mTimeOption[options1] + " ~ " + mTimeOption[options2]
+                            binding!!.tvSilentPeriod.text = txt
+                            XToastUtils.toast(txt)
+                            return@OnOptionsSelectListener false
+                        }).setTitleText(getString(R.string.select_time_period))
+                        .setSelectOptions(silentPeriodStart, silentPeriodEnd).build<Any>().also {
                         it.setNPicker(mTimeOption, mTimeOption)
                         it.show()
                     }
                 }
 
                 R.id.bt_insert_sender -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_from))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_from)
+                    )
                     return
                 }
 
                 R.id.bt_insert_content -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_sms))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_sms)
+                    )
                     return
                 }
 
                 R.id.bt_insert_sender_app -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_package_name))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_package_name)
+                    )
                     return
                 }
 
                 R.id.bt_insert_uid -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_uid))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_uid)
+                    )
                     return
                 }
 
                 R.id.bt_insert_title_app -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_title))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_title)
+                    )
                     return
                 }
 
                 R.id.bt_insert_content_app -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_msg))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_msg)
+                    )
                     return
                 }
 
                 R.id.bt_insert_extra -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_card_slot))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_card_slot)
+                    )
                     return
                 }
 
                 R.id.bt_insert_time -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_receive_time))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_receive_time)
+                    )
                     return
                 }
 
                 R.id.bt_insert_device_name -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etSmsTemplate, getString(R.string.tag_device_name))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etSmsTemplate,
+                        getString(R.string.tag_device_name)
+                    )
                     return
                 }
 
@@ -262,11 +294,27 @@ class NotificationFragment : BaseFragment<FragmentTasksActionNotificationBinding
                     try {
                         val settingVo = checkSetting()
                         Log.d(TAG, settingVo.toString())
-                        val taskAction = TaskSetting(TASK_ACTION_NOTIFICATION, getString(R.string.task_notification), description, Gson().toJson(settingVo), requestCode)
+                        val taskAction = TaskSetting(
+                            TASK_ACTION_NOTIFICATION,
+                            getString(R.string.task_notification),
+                            description,
+                            Gson().toJson(settingVo),
+                            requestCode
+                        )
                         val taskActionsJson = Gson().toJson(arrayListOf(taskAction))
-                        val msgInfo = MsgInfo("task", getString(R.string.task_notification), description, Date(), getString(R.string.task_notification))
-                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0).putString(TaskWorker.taskActions, taskActionsJson).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val msgInfo = MsgInfo(
+                            "task",
+                            getString(R.string.task_notification),
+                            description,
+                            Date(),
+                            getString(R.string.task_notification)
+                        )
+                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0)
+                            .putString(TaskWorker.taskActions, taskActionsJson)
+                            .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     } catch (e: Exception) {
                         mCountDownHelper?.finish()
@@ -303,7 +351,8 @@ class NotificationFragment : BaseFragment<FragmentTasksActionNotificationBinding
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
     private fun initSenderSpinner() {
         //免打扰(禁用转发)时间段
-        binding!!.tvSilentPeriod.text = mTimeOption[silentPeriodStart] + " ~ " + mTimeOption[silentPeriodEnd]
+        binding!!.tvSilentPeriod.text =
+            mTimeOption[silentPeriodStart] + " ~ " + mTimeOption[silentPeriodEnd]
 
         //初始化发送通道下拉框
         binding!!.spSender.setOnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
@@ -371,44 +420,58 @@ class NotificationFragment : BaseFragment<FragmentTasksActionNotificationBinding
 
     //获取发送通道列表
     private fun getSenderList() {
-        Core.sender.getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<List<Sender>> {
-            override fun onSubscribe(d: Disposable) {}
+        Core.sender.getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<List<Sender>> {
+                override fun onSubscribe(d: Disposable) {}
 
-            override fun onError(e: Throwable) {
-                e.printStackTrace()
-                Log.e(TAG, "getSenderList error: ${e.message}")
-            }
-
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onSuccess(senderList: List<Sender>) {
-                if (senderList.isEmpty()) {
-                    XToastUtils.error(R.string.add_sender_first)
-                    return
+                override fun onError(e: Throwable) {
+                    e.printStackTrace()
+                    Log.e(TAG, "getSenderList error: ${e.message}")
                 }
 
-                senderSpinnerList.clear()
-                senderListAll = senderList as MutableList<Sender>
-                for (sender in senderList) {
-                    val name = if (sender.name.length > 20) sender.name.substring(0, 19) else sender.name
-                    senderSpinnerList.add(SenderSpinnerItem(name, getDrawable(sender.imageId), sender.id, sender.status))
-                }
-                senderSpinnerAdapter = SenderSpinnerAdapter(senderSpinnerList).setIsFilterKey(true).setFilterColor("#EF5362").setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
-                binding!!.spSender.setAdapter(senderSpinnerAdapter)
-                //senderSpinnerAdapter.notifyDataSetChanged()
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onSuccess(senderList: List<Sender>) {
+                    if (senderList.isEmpty()) {
+                        XToastUtils.error(R.string.add_sender_first)
+                        return
+                    }
 
-                //更新senderListSelected的状态与名称
-                senderListSelected.forEach {
-                    senderListAll.forEach { sender ->
-                        if (it.id == sender.id) {
-                            it.name = sender.name
-                            it.status = sender.status
+                    senderSpinnerList.clear()
+                    senderListAll = senderList as MutableList<Sender>
+                    for (sender in senderList) {
+                        val name = if (sender.name.length > 20) sender.name.substring(
+                            0,
+                            19
+                        ) else sender.name
+                        senderSpinnerList.add(
+                            SenderSpinnerItem(
+                                name,
+                                getDrawable(sender.imageId),
+                                sender.id,
+                                sender.status
+                            )
+                        )
+                    }
+                    senderSpinnerAdapter =
+                        SenderSpinnerAdapter(senderSpinnerList).setIsFilterKey(true)
+                            .setFilterColor("#EF5362")
+                            .setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
+                    binding!!.spSender.setAdapter(senderSpinnerAdapter)
+                    //senderSpinnerAdapter.notifyDataSetChanged()
+
+                    //更新senderListSelected的状态与名称
+                    senderListSelected.forEach {
+                        senderListAll.forEach { sender ->
+                            if (it.id == sender.id) {
+                                it.name = sender.name
+                                it.status = sender.status
+                            }
                         }
                     }
-                }
-                senderRecyclerAdapter.notifyDataSetChanged()
+                    senderRecyclerAdapter.notifyDataSetChanged()
 
-            }
-        })
+                }
+            })
     }
 
     private fun checkSenderLogicShow() {

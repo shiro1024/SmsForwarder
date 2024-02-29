@@ -85,7 +85,8 @@ class FeishuFragment : BaseFragment<FragmentSendersFeishuBinding?>(), View.OnCli
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, SettingUtils.requestTimeout)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -114,7 +115,8 @@ class FeishuFragment : BaseFragment<FragmentSendersFeishuBinding?>(), View.OnCli
 
         //编辑
         binding!!.btnDel.setText(R.string.del)
-        Core.sender.get(senderId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
+        Core.sender.get(senderId).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
             override fun onSubscribe(d: Disposable) {}
 
             override fun onError(e: Throwable) {
@@ -157,7 +159,8 @@ class FeishuFragment : BaseFragment<FragmentSendersFeishuBinding?>(), View.OnCli
         binding!!.btnTest.setOnClickListener(this)
         binding!!.btnDel.setOnClickListener(this)
         binding!!.btnSave.setOnClickListener(this)
-        LiveEventBus.get(KEY_SENDER_TEST, String::class.java).observe(this) { mCountDownHelper?.finish() }
+        LiveEventBus.get(KEY_SENDER_TEST, String::class.java)
+            .observe(this) { mCountDownHelper?.finish() }
     }
 
     @SingleClick
@@ -167,47 +170,74 @@ class FeishuFragment : BaseFragment<FragmentSendersFeishuBinding?>(), View.OnCli
             val etMessageCard: EditText = binding!!.etMessageCard
             when (v.id) {
                 R.id.bt_insert_sender_to_title -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_from))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_from)
+                    )
                     return
                 }
 
                 R.id.bt_insert_extra_to_title -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_card_slot))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_card_slot)
+                    )
                     return
                 }
 
                 R.id.bt_insert_time_to_title -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_receive_time))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_receive_time)
+                    )
                     return
                 }
 
                 R.id.bt_insert_device_name_to_title -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_device_name))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_device_name)
+                    )
                     return
                 }
 
                 R.id.bt_insert_sender -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etMessageCard, getString(R.string.tag_from))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etMessageCard,
+                        getString(R.string.tag_from)
+                    )
                     return
                 }
 
                 R.id.bt_insert_content -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etMessageCard, getString(R.string.tag_sms))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etMessageCard,
+                        getString(R.string.tag_sms)
+                    )
                     return
                 }
 
                 R.id.bt_insert_extra -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etMessageCard, getString(R.string.tag_card_slot))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etMessageCard,
+                        getString(R.string.tag_card_slot)
+                    )
                     return
                 }
 
                 R.id.bt_insert_time -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etMessageCard, getString(R.string.tag_receive_time))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etMessageCard,
+                        getString(R.string.tag_receive_time)
+                    )
                     return
                 }
 
                 R.id.bt_insert_device_name -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etMessageCard, getString(R.string.tag_device_name))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etMessageCard,
+                        getString(R.string.tag_device_name)
+                    )
                     return
                 }
 
@@ -217,13 +247,22 @@ class FeishuFragment : BaseFragment<FragmentSendersFeishuBinding?>(), View.OnCli
                         try {
                             val settingVo = checkSetting()
                             Log.d(TAG, settingVo.toString())
-                            val name = binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() } ?: getString(R.string.test_sender_name)
-                            val msgInfo = MsgInfo("sms", getString(R.string.test_phone_num), String.format(getString(R.string.test_sender_sms), name), Date(), getString(R.string.test_sim_info))
+                            val name =
+                                binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() }
+                                    ?: getString(R.string.test_sender_name)
+                            val msgInfo = MsgInfo(
+                                "sms",
+                                getString(R.string.test_phone_num),
+                                String.format(getString(R.string.test_sender_sms), name),
+                                Date(),
+                                getString(R.string.test_sim_info)
+                            )
                             FeishuUtils.sendMsg(settingVo, msgInfo)
                         } catch (e: Exception) {
                             e.printStackTrace()
                             Log.e(TAG, "onClick error:$e")
-                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java).post(e.message.toString())
+                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java)
+                                .post(e.message.toString())
                         }
                         LiveEventBus.get(KEY_SENDER_TEST, String::class.java).post("finish")
                     }.start()
@@ -236,11 +275,14 @@ class FeishuFragment : BaseFragment<FragmentSendersFeishuBinding?>(), View.OnCli
                         return
                     }
 
-                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title).content(R.string.delete_sender_tips).positiveText(R.string.lab_yes).negativeText(R.string.lab_no).onPositive { _: MaterialDialog?, _: DialogAction? ->
-                        viewModel.delete(senderId)
-                        XToastUtils.success(R.string.delete_sender_toast)
-                        popToBack()
-                    }.show()
+                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title)
+                        .content(R.string.delete_sender_tips).positiveText(R.string.lab_yes)
+                        .negativeText(R.string.lab_no)
+                        .onPositive { _: MaterialDialog?, _: DialogAction? ->
+                            viewModel.delete(senderId)
+                            XToastUtils.success(R.string.delete_sender_toast)
+                            popToBack()
+                        }.show()
                     return
                 }
 
@@ -253,7 +295,8 @@ class FeishuFragment : BaseFragment<FragmentSendersFeishuBinding?>(), View.OnCli
                     val status = if (binding!!.sbEnable.isChecked) 1 else 0
                     val settingVo = checkSetting()
                     if (isClone) senderId = 0
-                    val senderNew = Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
+                    val senderNew =
+                        Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
                     Log.d(TAG, senderNew.toString())
 
                     viewModel.insertOrUpdate(senderNew)
@@ -276,7 +319,8 @@ class FeishuFragment : BaseFragment<FragmentSendersFeishuBinding?>(), View.OnCli
         }
 
         val secret = binding!!.etSecret.text.toString().trim()
-        val msgType = if (binding!!.rgMsgType.checkedRadioButtonId == R.id.rb_msg_type_interactive) "interactive" else "text"
+        val msgType =
+            if (binding!!.rgMsgType.checkedRadioButtonId == R.id.rb_msg_type_interactive) "interactive" else "text"
         val title = binding!!.etTitleTemplate.text.toString().trim()
         val messageCard = binding!!.etMessageCard.text.toString().trim()
 

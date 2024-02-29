@@ -17,10 +17,15 @@ import com.idormy.sms.forwarder.database.entity.Rule
 import com.idormy.sms.forwarder.databinding.AdapterRulesCardViewListItemBinding
 
 @Suppress("EmptyMethod")
-class RulePagingAdapter(private val itemClickListener: OnItemClickListener) : PagingDataAdapter<Rule, MyViewHolder>(diffCallback) {
+class RulePagingAdapter(private val itemClickListener: OnItemClickListener) :
+    PagingDataAdapter<Rule, MyViewHolder>(diffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val binding = AdapterRulesCardViewListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = AdapterRulesCardViewListItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return MyViewHolder(binding)
     }
 
@@ -33,7 +38,8 @@ class RulePagingAdapter(private val itemClickListener: OnItemClickListener) : Pa
 
             holder.binding.layoutSenders.removeAllViews()
             for (sender in item.senderList) {
-                val layoutSenderItem = View.inflate(App.context, R.layout.item_sender, null) as LinearLayout
+                val layoutSenderItem =
+                    View.inflate(App.context, R.layout.item_sender, null) as LinearLayout
                 val ivSenderImage = layoutSenderItem.findViewById<ImageView>(R.id.iv_sender_image)
                 val ivSenderStatus = layoutSenderItem.findViewById<ImageView>(R.id.iv_sender_status)
                 val tvSenderName = layoutSenderItem.findViewById<TextView>(R.id.tv_sender_name)
@@ -55,7 +61,9 @@ class RulePagingAdapter(private val itemClickListener: OnItemClickListener) : Pa
         }
     }
 
-    class MyViewHolder(val binding: AdapterRulesCardViewListItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class MyViewHolder(val binding: AdapterRulesCardViewListItemBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
     interface OnItemClickListener {
         fun onItemClicked(view: View?, item: Rule)
         fun onItemRemove(view: View?, id: Int)

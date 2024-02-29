@@ -197,7 +197,8 @@ class WebhookUtils {
 
                     override fun onSuccess(response: String) {
                         Log.i(TAG, response)
-                        val status = if (!setting.response.isNullOrEmpty() && !response.contains(setting.response)) 0 else 2
+                        val status =
+                            if (!setting.response.isNullOrEmpty() && !response.contains(setting.response)) 0 else 2
                         SendUtils.updateLogs(logId, status, response)
                         SendUtils.senderLogic(status, msgInfo, rule, senderIndex, msgId)
                     }

@@ -1,16 +1,13 @@
 package com.idormy.sms.forwarder.utils
 
-import android.app.Dialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.text.SpannableString
-import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.TextUtils
-import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.View
 import android.widget.EditText
@@ -28,10 +25,6 @@ import com.idormy.sms.forwarder.service.NotificationService
 import com.xuexiang.xpage.base.XPageFragment
 import com.xuexiang.xpage.core.PageOption
 import com.xuexiang.xui.utils.ColorUtils
-import com.xuexiang.xui.widget.dialog.DialogLoader
-import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction
-import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog
-import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog.SingleButtonCallback
 import com.xuexiang.xui.widget.imageview.preview.PreviewBuilder
 import com.xuexiang.xutil.XUtil
 import com.xuexiang.xutil.common.StringUtils
@@ -52,57 +45,6 @@ class CommonUtils private constructor() {
          */
         private const val PRIVACY_URL = "https://gitee.com/pp/SmsForwarder/raw/main/PRIVACY"
 
-        /**
-         * 显示隐私政策的提示
-         *
-         * @param context
-         * @param submitListener 同意的监听
-         * @return
-         */
-        @Suppress("SameParameterValue", "NAME_SHADOWING")
-        @JvmStatic
-        fun showPrivacyDialog(context: Context, submitListener: SingleButtonCallback?): Dialog {
-            val dialog = MaterialDialog.Builder(context).title(R.string.title_reminder).autoDismiss(false).cancelable(false).positiveText(R.string.lab_agree).onPositive { dialog1: MaterialDialog, which: DialogAction? ->
-                if (submitListener != null) {
-                    submitListener.onClick(dialog1, which!!)
-                } else {
-                    dialog1.dismiss()
-                }
-            }.negativeText(R.string.lab_disagree).onNegative { dialog, _ ->
-                dialog.dismiss()
-                DialogLoader.getInstance().showConfirmDialog(
-                    context, getString(R.string.title_reminder), String.format(
-                        getString(R.string.content_privacy_explain_again), getString(R.string.app_name)
-                    ), getString(R.string.lab_look_again), { dialog, _ ->
-                        dialog.dismiss()
-                        showPrivacyDialog(context, submitListener)
-                    }, getString(R.string.lab_still_disagree)
-                ) { dialog, _ ->
-                    dialog.dismiss()
-                    DialogLoader.getInstance().showConfirmDialog(
-                        context, getString(R.string.content_think_about_it_again), getString(R.string.lab_look_again), { dialog, _ ->
-                            dialog.dismiss()
-                            showPrivacyDialog(context, submitListener)
-                        }, getString(R.string.lab_exit_app)
-                    ) { dialog, _ ->
-                        dialog.dismiss()
-                        XUtil.exitApp()
-                    }
-                }
-            }.build()
-            dialog.setContent(getPrivacyContent(context))
-            //开始响应点击事件
-            dialog.contentView!!.movementMethod = LinkMovementMethod.getInstance()
-            dialog.show()
-            return dialog
-        }
-
-        /**
-         * @return 隐私政策说明
-         */
-        private fun getPrivacyContent(context: Context): SpannableStringBuilder {
-            return SpannableStringBuilder().append("    ").append(getString(R.string.privacy_content_1)).append(" ").append(getString(R.string.app_name)).append("!\n").append("    ").append(getString(R.string.privacy_content_2)).append("    ").append(getString(R.string.privacy_content_3)).append(getPrivacyLink(context, PRIVACY_URL)).append(getString(R.string.privacy_content_4)).append("    ").append(getString(R.string.privacy_content_5)).append(getPrivacyLink(context, PRIVACY_URL)).append(getString(R.string.privacy_content_6)).append("    ").append(getString(R.string.privacy_content_7))
-        }
 
         /**
          * @param context 隐私政策的链接
@@ -144,7 +86,8 @@ class CommonUtils private constructor() {
         @JvmStatic
         fun gotoProtocol(fragment: XPageFragment?, isPrivacy: Boolean, isImmersive: Boolean) {
             PageOption.to(ServiceProtocolFragment::class.java).putString(
-                ServiceProtocolFragment.KEY_PROTOCOL_TITLE, if (isPrivacy) getString(R.string.title_privacy_protocol) else getString(
+                ServiceProtocolFragment.KEY_PROTOCOL_TITLE,
+                if (isPrivacy) getString(R.string.title_privacy_protocol) else getString(
                     R.string.title_user_protocol
                 )
             ).putBoolean(ServiceProtocolFragment.KEY_IS_IMMERSIVE, isImmersive).open(fragment!!)
@@ -192,7 +135,10 @@ class CommonUtils private constructor() {
             }
             val bounds = Rect()
             view?.getGlobalVisibleRect(bounds)
-            PreviewBuilder.from(fragment).setImgs(ImageInfo.newInstance(url, bounds)).setCurrentIndex(0).setSingleFling(true).setProgressColor(R.color.xui_config_color_main_theme).setType(PreviewBuilder.IndicatorType.Number).start()
+            PreviewBuilder.from(fragment).setImgs(ImageInfo.newInstance(url, bounds))
+                .setCurrentIndex(0).setSingleFling(true)
+                .setProgressColor(R.color.xui_config_color_main_theme)
+                .setType(PreviewBuilder.IndicatorType.Number).start()
         }
 
         /**
@@ -203,8 +149,16 @@ class CommonUtils private constructor() {
          * @param isImmersive 是否沉浸式
          */
         @JvmStatic
-        fun previewMarkdown(fragment: XPageFragment?, title: String, url: String, isImmersive: Boolean) {
-            PageOption.to(MarkdownFragment::class.java).putString(MarkdownFragment.KEY_MD_TITLE, title).putString(MarkdownFragment.KEY_MD_URL, url).putBoolean(MarkdownFragment.KEY_IS_IMMERSIVE, isImmersive).open(fragment!!)
+        fun previewMarkdown(
+            fragment: XPageFragment?,
+            title: String,
+            url: String,
+            isImmersive: Boolean
+        ) {
+            PageOption.to(MarkdownFragment::class.java)
+                .putString(MarkdownFragment.KEY_MD_TITLE, title)
+                .putString(MarkdownFragment.KEY_MD_URL, url)
+                .putBoolean(MarkdownFragment.KEY_IS_IMMERSIVE, isImmersive).open(fragment!!)
         }
 
         //是否合法的url
@@ -215,7 +169,8 @@ class CommonUtils private constructor() {
         //是否合法的url
         fun checkUrl(urls: String?, emptyResult: Boolean): Boolean {
             if (TextUtils.isEmpty(urls)) return emptyResult
-            val regex = """^(https?://)?(?:www\.)?(?:\[[a-fA-F0-9:]+\]|[a-zA-Z0-9-]+\.?)(?::\d{1,5})?(?:[-a-zA-Z0-9()@:%_\+.~#?&/=\[\]]*)?${'$'}"""
+            val regex =
+                """^(https?://)?(?:www\.)?(?:\[[a-fA-F0-9:]+\]|[a-zA-Z0-9-]+\.?)(?::\d{1,5})?(?:[-a-zA-Z0-9()@:%_\+.~#?&/=\[\]]*)?${'$'}"""
             val pat = Pattern.compile(regex)
             val mat = pat.matcher(urls?.trim() ?: "")
             return mat.matches()
@@ -229,7 +184,8 @@ class CommonUtils private constructor() {
         //是否合法的URL Scheme
         fun checkUrlScheme(urls: String?, emptyResult: Boolean): Boolean {
             if (TextUtils.isEmpty(urls)) return emptyResult
-            val regex = "^[a-zA-Z\\d]+://[-a-zA-Z\\d+&@#/%?=~_|!:,.;\\[\\]]*[-a-zA-Z\\d+&@#/%=~_|\\[\\]]"
+            val regex =
+                "^[a-zA-Z\\d]+://[-a-zA-Z\\d+&@#/%?=~_|!:,.;\\[\\]]*[-a-zA-Z\\d+&@#/%=~_|\\[\\]]"
             val pat = Pattern.compile(regex)
             val mat = pat.matcher(urls?.trim() ?: "")
             return mat.matches()
@@ -253,14 +209,16 @@ class CommonUtils private constructor() {
 
         //是否合法的域名
         fun checkDomain(domain: String): Boolean {
-            val pattenDomain = Pattern.compile("^(?=^.{3,255}$)(?:(?:(?:[a-zA-Z\\d]|[a-zA-Z\\d][a-zA-Z\\d\\-]*[a-zA-Z\\d])\\.){1,126}(?:[A-Za-z\\d]|[A-Za-z\\d][A-Za-z\\d\\-]*[A-Za-z\\d]))$")
+            val pattenDomain =
+                Pattern.compile("^(?=^.{3,255}$)(?:(?:(?:[a-zA-Z\\d]|[a-zA-Z\\d][a-zA-Z\\d\\-]*[a-zA-Z\\d])\\.){1,126}(?:[A-Za-z\\d]|[A-Za-z\\d][A-Za-z\\d\\-]*[A-Za-z\\d]))$")
             return pattenDomain.matcher(domain).matches()
         }
 
         //是否合法的端口号
         fun checkPort(port: String): Boolean {
             if (TextUtils.isEmpty(port)) return false
-            val pattenPort = Pattern.compile("^((6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5])|[0-5]?\\d{0,4})$")
+            val pattenPort =
+                Pattern.compile("^((6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5])|[0-5]?\\d{0,4})$")
             return pattenPort.matcher(port).matches()
         }
 
@@ -274,10 +232,14 @@ class CommonUtils private constructor() {
         fun toggleNotificationListenerService(context: Context) {
             val pm = context.packageManager
             pm.setComponentEnabledSetting(
-                ComponentName(context.applicationContext, NotificationService::class.java), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP
+                ComponentName(context.applicationContext, NotificationService::class.java),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP
             )
             pm.setComponentEnabledSetting(
-                ComponentName(context.applicationContext, NotificationService::class.java), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
+                ComponentName(context.applicationContext, NotificationService::class.java),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP
             )
         }
 

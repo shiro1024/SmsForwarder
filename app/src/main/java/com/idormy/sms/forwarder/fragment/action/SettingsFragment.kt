@@ -92,7 +92,8 @@ class SettingsFragment : BaseFragment<FragmentTasksActionSettingsBinding?>(), Vi
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, 1)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -160,7 +161,8 @@ class SettingsFragment : BaseFragment<FragmentTasksActionSettingsBinding?>(), Vi
         binding!!.btnSave.setOnClickListener(this)
 
         //监听已安装App信息列表加载完成事件
-        LiveEventBus.get(EVENT_LOAD_APP_LIST, String::class.java).observeStickyForever(appListObserver)
+        LiveEventBus.get(EVENT_LOAD_APP_LIST, String::class.java)
+            .observeStickyForever(appListObserver)
 
         binding!!.sbEnableSms.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
@@ -235,36 +237,40 @@ class SettingsFragment : BaseFragment<FragmentTasksActionSettingsBinding?>(), Vi
         binding!!.sbEnableAppNotify.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
                 //检查权限是否获取
-                XXPermissions.with(this).permission(Permission.BIND_NOTIFICATION_LISTENER_SERVICE).request(OnPermissionCallback { _, allGranted ->
-                    if (!allGranted) {
-                        binding!!.sbEnableAppNotify.isChecked = false
-                        XToastUtils.error(R.string.tips_notification_listener)
-                        return@OnPermissionCallback
-                    }
+                XXPermissions.with(this).permission(Permission.BIND_NOTIFICATION_LISTENER_SERVICE)
+                    .request(OnPermissionCallback { _, allGranted ->
+                        if (!allGranted) {
+                            binding!!.sbEnableAppNotify.isChecked = false
+                            XToastUtils.error(R.string.tips_notification_listener)
+                            return@OnPermissionCallback
+                        }
 
-                    binding!!.sbEnableAppNotify.isChecked = true
-                    CommonUtils.toggleNotificationListenerService(requireContext())
-                })
+                        binding!!.sbEnableAppNotify.isChecked = true
+                        CommonUtils.toggleNotificationListenerService(requireContext())
+                    })
             }
         }
 
         binding!!.sbEnableLocation.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             if (isChecked) {
-                XXPermissions.with(this).permission(Permission.ACCESS_COARSE_LOCATION).permission(Permission.ACCESS_FINE_LOCATION).permission(Permission.ACCESS_BACKGROUND_LOCATION).request(object : OnPermissionCallback {
-                    override fun onGranted(permissions: List<String>, all: Boolean) {
-                    }
-
-                    override fun onDenied(permissions: List<String>, never: Boolean) {
-                        if (never) {
-                            XToastUtils.error(R.string.toast_denied_never)
-                            // 如果是被永久拒绝就跳转到应用权限系统设置页面
-                            XXPermissions.startPermissionActivity(requireContext(), permissions)
-                        } else {
-                            XToastUtils.error(R.string.toast_denied)
+                XXPermissions.with(this).permission(Permission.ACCESS_COARSE_LOCATION)
+                    .permission(Permission.ACCESS_FINE_LOCATION)
+                    .permission(Permission.ACCESS_BACKGROUND_LOCATION)
+                    .request(object : OnPermissionCallback {
+                        override fun onGranted(permissions: List<String>, all: Boolean) {
                         }
-                        binding!!.sbEnableLocation.isChecked = false
-                    }
-                })
+
+                        override fun onDenied(permissions: List<String>, never: Boolean) {
+                            if (never) {
+                                XToastUtils.error(R.string.toast_denied_never)
+                                // 如果是被永久拒绝就跳转到应用权限系统设置页面
+                                XXPermissions.startPermissionActivity(requireContext(), permissions)
+                            } else {
+                                XToastUtils.error(R.string.toast_denied)
+                            }
+                            binding!!.sbEnableLocation.isChecked = false
+                        }
+                    })
             }
         }
         //设置位置更新最小时间间隔（单位：毫秒）； 默认间隔：10000毫秒，最小间隔：1000毫秒
@@ -339,11 +345,27 @@ class SettingsFragment : BaseFragment<FragmentTasksActionSettingsBinding?>(), Vi
                     try {
                         val settingVo = checkSetting()
                         Log.d(TAG, settingVo.toString())
-                        val taskAction = TaskSetting(TASK_ACTION_SETTINGS, getString(R.string.task_settings), settingVo.description, Gson().toJson(settingVo), requestCode)
+                        val taskAction = TaskSetting(
+                            TASK_ACTION_SETTINGS,
+                            getString(R.string.task_settings),
+                            settingVo.description,
+                            Gson().toJson(settingVo),
+                            requestCode
+                        )
                         val taskActionsJson = Gson().toJson(arrayListOf(taskAction))
-                        val msgInfo = MsgInfo("task", getString(R.string.task_settings), settingVo.description, Date(), getString(R.string.task_settings))
-                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0).putString(TaskWorker.taskActions, taskActionsJson).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val msgInfo = MsgInfo(
+                            "task",
+                            getString(R.string.task_settings),
+                            settingVo.description,
+                            Date(),
+                            getString(R.string.task_settings)
+                        )
+                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0)
+                            .putString(TaskWorker.taskActions, taskActionsJson)
+                            .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     } catch (e: Exception) {
                         mCountDownHelper?.finish()
@@ -393,25 +415,42 @@ class SettingsFragment : BaseFragment<FragmentTasksActionSettingsBinding?>(), Vi
         if (SettingUtils.enableLoadUserAppList) {
             for (appInfo in App.UserAppList) {
                 if (TextUtils.isEmpty(appInfo.packageName)) continue
-                appListSpinnerList.add(AppListAdapterItem(appInfo.name, appInfo.icon, appInfo.packageName))
+                appListSpinnerList.add(
+                    AppListAdapterItem(
+                        appInfo.name,
+                        appInfo.icon,
+                        appInfo.packageName
+                    )
+                )
             }
         }
         if (SettingUtils.enableLoadSystemAppList) {
             for (appInfo in App.SystemAppList) {
                 if (TextUtils.isEmpty(appInfo.packageName)) continue
-                appListSpinnerList.add(AppListAdapterItem(appInfo.name, appInfo.icon, appInfo.packageName))
+                appListSpinnerList.add(
+                    AppListAdapterItem(
+                        appInfo.name,
+                        appInfo.icon,
+                        appInfo.packageName
+                    )
+                )
             }
         }
 
         //列表为空也不显示下拉框
         if (appListSpinnerList.isEmpty()) return
 
-        appListSpinnerAdapter = AppListSpinnerAdapter(appListSpinnerList).setIsFilterKey(true).setFilterColor("#EF5362").setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
+        appListSpinnerAdapter =
+            AppListSpinnerAdapter(appListSpinnerList).setIsFilterKey(true).setFilterColor("#EF5362")
+                .setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
         binding!!.spApp.setAdapter(appListSpinnerAdapter)
         binding!!.spApp.setOnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
             try {
                 val appInfo = appListSpinnerAdapter.getItemSource(position) as AppListAdapterItem
-                CommonUtils.insertOrReplaceText2Cursor(binding!!.etAppList, appInfo.packageName.toString() + "\n")
+                CommonUtils.insertOrReplaceText2Cursor(
+                    binding!!.etAppList,
+                    appInfo.packageName.toString() + "\n"
+                )
             } catch (e: Exception) {
                 XToastUtils.error(e.message.toString())
             }
@@ -427,10 +466,14 @@ class SettingsFragment : BaseFragment<FragmentTasksActionSettingsBinding?>(), Vi
         val disableList = mutableListOf<String>()
 
         val enableSms = binding!!.sbEnableSms.isChecked
-        if (enableSms) enableList.add(getString(R.string.forward_sms)) else disableList.add(getString(R.string.forward_sms))
+        if (enableSms) enableList.add(getString(R.string.forward_sms)) else disableList.add(
+            getString(R.string.forward_sms)
+        )
 
         val enablePhone = binding!!.sbEnablePhone.isChecked
-        if (enablePhone) enableList.add(getString(R.string.forward_missed_calls)) else disableList.add(getString(R.string.forward_missed_calls))
+        if (enablePhone) enableList.add(getString(R.string.forward_missed_calls)) else disableList.add(
+            getString(R.string.forward_missed_calls)
+        )
         val enableCallType1 = binding!!.scbCallType1.isChecked
         val enableCallType2 = binding!!.scbCallType2.isChecked
         val enableCallType3 = binding!!.scbCallType3.isChecked
@@ -442,12 +485,16 @@ class SettingsFragment : BaseFragment<FragmentTasksActionSettingsBinding?>(), Vi
         }
 
         val enableAppNotify = binding!!.sbEnableAppNotify.isChecked
-        if (enableAppNotify) enableList.add(getString(R.string.forward_app_notify)) else disableList.add(getString(R.string.forward_app_notify))
+        if (enableAppNotify) enableList.add(getString(R.string.forward_app_notify)) else disableList.add(
+            getString(R.string.forward_app_notify)
+        )
         val enableCancelAppNotify = binding!!.scbCancelAppNotify.isChecked
         val enableNotUserPresent = binding!!.scbNotUserPresent.isChecked
 
         val enableLocation = binding!!.sbEnableLocation.isChecked
-        if (enableLocation) enableList.add(getString(R.string.enable_location)) else disableList.add(getString(R.string.enable_location))
+        if (enableLocation) enableList.add(getString(R.string.enable_location)) else disableList.add(
+            getString(R.string.enable_location)
+        )
         val locationAccuracy = when (binding!!.rgAccuracy.checkedRadioButtonId) {
             R.id.rb_accuracy_fine -> Criteria.ACCURACY_FINE
             R.id.rb_accuracy_coarse -> Criteria.ACCURACY_COARSE
@@ -461,32 +508,68 @@ class SettingsFragment : BaseFragment<FragmentTasksActionSettingsBinding?>(), Vi
             R.id.rb_power_requirement_no_requirement -> Criteria.NO_REQUIREMENT
             else -> Criteria.POWER_LOW
         }
-        val locationMinInterval = (binding!!.etMinInterval.text.toString().toLongOrNull() ?: 1) * 1000
+        val locationMinInterval =
+            (binding!!.etMinInterval.text.toString().toLongOrNull() ?: 1) * 1000
         val locationMinDistance = binding!!.etMinDistance.text.toString().toIntOrNull() ?: 0
 
         val enableSmsCommand = binding!!.sbEnableSmsCommand.isChecked
-        if (enableSmsCommand) enableList.add(getString(R.string.sms_command)) else disableList.add(getString(R.string.sms_command))
+        if (enableSmsCommand) enableList.add(getString(R.string.sms_command)) else disableList.add(
+            getString(R.string.sms_command)
+        )
         val smsCommandSafePhone = binding!!.etSafePhone.text.toString()
 
         val enableLoadAppList = binding!!.sbEnableLoadAppList.isChecked
-        if (enableLoadAppList) enableList.add(getString(R.string.load_app_list)) else disableList.add(getString(R.string.load_app_list))
+        if (enableLoadAppList) enableList.add(getString(R.string.load_app_list)) else disableList.add(
+            getString(R.string.load_app_list)
+        )
         val enableLoadUserAppList = binding!!.scbLoadUserApp.isChecked
         val enableLoadSystemAppList = binding!!.scbLoadSystemApp.isChecked
 
         val cancelExtraAppNotify = binding!!.etAppList.text.toString()
-        if (cancelExtraAppNotify.isNotEmpty()) enableList.add(getString(R.string.extra_app)) else disableList.add(getString(R.string.extra_app))
+        if (cancelExtraAppNotify.isNotEmpty()) enableList.add(getString(R.string.extra_app)) else disableList.add(
+            getString(R.string.extra_app)
+        )
 
         val duplicateMessagesLimits = binding!!.xsbDuplicateMessagesLimits.selectedNumber
-        if (duplicateMessagesLimits > 0) enableList.add(getString(R.string.filtering_duplicate_messages)) else disableList.add(getString(R.string.filtering_duplicate_messages))
+        if (duplicateMessagesLimits > 0) enableList.add(getString(R.string.filtering_duplicate_messages)) else disableList.add(
+            getString(R.string.filtering_duplicate_messages)
+        )
 
         val description = StringBuilder()
         if (enableList.isNotEmpty()) {
-            description.append(" ").append(getString(R.string.enable_function)).append(": ").append(enableList.joinToString(","))
+            description.append(" ").append(getString(R.string.enable_function)).append(": ")
+                .append(enableList.joinToString(","))
         }
         if (disableList.isNotEmpty()) {
-            description.append(" ").append(getString(R.string.disable_function)).append(": ").append(disableList.joinToString(","))
+            description.append(" ").append(getString(R.string.disable_function)).append(": ")
+                .append(disableList.joinToString(","))
         }
 
-        return SettingsSetting(description.toString().trim(), enableSms, enablePhone, enableCallType1, enableCallType2, enableCallType3, enableCallType4, enableCallType5, enableCallType6, enableAppNotify, enableCancelAppNotify, enableNotUserPresent, enableLocation, locationAccuracy, locationPowerRequirement, locationMinInterval, locationMinDistance, enableSmsCommand, smsCommandSafePhone, enableLoadAppList, enableLoadUserAppList, enableLoadSystemAppList, cancelExtraAppNotify, duplicateMessagesLimits)
+        return SettingsSetting(
+            description.toString().trim(),
+            enableSms,
+            enablePhone,
+            enableCallType1,
+            enableCallType2,
+            enableCallType3,
+            enableCallType4,
+            enableCallType5,
+            enableCallType6,
+            enableAppNotify,
+            enableCancelAppNotify,
+            enableNotUserPresent,
+            enableLocation,
+            locationAccuracy,
+            locationPowerRequirement,
+            locationMinInterval,
+            locationMinDistance,
+            enableSmsCommand,
+            smsCommandSafePhone,
+            enableLoadAppList,
+            enableLoadUserAppList,
+            enableLoadSystemAppList,
+            cancelExtraAppNotify,
+            duplicateMessagesLimits
+        )
     }
 }

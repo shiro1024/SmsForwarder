@@ -15,32 +15,61 @@ data class LockScreenSetting(
     var checkAgain: Boolean = false, //是否再次校验
 ) : Serializable {
 
-    constructor(actionCheckId: Int, timeAfterOff: Int, timeAfterOn: Int, timeAfterLocked: Int, timeAfterUnlocked: Int, checkAgain: Boolean = false) : this() {
+    constructor(
+        actionCheckId: Int,
+        timeAfterOff: Int,
+        timeAfterOn: Int,
+        timeAfterLocked: Int,
+        timeAfterUnlocked: Int,
+        checkAgain: Boolean = false
+    ) : this() {
         val duration = when (actionCheckId) {
             R.id.rb_action_screen_on -> {
-                val durationStr = if (timeAfterOn > 0) String.format(getString(R.string.duration_minute), timeAfterOn.toString()) else ""
-                description = String.format(getString(R.string.time_after_screen_on_description), durationStr)
+                val durationStr = if (timeAfterOn > 0) String.format(
+                    getString(R.string.duration_minute),
+                    timeAfterOn.toString()
+                ) else ""
+                description =
+                    String.format(getString(R.string.time_after_screen_on_description), durationStr)
                 action = Intent.ACTION_SCREEN_ON
                 timeAfterOn
             }
 
             R.id.rb_action_screen_unlocked -> {
-                val durationStr = if (timeAfterUnlocked > 0) String.format(getString(R.string.duration_minute), timeAfterUnlocked.toString()) else ""
-                description = String.format(getString(R.string.time_after_screen_unlocked_description), durationStr)
+                val durationStr = if (timeAfterUnlocked > 0) String.format(
+                    getString(R.string.duration_minute),
+                    timeAfterUnlocked.toString()
+                ) else ""
+                description = String.format(
+                    getString(R.string.time_after_screen_unlocked_description),
+                    durationStr
+                )
                 action = Intent.ACTION_USER_PRESENT
                 timeAfterUnlocked
             }
 
             R.id.rb_action_screen_locked -> {
-                val durationStr = if (timeAfterLocked > 0) String.format(getString(R.string.duration_minute), timeAfterLocked.toString()) else ""
-                description = String.format(getString(R.string.time_after_screen_locked_description), durationStr)
+                val durationStr = if (timeAfterLocked > 0) String.format(
+                    getString(R.string.duration_minute),
+                    timeAfterLocked.toString()
+                ) else ""
+                description = String.format(
+                    getString(R.string.time_after_screen_locked_description),
+                    durationStr
+                )
                 action = Intent.ACTION_SCREEN_OFF + "_LOCKED"
                 timeAfterLocked
             }
 
             else -> {
-                val durationStr = if (timeAfterOff > 0) String.format(getString(R.string.duration_minute), timeAfterOff.toString()) else ""
-                description = String.format(getString(R.string.time_after_screen_off_description), durationStr)
+                val durationStr = if (timeAfterOff > 0) String.format(
+                    getString(R.string.duration_minute),
+                    timeAfterOff.toString()
+                ) else ""
+                description = String.format(
+                    getString(R.string.time_after_screen_off_description),
+                    durationStr
+                )
                 action = Intent.ACTION_SCREEN_OFF
                 timeAfterOff
             }

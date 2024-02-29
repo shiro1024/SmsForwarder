@@ -45,7 +45,8 @@ import java.util.Date
 
 @Page(name = "钉钉群机器人")
 @Suppress("PrivatePropertyName")
-class DingtalkGroupRobotFragment : BaseFragment<FragmentSendersDingtalkGroupRobotBinding?>(), View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+class DingtalkGroupRobotFragment : BaseFragment<FragmentSendersDingtalkGroupRobotBinding?>(),
+    View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private val TAG: String = DingtalkGroupRobotFragment::class.java.simpleName
     private var titleBar: TitleBar? = null
@@ -86,7 +87,8 @@ class DingtalkGroupRobotFragment : BaseFragment<FragmentSendersDingtalkGroupRobo
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, SettingUtils.requestTimeout)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -105,7 +107,8 @@ class DingtalkGroupRobotFragment : BaseFragment<FragmentSendersDingtalkGroupRobo
 
         //编辑
         binding!!.btnDel.setText(R.string.del)
-        Core.sender.get(senderId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
+        Core.sender.get(senderId).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
             override fun onSubscribe(d: Disposable) {}
 
             override fun onError(e: Throwable) {
@@ -122,7 +125,8 @@ class DingtalkGroupRobotFragment : BaseFragment<FragmentSendersDingtalkGroupRobo
                 }
                 binding!!.etName.setText(sender.name)
                 binding!!.sbEnable.isChecked = sender.status == 1
-                val settingVo = Gson().fromJson(sender.jsonSetting, DingtalkGroupRobotSetting::class.java)
+                val settingVo =
+                    Gson().fromJson(sender.jsonSetting, DingtalkGroupRobotSetting::class.java)
                 Log.d(TAG, settingVo.toString())
                 if (settingVo != null) {
                     binding!!.etToken.setText(settingVo.token)
@@ -147,9 +151,11 @@ class DingtalkGroupRobotFragment : BaseFragment<FragmentSendersDingtalkGroupRobo
         binding!!.btnSave.setOnClickListener(this)
         binding!!.sbAtAll.setOnCheckedChangeListener(this)
         binding!!.rgMsgType.setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
-            binding!!.layoutCustomTemplate.visibility = if (checkedId == R.id.rb_msg_type_markdown) View.VISIBLE else View.GONE
+            binding!!.layoutCustomTemplate.visibility =
+                if (checkedId == R.id.rb_msg_type_markdown) View.VISIBLE else View.GONE
         }
-        LiveEventBus.get(KEY_SENDER_TEST, String::class.java).observe(this) { mCountDownHelper?.finish() }
+        LiveEventBus.get(KEY_SENDER_TEST, String::class.java)
+            .observe(this) { mCountDownHelper?.finish() }
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
@@ -171,22 +177,34 @@ class DingtalkGroupRobotFragment : BaseFragment<FragmentSendersDingtalkGroupRobo
             val etTitleTemplate: EditText = binding!!.etTitleTemplate
             when (v.id) {
                 R.id.bt_insert_sender -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_from))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_from)
+                    )
                     return
                 }
 
                 R.id.bt_insert_extra -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_card_slot))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_card_slot)
+                    )
                     return
                 }
 
                 R.id.bt_insert_time -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_receive_time))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_receive_time)
+                    )
                     return
                 }
 
                 R.id.bt_insert_device_name -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_device_name))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_device_name)
+                    )
                     return
                 }
 
@@ -196,13 +214,22 @@ class DingtalkGroupRobotFragment : BaseFragment<FragmentSendersDingtalkGroupRobo
                         try {
                             val settingVo = checkSetting()
                             Log.d(TAG, settingVo.toString())
-                            val name = binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() } ?: getString(R.string.test_sender_name)
-                            val msgInfo = MsgInfo("sms", getString(R.string.test_phone_num), String.format(getString(R.string.test_sender_sms), name), Date(), getString(R.string.test_sim_info))
+                            val name =
+                                binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() }
+                                    ?: getString(R.string.test_sender_name)
+                            val msgInfo = MsgInfo(
+                                "sms",
+                                getString(R.string.test_phone_num),
+                                String.format(getString(R.string.test_sender_sms), name),
+                                Date(),
+                                getString(R.string.test_sim_info)
+                            )
                             DingtalkGroupRobotUtils.sendMsg(settingVo, msgInfo)
                         } catch (e: Exception) {
                             e.printStackTrace()
                             Log.e(TAG, "onClick error:$e")
-                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java).post(e.message.toString())
+                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java)
+                                .post(e.message.toString())
                         }
                         LiveEventBus.get(KEY_SENDER_TEST, String::class.java).post("finish")
                     }.start()
@@ -215,11 +242,14 @@ class DingtalkGroupRobotFragment : BaseFragment<FragmentSendersDingtalkGroupRobo
                         return
                     }
 
-                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title).content(R.string.delete_sender_tips).positiveText(R.string.lab_yes).negativeText(R.string.lab_no).onPositive { _: MaterialDialog?, _: DialogAction? ->
-                        viewModel.delete(senderId)
-                        XToastUtils.success(R.string.delete_sender_toast)
-                        popToBack()
-                    }.show()
+                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title)
+                        .content(R.string.delete_sender_tips).positiveText(R.string.lab_yes)
+                        .negativeText(R.string.lab_no)
+                        .onPositive { _: MaterialDialog?, _: DialogAction? ->
+                            viewModel.delete(senderId)
+                            XToastUtils.success(R.string.delete_sender_toast)
+                            popToBack()
+                        }.show()
                     return
                 }
 
@@ -232,7 +262,8 @@ class DingtalkGroupRobotFragment : BaseFragment<FragmentSendersDingtalkGroupRobo
                     val status = if (binding!!.sbEnable.isChecked) 1 else 0
                     val settingVo = checkSetting()
                     if (isClone) senderId = 0
-                    val senderNew = Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
+                    val senderNew =
+                        Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
                     Log.d(TAG, senderNew.toString())
 
                     viewModel.insertOrUpdate(senderNew)
@@ -258,10 +289,19 @@ class DingtalkGroupRobotFragment : BaseFragment<FragmentSendersDingtalkGroupRobo
         val atAll = binding!!.sbAtAll.isChecked
         val atMobiles = binding!!.etAtMobiles.text.toString().trim()
         val atDingtalkIds = binding!!.etAtDingtalkIds.text.toString().trim()
-        val msgType = if (binding!!.rgMsgType.checkedRadioButtonId == R.id.rb_msg_type_markdown) "markdown" else "text"
+        val msgType =
+            if (binding!!.rgMsgType.checkedRadioButtonId == R.id.rb_msg_type_markdown) "markdown" else "text"
         val titleTemplate = binding!!.etTitleTemplate.text.toString().trim()
 
-        return DingtalkGroupRobotSetting(token, secret, atAll, atMobiles, atDingtalkIds, msgType, titleTemplate)
+        return DingtalkGroupRobotSetting(
+            token,
+            secret,
+            atAll,
+            atMobiles,
+            atDingtalkIds,
+            msgType,
+            titleTemplate
+        )
     }
 
     override fun onDestroyView() {

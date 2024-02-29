@@ -28,7 +28,10 @@ data class ChargeSetting(
             else -> BatteryManager.BATTERY_PLUGGED_AC
         }
         description = String.format(getString(R.string.battery_status), getStatusStr(status))
-        description += ", " + String.format(getString(R.string.battery_plugged), getPluggedStr(plugged))
+        description += ", " + String.format(
+            getString(R.string.battery_plugged),
+            getPluggedStr(plugged)
+        )
     }
 
     private fun getStatusStr(status: Int): String {
@@ -71,10 +74,18 @@ data class ChargeSetting(
         }
     }
 
-    fun getMsg(statusNew: Int, statusOld: Int, pluggedNew: Int, pluggedOld: Int, batteryInfo: String): String {
+    fun getMsg(
+        statusNew: Int,
+        statusOld: Int,
+        pluggedNew: Int,
+        pluggedOld: Int,
+        batteryInfo: String
+    ): String {
 
         if (statusNew != status || (pluggedNew != plugged && plugged != 0)) return ""
 
-        return getString(R.string.battery_status_changed) + getStatusStr(statusOld) + "(" + getPluggedStr(pluggedOld) + ") → " + getStatusStr(statusNew) + "(" + getPluggedStr(pluggedNew) + ")" + batteryInfo
+        return getString(R.string.battery_status_changed) + getStatusStr(statusOld) + "(" + getPluggedStr(
+            pluggedOld
+        ) + ") → " + getStatusStr(statusNew) + "(" + getPluggedStr(pluggedNew) + ")" + batteryInfo
     }
 }

@@ -41,7 +41,14 @@ class LoggingInterceptor(private val logId: Long) : HttpLoggingInterceptor("cust
     @Throws(IOException::class)
     override fun logForRequest(request: Request, connection: Connection?) {
         if (level != Level.PARAM) {
-            log("------REQUEST------" + "\nAt " + DateUtils.getNowString(SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())))
+            log(
+                "------REQUEST------" + "\nAt " + DateUtils.getNowString(
+                    SimpleDateFormat(
+                        "yyyy-MM-dd HH:mm:ss",
+                        Locale.getDefault()
+                    )
+                )
+            )
         }
         val logBody = level == Level.BODY || level == Level.PARAM
         val logHeaders = level == Level.BODY || level == Level.HEADERS
@@ -85,7 +92,14 @@ class LoggingInterceptor(private val logId: Long) : HttpLoggingInterceptor("cust
      */
     override fun logForResponse(response: Response, tookMs: Long): Response {
         if (level != Level.PARAM) {
-            log("------RESPONSE------" + "\nAt " + DateUtils.getNowString(SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())))
+            log(
+                "------RESPONSE------" + "\nAt " + DateUtils.getNowString(
+                    SimpleDateFormat(
+                        "yyyy-MM-dd HH:mm:ss",
+                        Locale.getDefault()
+                    )
+                )
+            )
         }
         val builder = response.newBuilder()
         val clone = builder.build()

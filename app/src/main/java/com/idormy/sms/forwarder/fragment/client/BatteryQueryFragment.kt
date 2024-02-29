@@ -13,7 +13,6 @@ import com.idormy.sms.forwarder.utils.Base64
 import com.idormy.sms.forwarder.utils.HttpServerUtils
 import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.utils.RSACrypt
-import com.idormy.sms.forwarder.utils.SM4Crypt
 import com.idormy.sms.forwarder.utils.XToastUtils
 import com.xuexiang.xhttp2.XHttp
 import com.xuexiang.xhttp2.callback.SimpleCallBack
@@ -22,7 +21,6 @@ import com.xuexiang.xpage.annotation.Page
 import com.xuexiang.xrouter.utils.TextUtils
 import com.xuexiang.xui.widget.actionbar.TitleBar
 import com.xuexiang.xui.widget.grouplist.XUIGroupListView
-import com.xuexiang.xutil.data.ConvertTools
 
 @Suppress("PrivatePropertyName")
 @Page(name = "远程查电量")
@@ -82,22 +80,6 @@ class BatteryQueryFragment : BaseFragment<FragmentClientBatteryQueryBinding?>() 
                 postRequest.upString(requestMsg)
             }
 
-            3 -> {
-                try {
-                    val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                    //requestMsg = Base64.encode(requestMsg.toByteArray())
-                    val encryptCBC = SM4Crypt.encrypt(requestMsg.toByteArray(), sm4Key)
-                    requestMsg = ConvertTools.bytes2HexString(encryptCBC)
-                    Log.i(TAG, "requestMsg: $requestMsg")
-                } catch (e: Exception) {
-                    XToastUtils.error(getString(R.string.request_failed) + e.message)
-                    e.printStackTrace()
-                    Log.e(TAG, e.toString())
-                    return
-                }
-                postRequest.upString(requestMsg)
-            }
-
             else -> {
                 postRequest.upJson(requestMsg)
             }
@@ -116,26 +98,70 @@ class BatteryQueryFragment : BaseFragment<FragmentClientBatteryQueryBinding?>() 
                         val publicKey = RSACrypt.getPublicKey(HttpServerUtils.clientSignKey)
                         json = RSACrypt.decryptByPublicKey(json, publicKey)
                         json = String(Base64.decode(json))
-                    } else if (HttpServerUtils.clientSafetyMeasures == 3) {
-                        val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                        val encryptCBC = ConvertTools.hexStringToByteArray(json)
-                        val decryptCBC = SM4Crypt.decrypt(encryptCBC, sm4Key)
-                        json = String(decryptCBC)
                     }
-                    val resp: BaseResponse<BatteryInfo> = Gson().fromJson(json, object : TypeToken<BaseResponse<BatteryInfo>>() {}.type)
+                    val resp: BaseResponse<BatteryInfo> = Gson().fromJson(
+                        json,
+                        object : TypeToken<BaseResponse<BatteryInfo>>() {}.type
+                    )
                     if (resp.code == 200) {
                         XToastUtils.success(getString(R.string.request_succeeded))
                         val batteryInfo = resp.data ?: return
 
                         val groupListView = binding!!.infoList
                         val section = XUIGroupListView.newSection(context)
-                        section.addItemView(groupListView.createItemView(String.format(getString(R.string.battery_level), batteryInfo.level))) {}
-                        if (batteryInfo.scale != "") section.addItemView(groupListView.createItemView(String.format(getString(R.string.battery_scale), batteryInfo.scale))) {}
-                        if (batteryInfo.voltage != "") section.addItemView(groupListView.createItemView(String.format(getString(R.string.battery_voltage), batteryInfo.voltage))) {}
-                        if (batteryInfo.temperature != "") section.addItemView(groupListView.createItemView(String.format(getString(R.string.battery_temperature), batteryInfo.temperature))) {}
-                        section.addItemView(groupListView.createItemView(String.format(getString(R.string.battery_status), batteryInfo.status))) {}
-                        section.addItemView(groupListView.createItemView(String.format(getString(R.string.battery_health), batteryInfo.health))) {}
-                        section.addItemView(groupListView.createItemView(String.format(getString(R.string.battery_plugged), batteryInfo.plugged))) {}
+                        section.addItemView(
+                            groupListView.createItemView(
+                                String.format(
+                                    getString(R.string.battery_level),
+                                    batteryInfo.level
+                                )
+                            )
+                        ) {}
+                        if (batteryInfo.scale != "") section.addItemView(
+                            groupListView.createItemView(
+                                String.format(getString(R.string.battery_scale), batteryInfo.scale)
+                            )
+                        ) {}
+                        if (batteryInfo.voltage != "") section.addItemView(
+                            groupListView.createItemView(
+                                String.format(
+                                    getString(R.string.battery_voltage),
+                                    batteryInfo.voltage
+                                )
+                            )
+                        ) {}
+                        if (batteryInfo.temperature != "") section.addItemView(
+                            groupListView.createItemView(
+                                String.format(
+                                    getString(R.string.battery_temperature),
+                                    batteryInfo.temperature
+                                )
+                            )
+                        ) {}
+                        section.addItemView(
+                            groupListView.createItemView(
+                                String.format(
+                                    getString(R.string.battery_status),
+                                    batteryInfo.status
+                                )
+                            )
+                        ) {}
+                        section.addItemView(
+                            groupListView.createItemView(
+                                String.format(
+                                    getString(R.string.battery_health),
+                                    batteryInfo.health
+                                )
+                            )
+                        ) {}
+                        section.addItemView(
+                            groupListView.createItemView(
+                                String.format(
+                                    getString(R.string.battery_plugged),
+                                    batteryInfo.plugged
+                                )
+                            )
+                        ) {}
                         section.addTo(groupListView)
 
                     } else {

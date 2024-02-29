@@ -28,7 +28,8 @@ import java.util.Date
 class NetworkWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     private val TAG: String = NetworkWorker::class.java.simpleName
-    private val ipv4Pattern = Regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
+    private val ipv4Pattern =
+        Regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
     private val ipv6Pattern = Regex("^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$")
 
     override suspend fun doWork(): Result {
@@ -46,7 +47,8 @@ class NetworkWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                 Log.d(TAG, "task = $task")
 
                 // 根据任务信息执行相应操作
-                val conditionList = Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
+                val conditionList =
+                    Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
                 if (conditionList.isEmpty()) {
                     Log.d(TAG, "TASK-${task.id}：conditionList is empty")
                     continue
@@ -57,14 +59,18 @@ class NetworkWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                     continue
                 }
 
-                val networkSetting = Gson().fromJson(firstCondition.setting, NetworkSetting::class.java)
+                val networkSetting =
+                    Gson().fromJson(firstCondition.setting, NetworkSetting::class.java)
                 if (networkSetting == null) {
                     Log.d(TAG, "TASK-${task.id}：networkSetting is null")
                     continue
                 }
 
                 if (TaskUtils.networkState != networkSetting.networkState) {
-                    Log.d(TAG, "TASK-${task.id}：networkState is not match, networkSetting = $networkSetting")
+                    Log.d(
+                        TAG,
+                        "TASK-${task.id}：networkState is not match, networkSetting = $networkSetting"
+                    )
                     continue
                 }
 
@@ -81,19 +87,24 @@ class NetworkWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                     1 -> {
                         val dataSimSlot = TaskUtils.dataSimSlot
                         if (networkSetting.dataSimSlot != 0 && dataSimSlot != networkSetting.dataSimSlot) {
-                            Log.d(TAG, "TASK-${task.id}：dataSimSlot is not match, networkSetting = $networkSetting")
+                            Log.d(
+                                TAG,
+                                "TASK-${task.id}：dataSimSlot is not match, networkSetting = $networkSetting"
+                            )
                             continue
                         }
                         msg.append(getString(R.string.net_mobile)).append("\n")
 
                         if (dataSimSlot != 0) {
-                            msg.append(getString(R.string.data_sim_index)).append(": SIM-").append(dataSimSlot).append("\n")
+                            msg.append(getString(R.string.data_sim_index)).append(": SIM-")
+                                .append(dataSimSlot).append("\n")
                             // 获取 SIM 卡信息
                             val simIndex = dataSimSlot - 1
                             App.SimInfoList = PhoneUtils.getSimMultiInfo()
                             if (App.SimInfoList[simIndex]?.mCarrierName != null) {
                                 //获取网络运营商名称：中国移动、中国联通、中国电信
-                                msg.append(getString(R.string.carrier_name)).append(": ").append(App.SimInfoList[simIndex]?.mCarrierName).append("\n")
+                                msg.append(getString(R.string.carrier_name)).append(": ")
+                                    .append(App.SimInfoList[simIndex]?.mCarrierName).append("\n")
                             }
                         }
                     }
@@ -101,11 +112,15 @@ class NetworkWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                     //WiFi
                     2 -> {
                         if (networkSetting.wifiSsid.isNotEmpty() && TaskUtils.wifiSsid != networkSetting.wifiSsid) {
-                            Log.d(TAG, "TASK-${task.id}：wifiSsid is not match, networkSetting = $networkSetting")
+                            Log.d(
+                                TAG,
+                                "TASK-${task.id}：wifiSsid is not match, networkSetting = $networkSetting"
+                            )
                             continue
                         }
                         msg.append(getString(R.string.net_wifi)).append("\n")
-                        msg.append(getString(R.string.wifi_ssid)).append(": ").append(TaskUtils.wifiSsid).append("\n")
+                        msg.append(getString(R.string.wifi_ssid)).append(": ")
+                            .append(TaskUtils.wifiSsid).append("\n")
                     }
 
                     //未知 && 没有网络
@@ -114,25 +129,32 @@ class NetworkWorker(context: Context, params: WorkerParameters) : CoroutineWorke
                     }
                 }
 
-                val isHttpServerRunning = ServiceUtils.isServiceRunning("com.idormy.sms.forwarder.service.HttpServerService")
+                val isHttpServerRunning =
+                    ServiceUtils.isServiceRunning("com.idormy.sms.forwarder.service.HttpServerService")
                 if (ipv4Pattern.matches(ipv4)) {
                     msg.append(getString(R.string.ipv4)).append(": ").append(ipv4).append("\n")
                     if (isHttpServerRunning) {
-                        msg.append(getString(R.string.http_server)).append(": ").append("http://${ipv4}:5000").append("\n")
+                        msg.append(getString(R.string.http_server)).append(": ")
+                            .append("http://${ipv4}:5000").append("\n")
                     }
                 }
 
                 if (ipv6Pattern.matches(ipv6)) {
                     msg.append(getString(R.string.ipv6)).append(": ").append(ipv6).append("\n")
                     if (isHttpServerRunning) {
-                        msg.append(getString(R.string.http_server)).append(": ").append("http://[${ipv6}]:5000").append("\n")
+                        msg.append(getString(R.string.http_server)).append(": ")
+                            .append("http://[${ipv6}]:5000").append("\n")
                     }
                 }
 
                 //TODO: 组装消息体 && 执行具体任务
-                val msgInfo = MsgInfo("task", task.name, msg.toString().trimEnd(), Date(), task.description)
-                val actionData = Data.Builder().putLong(TaskWorker.taskId, task.id).putString(TaskWorker.taskActions, task.actions).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                val msgInfo =
+                    MsgInfo("task", task.name, msg.toString().trimEnd(), Date(), task.description)
+                val actionData = Data.Builder().putLong(TaskWorker.taskId, task.id)
+                    .putString(TaskWorker.taskActions, task.actions)
+                    .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                val actionRequest =
+                    OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
                 WorkManager.getInstance().enqueue(actionRequest)
             }
 

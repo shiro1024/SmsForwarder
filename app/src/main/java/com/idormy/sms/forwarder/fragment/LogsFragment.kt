@@ -154,14 +154,17 @@ class LogsFragment : BaseFragment<FragmentLogsBinding?>(), MsgPagingAdapter.OnIt
                 val scheme = splitSimInfo.getOrElse(1) { "" }
                 detailStr.append(getString(R.string.title)).append(title).append("\n\n")
                 detailStr.append(getString(R.string.msg)).append(item.msg.content).append("\n\n")
-                if (!TextUtils.isEmpty(scheme) && scheme != "null") detailStr.append(getString(R.string.scheme)).append(scheme).append("\n\n")
+                if (!TextUtils.isEmpty(scheme) && scheme != "null") detailStr.append(getString(R.string.scheme))
+                    .append(scheme).append("\n\n")
             } else {
                 detailStr.append(getString(R.string.msg)).append(item.msg.content).append("\n\n")
                 detailStr.append(getString(R.string.slot)).append(item.msg.simInfo).append("\n\n")
             }
         }
-        @SuppressLint("SimpleDateFormat") val utcFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        detailStr.append(getString(R.string.time)).append(DateUtils.date2String(item.msg.time, utcFormatter))
+        @SuppressLint("SimpleDateFormat") val utcFormatter =
+            SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        detailStr.append(getString(R.string.time))
+            .append(DateUtils.date2String(item.msg.time, utcFormatter))
 
         MaterialDialog.Builder(requireContext())
             .iconRes(item.msg.simImageId)
@@ -185,12 +188,22 @@ class LogsFragment : BaseFragment<FragmentLogsBinding?>(), MsgPagingAdapter.OnIt
     override fun onLogsClicked(view: View?, item: LogsDetail) {
         Log.d(TAG, "item: $item")
         val ruleStr = StringBuilder()
-        ruleStr.append(Rule.getRuleMatch(item.ruleFiled, item.ruleCheck, item.ruleValue, item.ruleSimSlot)).append(item.senderName)
+        ruleStr.append(
+            Rule.getRuleMatch(
+                item.ruleFiled,
+                item.ruleCheck,
+                item.ruleValue,
+                item.ruleSimSlot
+            )
+        ).append(item.senderName)
         val detailStr = StringBuilder()
         detailStr.append(getString(R.string.rule)).append(ruleStr.toString()).append("\n\n")
-        @SuppressLint("SimpleDateFormat") val utcFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        detailStr.append(getString(R.string.time)).append(DateUtils.date2String(item.time, utcFormatter)).append("\n\n")
-        detailStr.append(getString(R.string.result)).append(FORWARD_STATUS_MAP[item.forwardStatus]).append("\n--------------------\n").append(item.forwardResponse)
+        @SuppressLint("SimpleDateFormat") val utcFormatter =
+            SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        detailStr.append(getString(R.string.time))
+            .append(DateUtils.date2String(item.time, utcFormatter)).append("\n\n")
+        detailStr.append(getString(R.string.result)).append(FORWARD_STATUS_MAP[item.forwardStatus])
+            .append("\n--------------------\n").append(item.forwardResponse)
 
         MaterialDialog.Builder(requireContext())
             .title(R.string.details)

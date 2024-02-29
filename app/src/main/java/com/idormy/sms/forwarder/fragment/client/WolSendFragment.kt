@@ -13,7 +13,6 @@ import com.idormy.sms.forwarder.utils.Base64
 import com.idormy.sms.forwarder.utils.HttpServerUtils
 import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.utils.RSACrypt
-import com.idormy.sms.forwarder.utils.SM4Crypt
 import com.idormy.sms.forwarder.utils.SettingUtils
 import com.idormy.sms.forwarder.utils.XToastUtils
 import com.xuexiang.xaop.annotation.SingleClick
@@ -26,7 +25,6 @@ import com.xuexiang.xui.utils.CountDownButtonHelper
 import com.xuexiang.xui.widget.actionbar.TitleBar
 import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog
-import com.xuexiang.xutil.data.ConvertTools
 import com.xuexiang.xutil.resource.ResUtils.getColors
 
 @Suppress("PrivatePropertyName")
@@ -169,22 +167,6 @@ class WolSendFragment : BaseFragment<FragmentClientWolSendBinding?>(), View.OnCl
                         postRequest.upString(requestMsg)
                     }
 
-                    3 -> {
-                        try {
-                            val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                            //requestMsg = Base64.encode(requestMsg.toByteArray())
-                            val encryptCBC = SM4Crypt.encrypt(requestMsg.toByteArray(), sm4Key)
-                            requestMsg = ConvertTools.bytes2HexString(encryptCBC)
-                            Log.i(TAG, "requestMsg: $requestMsg")
-                        } catch (e: Exception) {
-                            XToastUtils.error(getString(R.string.request_failed) + e.message)
-                            e.printStackTrace()
-                            Log.e(TAG, e.toString())
-                            return
-                        }
-                        postRequest.upString(requestMsg)
-                    }
-
                     else -> {
                         postRequest.upJson(requestMsg)
                     }
@@ -205,13 +187,11 @@ class WolSendFragment : BaseFragment<FragmentClientWolSendBinding?>(), View.OnCl
                                 val publicKey = RSACrypt.getPublicKey(HttpServerUtils.clientSignKey)
                                 json = RSACrypt.decryptByPublicKey(json, publicKey)
                                 json = String(Base64.decode(json))
-                            } else if (HttpServerUtils.clientSafetyMeasures == 3) {
-                                val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                                val encryptCBC = ConvertTools.hexStringToByteArray(json)
-                                val decryptCBC = SM4Crypt.decrypt(encryptCBC, sm4Key)
-                                json = String(decryptCBC)
                             }
-                            val resp: BaseResponse<String> = Gson().fromJson(json, object : TypeToken<BaseResponse<String>>() {}.type)
+                            val resp: BaseResponse<String> = Gson().fromJson(
+                                json,
+                                object : TypeToken<BaseResponse<String>>() {}.type
+                            )
                             if (resp.code == 200) {
                                 XToastUtils.success(getString(R.string.request_succeeded))
                                 //添加到历史记录

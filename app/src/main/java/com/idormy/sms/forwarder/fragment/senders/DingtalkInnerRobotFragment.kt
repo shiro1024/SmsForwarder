@@ -39,7 +39,8 @@ import java.util.*
 
 @Page(name = "钉钉企业机器人")
 @Suppress("PrivatePropertyName")
-class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobotBinding?>(), View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobotBinding?>(),
+    View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private val TAG: String = DingtalkInnerRobotFragment::class.java.simpleName
     private var titleBar: TitleBar? = null
@@ -80,7 +81,8 @@ class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobo
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, SettingUtils.requestTimeout)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -99,7 +101,8 @@ class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobo
 
         //编辑
         binding!!.btnDel.setText(R.string.del)
-        Core.sender.get(senderId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
+        Core.sender.get(senderId).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
             override fun onSubscribe(d: Disposable) {}
 
             override fun onError(e: Throwable) {
@@ -116,7 +119,8 @@ class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobo
                 }
                 binding!!.etName.setText(sender.name)
                 binding!!.sbEnable.isChecked = sender.status == 1
-                val settingVo = Gson().fromJson(sender.jsonSetting, DingtalkInnerRobotSetting::class.java)
+                val settingVo =
+                    Gson().fromJson(sender.jsonSetting, DingtalkInnerRobotSetting::class.java)
                 Log.d(TAG, settingVo.toString())
                 if (settingVo != null) {
                     binding!!.etAgentID.setText(settingVo.agentID)
@@ -149,7 +153,8 @@ class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobo
             if (checkedId == R.id.rb_proxyHttp || checkedId == R.id.rb_proxySocks) {
                 binding!!.layoutProxyHost.visibility = View.VISIBLE
                 binding!!.layoutProxyPort.visibility = View.VISIBLE
-                binding!!.layoutProxyAuthenticator.visibility = if (binding!!.sbProxyAuthenticator.isChecked) View.VISIBLE else View.GONE
+                binding!!.layoutProxyAuthenticator.visibility =
+                    if (binding!!.sbProxyAuthenticator.isChecked) View.VISIBLE else View.GONE
             } else {
                 binding!!.layoutProxyHost.visibility = View.GONE
                 binding!!.layoutProxyPort.visibility = View.GONE
@@ -157,16 +162,19 @@ class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobo
             }
         }
         binding!!.rgMsgType.setOnCheckedChangeListener { _: RadioGroup?, checkedId: Int ->
-            binding!!.layoutCustomTemplate.visibility = if (checkedId == R.id.rb_msg_type_markdown) View.VISIBLE else View.GONE
+            binding!!.layoutCustomTemplate.visibility =
+                if (checkedId == R.id.rb_msg_type_markdown) View.VISIBLE else View.GONE
         }
-        LiveEventBus.get(KEY_SENDER_TEST, String::class.java).observe(this) { mCountDownHelper?.finish() }
+        LiveEventBus.get(KEY_SENDER_TEST, String::class.java)
+            .observe(this) { mCountDownHelper?.finish() }
     }
 
     @SuppressLint("SetTextI18n")
     override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
         when (buttonView.id) {
             R.id.sb_proxyAuthenticator -> {
-                binding!!.layoutProxyAuthenticator.visibility = if (isChecked) View.VISIBLE else View.GONE
+                binding!!.layoutProxyAuthenticator.visibility =
+                    if (isChecked) View.VISIBLE else View.GONE
             }
 
             else -> {}
@@ -179,22 +187,34 @@ class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobo
             val etTitleTemplate: EditText = binding!!.etTitleTemplate
             when (v.id) {
                 R.id.bt_insert_sender -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_from))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_from)
+                    )
                     return
                 }
 
                 R.id.bt_insert_extra -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_card_slot))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_card_slot)
+                    )
                     return
                 }
 
                 R.id.bt_insert_time -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_receive_time))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_receive_time)
+                    )
                     return
                 }
 
                 R.id.bt_insert_device_name -> {
-                    CommonUtils.insertOrReplaceText2Cursor(etTitleTemplate, getString(R.string.tag_device_name))
+                    CommonUtils.insertOrReplaceText2Cursor(
+                        etTitleTemplate,
+                        getString(R.string.tag_device_name)
+                    )
                     return
                 }
 
@@ -204,13 +224,22 @@ class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobo
                         try {
                             val settingVo = checkSetting()
                             Log.d(TAG, settingVo.toString())
-                            val name = binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() } ?: getString(R.string.test_sender_name)
-                            val msgInfo = MsgInfo("sms", getString(R.string.test_phone_num), String.format(getString(R.string.test_sender_sms), name), Date(), getString(R.string.test_sim_info))
+                            val name =
+                                binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() }
+                                    ?: getString(R.string.test_sender_name)
+                            val msgInfo = MsgInfo(
+                                "sms",
+                                getString(R.string.test_phone_num),
+                                String.format(getString(R.string.test_sender_sms), name),
+                                Date(),
+                                getString(R.string.test_sim_info)
+                            )
                             DingtalkInnerRobotUtils.sendMsg(settingVo, msgInfo)
                         } catch (e: Exception) {
                             e.printStackTrace()
                             Log.e(TAG, "onClick error:$e")
-                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java).post(e.message.toString())
+                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java)
+                                .post(e.message.toString())
                         }
                         LiveEventBus.get(KEY_SENDER_TEST, String::class.java).post("finish")
                     }.start()
@@ -223,11 +252,14 @@ class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobo
                         return
                     }
 
-                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title).content(R.string.delete_sender_tips).positiveText(R.string.lab_yes).negativeText(R.string.lab_no).onPositive { _: MaterialDialog?, _: DialogAction? ->
-                        viewModel.delete(senderId)
-                        XToastUtils.success(R.string.delete_sender_toast)
-                        popToBack()
-                    }.show()
+                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title)
+                        .content(R.string.delete_sender_tips).positiveText(R.string.lab_yes)
+                        .negativeText(R.string.lab_no)
+                        .onPositive { _: MaterialDialog?, _: DialogAction? ->
+                            viewModel.delete(senderId)
+                            XToastUtils.success(R.string.delete_sender_toast)
+                            popToBack()
+                        }.show()
                     return
                 }
 
@@ -240,7 +272,8 @@ class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobo
                     val status = if (binding!!.sbEnable.isChecked) 1 else 0
                     val settingVo = checkSetting()
                     if (isClone) senderId = 0
-                    val senderNew = Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
+                    val senderNew =
+                        Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
                     Log.d(TAG, senderNew.toString())
 
                     viewModel.insertOrUpdate(senderNew)
@@ -261,7 +294,10 @@ class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobo
         val appKey = binding!!.etAppKey.text.toString().trim()
         val appSecret = binding!!.etAppSecret.text.toString().trim()
         val userIds = binding!!.etUserIds.text.toString().trim()
-        if (TextUtils.isEmpty(agentID) || TextUtils.isEmpty(appKey) || TextUtils.isEmpty(appSecret) || TextUtils.isEmpty(userIds)) {
+        if (TextUtils.isEmpty(agentID) || TextUtils.isEmpty(appKey) || TextUtils.isEmpty(appSecret) || TextUtils.isEmpty(
+                userIds
+            )
+        ) {
             throw Exception(getString(R.string.invalid_dingtalk_inner_robot))
         }
 
@@ -273,21 +309,41 @@ class DingtalkInnerRobotFragment : BaseFragment<FragmentSendersDingtalkInnerRobo
         val proxyHost = binding!!.etProxyHost.text.toString().trim()
         val proxyPort = binding!!.etProxyPort.text.toString().trim()
 
-        if (proxyType != Proxy.Type.DIRECT && (TextUtils.isEmpty(proxyHost) || TextUtils.isEmpty(proxyPort))) {
+        if (proxyType != Proxy.Type.DIRECT && (TextUtils.isEmpty(proxyHost) || TextUtils.isEmpty(
+                proxyPort
+            ))
+        ) {
             throw Exception(getString(R.string.invalid_host_or_port))
         }
 
         val proxyAuthenticator = binding!!.sbProxyAuthenticator.isChecked
         val proxyUsername = binding!!.etProxyUsername.text.toString().trim()
         val proxyPassword = binding!!.etProxyPassword.text.toString().trim()
-        if (proxyAuthenticator && TextUtils.isEmpty(proxyUsername) && TextUtils.isEmpty(proxyPassword)) {
+        if (proxyAuthenticator && TextUtils.isEmpty(proxyUsername) && TextUtils.isEmpty(
+                proxyPassword
+            )
+        ) {
             throw Exception(getString(R.string.invalid_username_or_password))
         }
 
-        val msgKey = if (binding!!.rgMsgType.checkedRadioButtonId == R.id.rb_msg_type_markdown) "sampleMarkdown" else "sampleText"
+        val msgKey =
+            if (binding!!.rgMsgType.checkedRadioButtonId == R.id.rb_msg_type_markdown) "sampleMarkdown" else "sampleText"
         val titleTemplate = binding!!.etTitleTemplate.text.toString().trim()
 
-        return DingtalkInnerRobotSetting(agentID, appKey, appSecret, userIds, msgKey, titleTemplate, proxyType, proxyHost, proxyPort, proxyAuthenticator, proxyUsername, proxyPassword)
+        return DingtalkInnerRobotSetting(
+            agentID,
+            appKey,
+            appSecret,
+            userIds,
+            msgKey,
+            titleTemplate,
+            proxyType,
+            proxyHost,
+            proxyPort,
+            proxyAuthenticator,
+            proxyUsername,
+            proxyPassword
+        )
     }
 
     override fun onDestroyView() {

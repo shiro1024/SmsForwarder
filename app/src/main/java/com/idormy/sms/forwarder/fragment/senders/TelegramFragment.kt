@@ -44,7 +44,8 @@ import java.util.Date
 
 @Page(name = "Telegram机器人")
 @Suppress("PrivatePropertyName")
-class TelegramFragment : BaseFragment<FragmentSendersTelegramBinding?>(), View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+class TelegramFragment : BaseFragment<FragmentSendersTelegramBinding?>(), View.OnClickListener,
+    CompoundButton.OnCheckedChangeListener {
 
     private val TAG: String = TelegramFragment::class.java.simpleName
     private var titleBar: TitleBar? = null
@@ -85,7 +86,8 @@ class TelegramFragment : BaseFragment<FragmentSendersTelegramBinding?>(), View.O
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, SettingUtils.requestTimeout)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -104,7 +106,8 @@ class TelegramFragment : BaseFragment<FragmentSendersTelegramBinding?>(), View.O
 
         //编辑
         binding!!.btnDel.setText(R.string.del)
-        Core.sender.get(senderId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
+        Core.sender.get(senderId).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<Sender> {
             override fun onSubscribe(d: Disposable) {}
 
             override fun onError(e: Throwable) {
@@ -147,14 +150,16 @@ class TelegramFragment : BaseFragment<FragmentSendersTelegramBinding?>(), View.O
             if (checkedId == R.id.rb_proxyHttp || checkedId == R.id.rb_proxySocks) {
                 binding!!.layoutProxyHost.visibility = View.VISIBLE
                 binding!!.layoutProxyPort.visibility = View.VISIBLE
-                binding!!.layoutProxyAuthenticator.visibility = if (binding!!.sbProxyAuthenticator.isChecked) View.VISIBLE else View.GONE
+                binding!!.layoutProxyAuthenticator.visibility =
+                    if (binding!!.sbProxyAuthenticator.isChecked) View.VISIBLE else View.GONE
             } else {
                 binding!!.layoutProxyHost.visibility = View.GONE
                 binding!!.layoutProxyPort.visibility = View.GONE
                 binding!!.layoutProxyAuthenticator.visibility = View.GONE
             }
         }
-        LiveEventBus.get(KEY_SENDER_TEST, String::class.java).observe(this) { mCountDownHelper?.finish() }
+        LiveEventBus.get(KEY_SENDER_TEST, String::class.java)
+            .observe(this) { mCountDownHelper?.finish() }
     }
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
@@ -172,13 +177,22 @@ class TelegramFragment : BaseFragment<FragmentSendersTelegramBinding?>(), View.O
                         try {
                             val settingVo = checkSetting()
                             Log.d(TAG, settingVo.toString())
-                            val name = binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() } ?: getString(R.string.test_sender_name)
-                            val msgInfo = MsgInfo("sms", getString(R.string.test_phone_num), String.format(getString(R.string.test_sender_sms), name), Date(), getString(R.string.test_sim_info))
+                            val name =
+                                binding!!.etName.text.toString().trim().takeIf { it.isNotEmpty() }
+                                    ?: getString(R.string.test_sender_name)
+                            val msgInfo = MsgInfo(
+                                "sms",
+                                getString(R.string.test_phone_num),
+                                String.format(getString(R.string.test_sender_sms), name),
+                                Date(),
+                                getString(R.string.test_sim_info)
+                            )
                             TelegramUtils.sendMsg(settingVo, msgInfo)
                         } catch (e: Exception) {
                             e.printStackTrace()
                             Log.e(TAG, "onClick: $e")
-                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java).post(e.message.toString())
+                            LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java)
+                                .post(e.message.toString())
                         }
                         LiveEventBus.get(KEY_SENDER_TEST, String::class.java).post("finish")
                     }.start()
@@ -191,11 +205,14 @@ class TelegramFragment : BaseFragment<FragmentSendersTelegramBinding?>(), View.O
                         return
                     }
 
-                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title).content(R.string.delete_sender_tips).positiveText(R.string.lab_yes).negativeText(R.string.lab_no).onPositive { _: MaterialDialog?, _: DialogAction? ->
-                        viewModel.delete(senderId)
-                        XToastUtils.success(R.string.delete_sender_toast)
-                        popToBack()
-                    }.show()
+                    MaterialDialog.Builder(requireContext()).title(R.string.delete_sender_title)
+                        .content(R.string.delete_sender_tips).positiveText(R.string.lab_yes)
+                        .negativeText(R.string.lab_no)
+                        .onPositive { _: MaterialDialog?, _: DialogAction? ->
+                            viewModel.delete(senderId)
+                            XToastUtils.success(R.string.delete_sender_toast)
+                            popToBack()
+                        }.show()
                     return
                 }
 
@@ -208,7 +225,8 @@ class TelegramFragment : BaseFragment<FragmentSendersTelegramBinding?>(), View.O
                     val status = if (binding!!.sbEnable.isChecked) 1 else 0
                     val settingVo = checkSetting()
                     if (isClone) senderId = 0
-                    val senderNew = Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
+                    val senderNew =
+                        Sender(senderId, senderType, name, Gson().toJson(settingVo), status)
                     Log.d(TAG, senderNew.toString())
 
                     viewModel.insertOrUpdate(senderNew)
@@ -239,20 +257,37 @@ class TelegramFragment : BaseFragment<FragmentSendersTelegramBinding?>(), View.O
         val proxyHost = binding!!.etProxyHost.text.toString().trim()
         val proxyPort = binding!!.etProxyPort.text.toString().trim()
 
-        if (proxyType != Proxy.Type.DIRECT && (TextUtils.isEmpty(proxyHost) || TextUtils.isEmpty(proxyPort))) {
+        if (proxyType != Proxy.Type.DIRECT && (TextUtils.isEmpty(proxyHost) || TextUtils.isEmpty(
+                proxyPort
+            ))
+        ) {
             throw Exception(getString(R.string.invalid_host_or_port))
         }
 
         val proxyAuthenticator = binding!!.sbProxyAuthenticator.isChecked
         val proxyUsername = binding!!.etProxyUsername.text.toString().trim()
         val proxyPassword = binding!!.etProxyPassword.text.toString().trim()
-        if (proxyAuthenticator && TextUtils.isEmpty(proxyUsername) && TextUtils.isEmpty(proxyPassword)) {
+        if (proxyAuthenticator && TextUtils.isEmpty(proxyUsername) && TextUtils.isEmpty(
+                proxyPassword
+            )
+        ) {
             throw Exception(getString(R.string.invalid_username_or_password))
         }
 
-        val method = if (binding!!.rgMethod.checkedRadioButtonId == R.id.rb_method_get) "GET" else "POST"
+        val method =
+            if (binding!!.rgMethod.checkedRadioButtonId == R.id.rb_method_get) "GET" else "POST"
 
-        return TelegramSetting(method, apiToken, chatId, proxyType, proxyHost, proxyPort, proxyAuthenticator, proxyUsername, proxyPassword)
+        return TelegramSetting(
+            method,
+            apiToken,
+            chatId,
+            proxyType,
+            proxyHost,
+            proxyPort,
+            proxyAuthenticator,
+            proxyUsername,
+            proxyPassword
+        )
     }
 
     override fun onDestroyView() {

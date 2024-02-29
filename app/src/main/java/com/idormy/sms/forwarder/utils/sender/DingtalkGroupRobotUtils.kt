@@ -38,15 +38,22 @@ class DingtalkGroupRobotUtils private constructor() {
                 msgInfo.getContentForSend(SettingUtils.smsTemplate)
             }
 
-            var requestUrl = if (setting.token.startsWith("http")) setting.token else "https://oapi.dingtalk.com/robot/send?access_token=" + setting.token
+            var requestUrl =
+                if (setting.token.startsWith("http")) setting.token else "https://oapi.dingtalk.com/robot/send?access_token=" + setting.token
 
             if (!TextUtils.isEmpty(setting.secret)) {
                 val timestamp = System.currentTimeMillis()
                 val stringToSign = "$timestamp\n" + setting.secret
                 val mac = Mac.getInstance("HmacSHA256")
-                mac.init(SecretKeySpec(setting.secret?.toByteArray(StandardCharsets.UTF_8), "HmacSHA256"))
+                mac.init(
+                    SecretKeySpec(
+                        setting.secret?.toByteArray(StandardCharsets.UTF_8),
+                        "HmacSHA256"
+                    )
+                )
                 val signData = mac.doFinal(stringToSign.toByteArray(StandardCharsets.UTF_8))
-                val sign = URLEncoder.encode(String(Base64.encode(signData, Base64.NO_WRAP)), "UTF-8")
+                val sign =
+                    URLEncoder.encode(String(Base64.encode(signData, Base64.NO_WRAP)), "UTF-8")
                 requestUrl += "&timestamp=$timestamp&sign=$sign"
             }
 
@@ -62,7 +69,9 @@ class DingtalkGroupRobotUtils private constructor() {
             } else {
                 atMap["isAtAll"] = false
                 if (!TextUtils.isEmpty(setting.atMobiles)) {
-                    val atMobilesArray: Array<String> = setting.atMobiles.toString().replace("[,，;；]".toRegex(), ",").trim(',').split(',').toTypedArray()
+                    val atMobilesArray: Array<String> =
+                        setting.atMobiles.toString().replace("[,，;；]".toRegex(), ",").trim(',')
+                            .split(',').toTypedArray()
                     if (atMobilesArray.isNotEmpty()) {
                         atMap["atMobiles"] = atMobilesArray
                         for (atMobile in atMobilesArray) {
@@ -73,7 +82,9 @@ class DingtalkGroupRobotUtils private constructor() {
                     }
                 }
                 if (!TextUtils.isEmpty(setting.atDingtalkIds)) {
-                    val atDingtalkIdsArray: Array<String> = setting.atDingtalkIds.toString().replace("[,，;；]".toRegex(), ",").trim(',').split(',').toTypedArray()
+                    val atDingtalkIdsArray: Array<String> =
+                        setting.atDingtalkIds.toString().replace("[,，;；]".toRegex(), ",").trim(',')
+                            .split(',').toTypedArray()
                     if (atDingtalkIdsArray.isNotEmpty()) {
                         atMap["atDingtalkIds"] = atDingtalkIdsArray
                         for (atDingtalkId in atDingtalkIdsArray) {
@@ -87,7 +98,8 @@ class DingtalkGroupRobotUtils private constructor() {
 
             if ("markdown" == msgMap["msgtype"]) {
                 val titleTemplate = setting.titleTemplate.toString()
-                val title = rule?.let { msgInfo.getTitleForSend(titleTemplate, it.regexReplace) } ?: msgInfo.getTitleForSend(titleTemplate)
+                val title = rule?.let { msgInfo.getTitleForSend(titleTemplate, it.regexReplace) }
+                    ?: msgInfo.getTitleForSend(titleTemplate)
                 msgMap["markdown"] = mutableMapOf<String, Any>("title" to title, "text" to content)
             } else {
                 msgMap["text"] = mutableMapOf<String, Any>("content" to content)

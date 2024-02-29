@@ -92,7 +92,8 @@ class TaskActionFragment : BaseFragment<FragmentTasksActionTaskBinding?>(), View
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, 1)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -141,11 +142,27 @@ class TaskActionFragment : BaseFragment<FragmentTasksActionTaskBinding?>(), View
                     try {
                         val settingVo = checkSetting()
                         Log.d(TAG, settingVo.toString())
-                        val taskAction = TaskSetting(TASK_ACTION_TASK, getString(R.string.task_task), settingVo.description, Gson().toJson(settingVo), requestCode)
+                        val taskAction = TaskSetting(
+                            TASK_ACTION_TASK,
+                            getString(R.string.task_task),
+                            settingVo.description,
+                            Gson().toJson(settingVo),
+                            requestCode
+                        )
                         val taskActionsJson = Gson().toJson(arrayListOf(taskAction))
-                        val msgInfo = MsgInfo("task", getString(R.string.task_task), settingVo.description, Date(), getString(R.string.task_task))
-                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0).putString(TaskWorker.taskActions, taskActionsJson).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val msgInfo = MsgInfo(
+                            "task",
+                            getString(R.string.task_task),
+                            settingVo.description,
+                            Date(),
+                            getString(R.string.task_task)
+                        )
+                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0)
+                            .putString(TaskWorker.taskActions, taskActionsJson)
+                            .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     } catch (e: Exception) {
                         mCountDownHelper?.finish()
@@ -239,44 +256,55 @@ class TaskActionFragment : BaseFragment<FragmentTasksActionTaskBinding?>(), View
 
     //获取自动任务列表
     private fun getTaskList() {
-        Core.task.getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<List<Task>> {
-            override fun onSubscribe(d: Disposable) {}
+        Core.task.getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<List<Task>> {
+                override fun onSubscribe(d: Disposable) {}
 
-            override fun onError(e: Throwable) {
-                e.printStackTrace()
-                Log.e(TAG, "getTaskList error: ${e.message}")
-            }
-
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onSuccess(taskList: List<Task>) {
-                if (taskList.isEmpty()) {
-                    XToastUtils.error(R.string.add_task_first)
-                    return
+                override fun onError(e: Throwable) {
+                    e.printStackTrace()
+                    Log.e(TAG, "getTaskList error: ${e.message}")
                 }
 
-                taskSpinnerList.clear()
-                taskListAll = taskList as MutableList<Task>
-                for (task in taskList) {
-                    val name = if (task.name.length > 20) task.name.substring(0, 19) else task.name
-                    taskSpinnerList.add(TaskSpinnerItem(name, getDrawable(if (STATUS_OFF == task.status) task.greyImageId else task.imageId), task.id, task.status))
-                }
-                taskSpinnerAdapter = TaskSpinnerAdapter(taskSpinnerList).setIsFilterKey(true).setFilterColor("#EF5362").setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
-                binding!!.spTask.setAdapter(taskSpinnerAdapter)
-                //taskSpinnerAdapter.notifyDataSetChanged()
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onSuccess(taskList: List<Task>) {
+                    if (taskList.isEmpty()) {
+                        XToastUtils.error(R.string.add_task_first)
+                        return
+                    }
 
-                //更新taskListSelected的状态与名称
-                taskListSelected.forEach {
-                    taskListAll.forEach { task ->
-                        if (it.id == task.id) {
-                            //it.name = task.name
-                            it.status = task.status
+                    taskSpinnerList.clear()
+                    taskListAll = taskList as MutableList<Task>
+                    for (task in taskList) {
+                        val name =
+                            if (task.name.length > 20) task.name.substring(0, 19) else task.name
+                        taskSpinnerList.add(
+                            TaskSpinnerItem(
+                                name,
+                                getDrawable(if (STATUS_OFF == task.status) task.greyImageId else task.imageId),
+                                task.id,
+                                task.status
+                            )
+                        )
+                    }
+                    taskSpinnerAdapter = TaskSpinnerAdapter(taskSpinnerList).setIsFilterKey(true)
+                        .setFilterColor("#EF5362")
+                        .setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
+                    binding!!.spTask.setAdapter(taskSpinnerAdapter)
+                    //taskSpinnerAdapter.notifyDataSetChanged()
+
+                    //更新taskListSelected的状态与名称
+                    taskListSelected.forEach {
+                        taskListAll.forEach { task ->
+                            if (it.id == task.id) {
+                                //it.name = task.name
+                                it.status = task.status
+                            }
                         }
                     }
-                }
-                taskRecyclerAdapter.notifyDataSetChanged()
+                    taskRecyclerAdapter.notifyDataSetChanged()
 
-            }
-        })
+                }
+            })
     }
 
     //检查设置
@@ -295,7 +323,8 @@ class TaskActionFragment : BaseFragment<FragmentTasksActionTaskBinding?>(), View
             status = 0
             description.append(getString(R.string.disable))
         }
-        description.append(getString(R.string.menu_tasks)).append(", ").append(getString(R.string.specified_task)).append(": ")
+        description.append(getString(R.string.menu_tasks)).append(", ")
+            .append(getString(R.string.specified_task)).append(": ")
         description.append(taskListSelected.joinToString(",") { "[${it.id}]${it.name}" })
 
         return TaskActionSetting(description.toString(), status, taskListSelected)

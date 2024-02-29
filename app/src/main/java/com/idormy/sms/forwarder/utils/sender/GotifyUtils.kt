@@ -41,10 +41,12 @@ class GotifyUtils {
 
             //支持HTTP基本认证(Basic Authentication)
             val regex = "^(https?://)([^:]+):([^@]+)@(.+)"
-            val matches = Regex(regex, RegexOption.IGNORE_CASE).findAll(requestUrl).toList().flatMap(MatchResult::groupValues)
+            val matches = Regex(regex, RegexOption.IGNORE_CASE).findAll(requestUrl).toList()
+                .flatMap(MatchResult::groupValues)
             Log.i(TAG, "matches = $matches")
             val request = if (matches.isNotEmpty()) {
-                XHttp.post(matches[1] + matches[4]).addInterceptor(BasicAuthInterceptor(matches[2], matches[3]))
+                XHttp.post(matches[1] + matches[4])
+                    .addInterceptor(BasicAuthInterceptor(matches[2], matches[3]))
             } else {
                 XHttp.post(requestUrl)
             }

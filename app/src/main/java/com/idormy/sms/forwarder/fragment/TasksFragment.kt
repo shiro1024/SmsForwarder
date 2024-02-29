@@ -124,10 +124,13 @@ class TasksFragment : BaseFragment<FragmentTasksBinding?>(), TaskPagingAdapter.O
             }
 
             R.id.iv_delete -> {
-                MaterialDialog.Builder(requireContext()).title(R.string.delete_task_title).content(R.string.delete_task_tips).positiveText(R.string.lab_yes).negativeText(R.string.lab_no).onPositive { _: MaterialDialog?, _: DialogAction? ->
-                    viewModel.delete(item.id)
-                    XToastUtils.success(R.string.delete_task_toast)
-                }.show()
+                MaterialDialog.Builder(requireContext()).title(R.string.delete_task_title)
+                    .content(R.string.delete_task_tips).positiveText(R.string.lab_yes)
+                    .negativeText(R.string.lab_no)
+                    .onPositive { _: MaterialDialog?, _: DialogAction? ->
+                        viewModel.delete(item.id)
+                        XToastUtils.success(R.string.delete_task_toast)
+                    }.show()
             }
 
             else -> {}

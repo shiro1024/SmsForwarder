@@ -29,7 +29,15 @@ object SendUtils {
 
     //重新匹配规则并发送消息
     fun rematchSendMsg(item: MsgAndLogs) {
-        val msgInfo = MsgInfo(item.msg.type, item.msg.from, item.msg.content, item.msg.time, item.msg.simInfo, item.msg.simSlot, item.msg.subId)
+        val msgInfo = MsgInfo(
+            item.msg.type,
+            item.msg.from,
+            item.msg.content,
+            item.msg.time,
+            item.msg.simInfo,
+            item.msg.simSlot,
+            item.msg.subId
+        )
         Log.d(TAG, "msgInfo = $msgInfo")
 
         val request = OneTimeWorkRequestBuilder<SendWorker>().setInputData(
@@ -43,7 +51,15 @@ object SendUtils {
     //重试发送消息
     fun retrySendMsg(logId: Long) {
         val item = Core.logs.getOne(logId)
-        val msgInfo = MsgInfo(item.msg.type, item.msg.from, item.msg.content, item.msg.time, item.msg.simInfo, item.msg.simSlot, item.msg.subId)
+        val msgInfo = MsgInfo(
+            item.msg.type,
+            item.msg.from,
+            item.msg.content,
+            item.msg.time,
+            item.msg.simInfo,
+            item.msg.simSlot,
+            item.msg.subId
+        )
         Log.d(TAG, "msgInfo = $msgInfo")
 
         var senderIndex = 0
@@ -62,7 +78,13 @@ object SendUtils {
 
     //匹配发送通道发送消息
     @SuppressLint("SimpleDateFormat")
-    fun sendMsgSender(msgInfo: MsgInfo, rule: Rule, senderIndex: Int = 0, logId: Long = 0L, msgId: Long = 0L) {
+    fun sendMsgSender(
+        msgInfo: MsgInfo,
+        rule: Rule,
+        senderIndex: Int = 0,
+        logId: Long = 0L,
+        msgId: Long = 0L
+    ) {
         try {
             val sender = rule.senderList[senderIndex]
             if (sender.status != 1) {
@@ -85,8 +107,10 @@ object SendUtils {
 
                 val dateFmt = SimpleDateFormat("yyyy-MM-dd")
                 val mTimeOption = DataProvider.timePeriodOption
-                val periodStartStr = dateFmt.format(periodStartDay) + " " + mTimeOption[rule.silentPeriodStart] + ":00"
-                val periodEndStr = dateFmt.format(periodStartEnd) + " " + mTimeOption[rule.silentPeriodEnd] + ":00"
+                val periodStartStr =
+                    dateFmt.format(periodStartDay) + " " + mTimeOption[rule.silentPeriodStart] + ":00"
+                val periodEndStr =
+                    dateFmt.format(periodStartEnd) + " " + mTimeOption[rule.silentPeriodEnd] + ":00"
 
                 val timeFmt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 val periodStart = timeFmt.parse(periodStartStr, ParsePosition(0))?.time
@@ -102,8 +126,16 @@ object SendUtils {
             }
             when (sender.type) {
                 TYPE_DINGTALK_GROUP_ROBOT -> {
-                    val settingVo = Gson().fromJson(sender.jsonSetting, DingtalkGroupRobotSetting::class.java)
-                    DingtalkGroupRobotUtils.sendMsg(settingVo, msgInfo, rule, senderIndex, logId, msgId)
+                    val settingVo =
+                        Gson().fromJson(sender.jsonSetting, DingtalkGroupRobotSetting::class.java)
+                    DingtalkGroupRobotUtils.sendMsg(
+                        settingVo,
+                        msgInfo,
+                        rule,
+                        senderIndex,
+                        logId,
+                        msgId
+                    )
                 }
 
                 TYPE_EMAIL -> {
@@ -122,17 +154,20 @@ object SendUtils {
                 }
 
                 TYPE_WEWORK_ROBOT -> {
-                    val settingVo = Gson().fromJson(sender.jsonSetting, WeworkRobotSetting::class.java)
+                    val settingVo =
+                        Gson().fromJson(sender.jsonSetting, WeworkRobotSetting::class.java)
                     WeworkRobotUtils.sendMsg(settingVo, msgInfo, rule, senderIndex, logId, msgId)
                 }
 
                 TYPE_WEWORK_AGENT -> {
-                    val settingVo = Gson().fromJson(sender.jsonSetting, WeworkAgentSetting::class.java)
+                    val settingVo =
+                        Gson().fromJson(sender.jsonSetting, WeworkAgentSetting::class.java)
                     WeworkAgentUtils.sendMsg(settingVo, msgInfo, rule, senderIndex, logId, msgId)
                 }
 
                 TYPE_SERVERCHAN -> {
-                    val settingVo = Gson().fromJson(sender.jsonSetting, ServerchanSetting::class.java)
+                    val settingVo =
+                        Gson().fromJson(sender.jsonSetting, ServerchanSetting::class.java)
                     ServerchanUtils.sendMsg(settingVo, msgInfo, rule, senderIndex, logId, msgId)
                 }
 
@@ -162,17 +197,27 @@ object SendUtils {
                 }
 
                 TYPE_DINGTALK_INNER_ROBOT -> {
-                    val settingVo = Gson().fromJson(sender.jsonSetting, DingtalkInnerRobotSetting::class.java)
-                    DingtalkInnerRobotUtils.sendMsg(settingVo, msgInfo, rule, senderIndex, logId, msgId)
+                    val settingVo =
+                        Gson().fromJson(sender.jsonSetting, DingtalkInnerRobotSetting::class.java)
+                    DingtalkInnerRobotUtils.sendMsg(
+                        settingVo,
+                        msgInfo,
+                        rule,
+                        senderIndex,
+                        logId,
+                        msgId
+                    )
                 }
 
                 TYPE_FEISHU_APP -> {
-                    val settingVo = Gson().fromJson(sender.jsonSetting, FeishuAppSetting::class.java)
+                    val settingVo =
+                        Gson().fromJson(sender.jsonSetting, FeishuAppSetting::class.java)
                     FeishuAppUtils.sendMsg(settingVo, msgInfo, rule, senderIndex, logId, msgId)
                 }
 
                 TYPE_URL_SCHEME -> {
-                    val settingVo = Gson().fromJson(sender.jsonSetting, UrlSchemeSetting::class.java)
+                    val settingVo =
+                        Gson().fromJson(sender.jsonSetting, UrlSchemeSetting::class.java)
                     UrlSchemeUtils.sendMsg(settingVo, msgInfo, rule, senderIndex, logId, msgId)
                 }
 
@@ -195,7 +240,13 @@ object SendUtils {
     }
 
     //发送通道执行逻辑：ALL=全部执行, UntilFail=失败即终止, UntilSuccess=成功即终止, Retry=重试发送
-    fun senderLogic(status: Int, msgInfo: MsgInfo, rule: Rule?, senderIndex: Int = 0, msgId: Long = 0L) {
+    fun senderLogic(
+        status: Int,
+        msgInfo: MsgInfo,
+        rule: Rule?,
+        senderIndex: Int = 0,
+        msgId: Long = 0L
+    ) {
         if (rule == null || rule.senderLogic == SENDER_LOGIC_RETRY) return
 
         if (senderIndex < rule.senderList.count() - 1 && (rule.senderLogic == SENDER_LOGIC_ALL || (status == 2 && rule.senderLogic == SENDER_LOGIC_UNTIL_FAIL) || (status == 0 && rule.senderLogic == SENDER_LOGIC_UNTIL_SUCCESS))) {
@@ -221,9 +272,11 @@ object SendUtils {
         //测试的没有记录ID，这里取巧了
         if (logId == null || logId == 0L) {
             if (status == 2) {
-                LiveEventBus.get(EVENT_TOAST_SUCCESS, String::class.java).post(getString(R.string.request_succeeded))
+                LiveEventBus.get(EVENT_TOAST_SUCCESS, String::class.java)
+                    .post(getString(R.string.request_succeeded))
             } else if (status == 0) {
-                LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java).post(getString(R.string.request_failed) + response)
+                LiveEventBus.get(EVENT_TOAST_ERROR, String::class.java)
+                    .post(getString(R.string.request_failed) + response)
             }
             return
         }

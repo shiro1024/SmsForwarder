@@ -47,13 +47,17 @@ class PushplusUtils private constructor() {
             msgMap["content"] = content
 
             if (!TextUtils.isEmpty(title)) msgMap["title"] = title
-            if (!TextUtils.isEmpty(setting.template)) msgMap["template"] = setting.template.toString()
+            if (!TextUtils.isEmpty(setting.template)) msgMap["template"] =
+                setting.template.toString()
             if (!TextUtils.isEmpty(setting.topic)) msgMap["topic"] = setting.topic.toString()
 
             if (setting.website == getString(R.string.pushplus_plus)) {
-                if (!TextUtils.isEmpty(setting.channel)) msgMap["channel"] = setting.channel.toString()
-                if (!TextUtils.isEmpty(setting.webhook)) msgMap["webhook"] = setting.webhook.toString()
-                if (!TextUtils.isEmpty(setting.callbackUrl)) msgMap["callbackUrl"] = setting.callbackUrl.toString()
+                if (!TextUtils.isEmpty(setting.channel)) msgMap["channel"] =
+                    setting.channel.toString()
+                if (!TextUtils.isEmpty(setting.webhook)) msgMap["webhook"] =
+                    setting.webhook.toString()
+                if (!TextUtils.isEmpty(setting.callbackUrl)) msgMap["callbackUrl"] =
+                    setting.callbackUrl.toString()
                 if (!TextUtils.isEmpty(setting.validTime)) {
                     val validTime = setting.validTime?.toInt()
                     if (validTime != null && validTime > 0) {

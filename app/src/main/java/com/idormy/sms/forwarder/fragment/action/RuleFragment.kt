@@ -91,7 +91,8 @@ class RuleFragment : BaseFragment<FragmentTasksActionRuleBinding?>(), View.OnCli
     override fun initViews() {
         //测试按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnTest, 1)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnTest.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -140,11 +141,27 @@ class RuleFragment : BaseFragment<FragmentTasksActionRuleBinding?>(), View.OnCli
                     try {
                         val settingVo = checkSetting()
                         Log.d(TAG, settingVo.toString())
-                        val taskAction = TaskSetting(TASK_ACTION_RULE, getString(R.string.task_rule), settingVo.description, Gson().toJson(settingVo), requestCode)
+                        val taskAction = TaskSetting(
+                            TASK_ACTION_RULE,
+                            getString(R.string.task_rule),
+                            settingVo.description,
+                            Gson().toJson(settingVo),
+                            requestCode
+                        )
                         val taskActionsJson = Gson().toJson(arrayListOf(taskAction))
-                        val msgInfo = MsgInfo("task", getString(R.string.task_rule), settingVo.description, Date(), getString(R.string.task_rule))
-                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0).putString(TaskWorker.taskActions, taskActionsJson).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val msgInfo = MsgInfo(
+                            "task",
+                            getString(R.string.task_rule),
+                            settingVo.description,
+                            Date(),
+                            getString(R.string.task_rule)
+                        )
+                        val actionData = Data.Builder().putLong(TaskWorker.taskId, 0)
+                            .putString(TaskWorker.taskActions, taskActionsJson)
+                            .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     } catch (e: Exception) {
                         mCountDownHelper?.finish()
@@ -238,50 +255,61 @@ class RuleFragment : BaseFragment<FragmentTasksActionRuleBinding?>(), View.OnCli
 
     //获取转发规则列表
     private fun getRuleList() {
-        Core.rule.getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<List<Rule>> {
-            override fun onSubscribe(d: Disposable) {}
+        Core.rule.getAll().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<List<Rule>> {
+                override fun onSubscribe(d: Disposable) {}
 
-            override fun onError(e: Throwable) {
-                e.printStackTrace()
-                Log.e(TAG, "getRuleList error: ${e.message}")
-            }
-
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onSuccess(ruleList: List<Rule>) {
-                if (ruleList.isEmpty()) {
-                    XToastUtils.error(R.string.add_rule_first)
-                    return
+                override fun onError(e: Throwable) {
+                    e.printStackTrace()
+                    Log.e(TAG, "getRuleList error: ${e.message}")
                 }
 
-                ruleSpinnerList.clear()
-                ruleListAll = ruleList as MutableList<Rule>
-                for (rule in ruleList) {
-                    val name = if (rule.name.length > 20) rule.name.substring(0, 19) else rule.name
-                    val icon = when (rule.type) {
-                        "sms" -> R.drawable.auto_task_icon_sms
-                        "call" -> R.drawable.auto_task_icon_incall
-                        "app" -> R.drawable.auto_task_icon_start_activity
-                        else -> R.drawable.auto_task_icon_sms
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onSuccess(ruleList: List<Rule>) {
+                    if (ruleList.isEmpty()) {
+                        XToastUtils.error(R.string.add_rule_first)
+                        return
                     }
-                    ruleSpinnerList.add(RuleSpinnerItem(name, getDrawable(icon), rule.id, rule.status))
-                }
-                ruleSpinnerAdapter = RuleSpinnerAdapter(ruleSpinnerList).setIsFilterKey(true).setFilterColor("#EF5362").setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
-                binding!!.spRule.setAdapter(ruleSpinnerAdapter)
-                //ruleSpinnerAdapter.notifyDataSetChanged()
 
-                //更新ruleListSelected的状态与名称
-                ruleListSelected.forEach {
-                    ruleListAll.forEach { rule ->
-                        if (it.id == rule.id) {
-                            //it.name = rule.name
-                            it.status = rule.status
+                    ruleSpinnerList.clear()
+                    ruleListAll = ruleList as MutableList<Rule>
+                    for (rule in ruleList) {
+                        val name =
+                            if (rule.name.length > 20) rule.name.substring(0, 19) else rule.name
+                        val icon = when (rule.type) {
+                            "sms" -> R.drawable.auto_task_icon_sms
+                            "call" -> R.drawable.auto_task_icon_incall
+                            "app" -> R.drawable.auto_task_icon_start_activity
+                            else -> R.drawable.auto_task_icon_sms
+                        }
+                        ruleSpinnerList.add(
+                            RuleSpinnerItem(
+                                name,
+                                getDrawable(icon),
+                                rule.id,
+                                rule.status
+                            )
+                        )
+                    }
+                    ruleSpinnerAdapter = RuleSpinnerAdapter(ruleSpinnerList).setIsFilterKey(true)
+                        .setFilterColor("#EF5362")
+                        .setBackgroundSelector(R.drawable.selector_custom_spinner_bg)
+                    binding!!.spRule.setAdapter(ruleSpinnerAdapter)
+                    //ruleSpinnerAdapter.notifyDataSetChanged()
+
+                    //更新ruleListSelected的状态与名称
+                    ruleListSelected.forEach {
+                        ruleListAll.forEach { rule ->
+                            if (it.id == rule.id) {
+                                //it.name = rule.name
+                                it.status = rule.status
+                            }
                         }
                     }
-                }
-                ruleRecyclerAdapter.notifyDataSetChanged()
+                    ruleRecyclerAdapter.notifyDataSetChanged()
 
-            }
-        })
+                }
+            })
     }
 
     //检查设置
@@ -300,7 +328,8 @@ class RuleFragment : BaseFragment<FragmentTasksActionRuleBinding?>(), View.OnCli
             status = 0
             description.append(getString(R.string.disable))
         }
-        description.append(getString(R.string.menu_rules)).append(", ").append(getString(R.string.specified_rule)).append(": ")
+        description.append(getString(R.string.menu_rules)).append(", ")
+            .append(getString(R.string.specified_rule)).append(": ")
         description.append(ruleListSelected.joinToString(",") { it.id.toString() })
 
         return RuleSetting(description.toString(), status, ruleListSelected)

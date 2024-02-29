@@ -24,7 +24,8 @@ import com.xuexiang.xui.widget.actionbar.TitleBar
 
 @Page(name = "LockScreen")
 @Suppress("PrivatePropertyName", "SameParameterValue")
-class LockScreenFragment : BaseFragment<FragmentTasksConditionLockScreenBinding?>(), View.OnClickListener {
+class LockScreenFragment : BaseFragment<FragmentTasksConditionLockScreenBinding?>(),
+    View.OnClickListener {
 
     private val TAG: String = LockScreenFragment::class.java.simpleName
     private var titleBar: TitleBar? = null
@@ -60,8 +61,12 @@ class LockScreenFragment : BaseFragment<FragmentTasksConditionLockScreenBinding?
             binding!!.xsbTimeAfterScreenUnlocked.visibility = View.GONE
             when (checkedId) {
                 R.id.rb_action_screen_on -> binding!!.xsbTimeAfterScreenOn.visibility = View.VISIBLE
-                R.id.rb_action_screen_unlocked -> binding!!.xsbTimeAfterScreenUnlocked.visibility = View.VISIBLE
-                R.id.rb_action_screen_locked -> binding!!.xsbTimeAfterScreenLocked.visibility = View.VISIBLE
+                R.id.rb_action_screen_unlocked -> binding!!.xsbTimeAfterScreenUnlocked.visibility =
+                    View.VISIBLE
+
+                R.id.rb_action_screen_locked -> binding!!.xsbTimeAfterScreenLocked.visibility =
+                    View.VISIBLE
+
                 else -> binding!!.xsbTimeAfterScreenOff.visibility = View.VISIBLE
             }
             checkSetting(true)
@@ -143,7 +148,14 @@ class LockScreenFragment : BaseFragment<FragmentTasksConditionLockScreenBinding?
         val timeAferScreenLocked = binding!!.xsbTimeAfterScreenLocked.selectedNumber
         val timeAfterScreenUnlocked = binding!!.xsbTimeAfterScreenUnlocked.selectedNumber
         val checkAgain = binding!!.sbCheckAgain.isChecked
-        val settingVo = LockScreenSetting(actionCheckId, timeAfterScreenOff, timeAfterScreenOn, timeAferScreenLocked, timeAfterScreenUnlocked, checkAgain)
+        val settingVo = LockScreenSetting(
+            actionCheckId,
+            timeAfterScreenOff,
+            timeAfterScreenOn,
+            timeAferScreenLocked,
+            timeAfterScreenUnlocked,
+            checkAgain
+        )
 
         if (updateView) {
             binding!!.tvDescription.text = settingVo.description

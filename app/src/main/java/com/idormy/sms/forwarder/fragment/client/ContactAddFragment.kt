@@ -20,7 +20,6 @@ import com.xuexiang.xpage.annotation.Page
 import com.xuexiang.xrouter.utils.TextUtils
 import com.xuexiang.xui.utils.CountDownButtonHelper
 import com.xuexiang.xui.widget.actionbar.TitleBar
-import com.xuexiang.xutil.data.ConvertTools
 
 @Suppress("PrivatePropertyName")
 @Page(name = "远程加话簿")
@@ -47,7 +46,8 @@ class ContactAddFragment : BaseFragment<FragmentClientContactAddBinding?>(), Vie
     override fun initViews() {
         //发送按钮增加倒计时，避免重复点击
         mCountDownHelper = CountDownButtonHelper(binding!!.btnSubmit, SettingUtils.requestTimeout)
-        mCountDownHelper!!.setOnCountDownListener(object : CountDownButtonHelper.OnCountDownListener {
+        mCountDownHelper!!.setOnCountDownListener(object :
+            CountDownButtonHelper.OnCountDownListener {
             override fun onCountDown(time: Int) {
                 binding!!.btnSubmit.text = String.format(getString(R.string.seconds_n), time)
             }
@@ -60,9 +60,10 @@ class ContactAddFragment : BaseFragment<FragmentClientContactAddBinding?>(), Vie
 
     override fun initListeners() {
         binding!!.btnSubmit.setOnClickListener(this)
-        LiveEventBus.get(EVENT_KEY_PHONE_NUMBERS, String::class.java).observeSticky(this) { value: String ->
-            binding!!.etPhoneNumbers.setText(value)
-        }
+        LiveEventBus.get(EVENT_KEY_PHONE_NUMBERS, String::class.java)
+            .observeSticky(this) { value: String ->
+                binding!!.etPhoneNumbers.setText(value)
+            }
     }
 
     @SingleClick
@@ -115,22 +116,6 @@ class ContactAddFragment : BaseFragment<FragmentClientContactAddBinding?>(), Vie
                         postRequest.upString(requestMsg)
                     }
 
-                    3 -> {
-                        try {
-                            val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                            //requestMsg = Base64.encode(requestMsg.toByteArray())
-                            val encryptCBC = SM4Crypt.encrypt(requestMsg.toByteArray(), sm4Key)
-                            requestMsg = ConvertTools.bytes2HexString(encryptCBC)
-                            Log.i(TAG, "requestMsg: $requestMsg")
-                        } catch (e: Exception) {
-                            XToastUtils.error(getString(R.string.request_failed) + e.message)
-                            e.printStackTrace()
-                            Log.e(TAG, e.toString())
-                            return
-                        }
-                        postRequest.upString(requestMsg)
-                    }
-
                     else -> {
                         postRequest.upJson(requestMsg)
                     }
@@ -151,13 +136,11 @@ class ContactAddFragment : BaseFragment<FragmentClientContactAddBinding?>(), Vie
                                 val publicKey = RSACrypt.getPublicKey(HttpServerUtils.clientSignKey)
                                 json = RSACrypt.decryptByPublicKey(json, publicKey)
                                 json = String(Base64.decode(json))
-                            } else if (HttpServerUtils.clientSafetyMeasures == 3) {
-                                val sm4Key = ConvertTools.hexStringToByteArray(HttpServerUtils.clientSignKey)
-                                val encryptCBC = ConvertTools.hexStringToByteArray(json)
-                                val decryptCBC = SM4Crypt.decrypt(encryptCBC, sm4Key)
-                                json = String(decryptCBC)
                             }
-                            val resp: BaseResponse<String> = Gson().fromJson(json, object : TypeToken<BaseResponse<String>>() {}.type)
+                            val resp: BaseResponse<String> = Gson().fromJson(
+                                json,
+                                object : TypeToken<BaseResponse<String>>() {}.type
+                            )
                             if (resp.code == 200) {
                                 XToastUtils.success(getString(R.string.request_succeeded))
                             } else {

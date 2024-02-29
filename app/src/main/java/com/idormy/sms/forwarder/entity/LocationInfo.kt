@@ -16,9 +16,15 @@ data class LocationInfo(
         var msg = ""
         msg += "\n" + String.format(getString(R.string.location_longitude), longitude)
         msg += "\n" + String.format(getString(R.string.location_latitude), latitude)
-        if (address != "") msg += "\n" + String.format(getString(R.string.location_address), address)
+        if (address != "") msg += "\n" + String.format(
+            getString(R.string.location_address),
+            address
+        )
         if (time != "") msg += "\n" + String.format(getString(R.string.location_time), time)
-        if (provider != "") msg += "\n" + String.format(getString(R.string.location_provider), provider)
+        if (provider != "") msg += "\n" + String.format(
+            getString(R.string.location_provider),
+            provider
+        )
         return msg + "\n"
     }
 

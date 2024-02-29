@@ -23,7 +23,8 @@ import com.xuexiang.xutil.resource.ResUtils.getString
 import java.util.Date
 
 @Suppress("PrivatePropertyName", "DEPRECATION")
-class LocationWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+class LocationWorker(context: Context, params: WorkerParameters) :
+    CoroutineWorker(context, params) {
 
     private val TAG: String = LocationWorker::class.java.simpleName
 
@@ -32,7 +33,10 @@ class LocationWorker(context: Context, params: WorkerParameters) : CoroutineWork
             val conditionType = inputData.getInt(TaskWorker.conditionType, -1)
             val locationJsonOld = inputData.getString("locationJsonOld")
             val locationJsonNew = inputData.getString("locationJsonNew")
-            Log.d(TAG, "conditionType = $conditionType, locationJsonOld = $locationJsonOld, locationJsonNew = $locationJsonNew")
+            Log.d(
+                TAG,
+                "conditionType = $conditionType, locationJsonOld = $locationJsonOld, locationJsonNew = $locationJsonNew"
+            )
 
             if (locationJsonOld == null || locationJsonNew == null) {
                 Log.d(TAG, "locationInfoOld or locationInfoNew is null")
@@ -55,7 +59,9 @@ class LocationWorker(context: Context, params: WorkerParameters) : CoroutineWork
                         Log.d(TAG, "task = $task")
 
                         // 根据任务信息执行相应操作
-                        val conditionList = Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
+                        val conditionList =
+                            Gson().fromJson(task.conditions, Array<TaskSetting>::class.java)
+                                .toMutableList()
                         if (conditionList.isEmpty()) {
                             Log.d(TAG, "TASK-${task.id}：conditionList is empty")
                             continue
@@ -66,7 +72,8 @@ class LocationWorker(context: Context, params: WorkerParameters) : CoroutineWork
                             continue
                         }
 
-                        val locationSetting = Gson().fromJson(firstCondition.setting, LocationSetting::class.java)
+                        val locationSetting =
+                            Gson().fromJson(firstCondition.setting, LocationSetting::class.java)
                         if (locationSetting == null) {
                             Log.d(TAG, "TASK-${task.id}：locationSetting is null")
                             continue
@@ -76,15 +83,33 @@ class LocationWorker(context: Context, params: WorkerParameters) : CoroutineWork
                         var description = locationSetting.description
                         val isMatchCondition = when (locationSetting.calcType) {
                             "distance" -> {
-                                val distanceOld = calculateDistance(locationOld.latitude, locationOld.longitude, locationSetting.latitude, locationSetting.longitude)
-                                val distanceNew = calculateDistance(locationNew.latitude, locationNew.longitude, locationSetting.latitude, locationSetting.longitude)
-                                Log.d(TAG, "TASK-${task.id}：distanceOld = $distanceOld, distanceNew = $distanceNew")
-                                description += String.format(getString(R.string.current_distance_from_center), String.format("%.2f", distanceNew))
+                                val distanceOld = calculateDistance(
+                                    locationOld.latitude,
+                                    locationOld.longitude,
+                                    locationSetting.latitude,
+                                    locationSetting.longitude
+                                )
+                                val distanceNew = calculateDistance(
+                                    locationNew.latitude,
+                                    locationNew.longitude,
+                                    locationSetting.latitude,
+                                    locationSetting.longitude
+                                )
+                                Log.d(
+                                    TAG,
+                                    "TASK-${task.id}：distanceOld = $distanceOld, distanceNew = $distanceNew"
+                                )
+                                description += String.format(
+                                    getString(R.string.current_distance_from_center),
+                                    String.format("%.2f", distanceNew)
+                                )
                                 distanceOld > locationSetting.distance && distanceNew <= locationSetting.distance
                             }
 
                             "address" -> {
-                                !locationOld.address.contains(locationSetting.address) && locationNew.address.contains(locationSetting.address)
+                                !locationOld.address.contains(locationSetting.address) && locationNew.address.contains(
+                                    locationSetting.address
+                                )
                             }
 
                             else -> false
@@ -102,9 +127,14 @@ class LocationWorker(context: Context, params: WorkerParameters) : CoroutineWork
                         }
 
                         //TODO: 组装消息体 && 执行具体任务
-                        val msgInfo = MsgInfo("task", task.name, locationNew.toString(), Date(), description)
-                        val actionData = Data.Builder().putLong(TaskWorker.taskId, task.id).putString(TaskWorker.taskActions, task.actions).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val msgInfo =
+                            MsgInfo("task", task.name, locationNew.toString(), Date(), description)
+                        val actionData = Data.Builder().putLong(TaskWorker.taskId, task.id)
+                            .putString(TaskWorker.taskActions, task.actions)
+                            .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     }
 
@@ -118,7 +148,9 @@ class LocationWorker(context: Context, params: WorkerParameters) : CoroutineWork
                         Log.d(TAG, "task = $task")
 
                         // 根据任务信息执行相应操作
-                        val conditionList = Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
+                        val conditionList =
+                            Gson().fromJson(task.conditions, Array<TaskSetting>::class.java)
+                                .toMutableList()
                         if (conditionList.isEmpty()) {
                             Log.d(TAG, "TASK-${task.id}：conditionList is empty")
                             continue
@@ -129,7 +161,8 @@ class LocationWorker(context: Context, params: WorkerParameters) : CoroutineWork
                             continue
                         }
 
-                        val locationSetting = Gson().fromJson(firstCondition.setting, LocationSetting::class.java)
+                        val locationSetting =
+                            Gson().fromJson(firstCondition.setting, LocationSetting::class.java)
                         if (locationSetting == null) {
                             Log.d(TAG, "TASK-${task.id}：locationSetting is null")
                             continue
@@ -139,15 +172,33 @@ class LocationWorker(context: Context, params: WorkerParameters) : CoroutineWork
                         var description = locationSetting.description
                         val isMatchCondition = when (locationSetting.calcType) {
                             "distance" -> {
-                                val distanceOld = calculateDistance(locationOld.latitude, locationOld.longitude, locationSetting.latitude, locationSetting.longitude)
-                                val distanceNew = calculateDistance(locationNew.latitude, locationNew.longitude, locationSetting.latitude, locationSetting.longitude)
-                                Log.d(TAG, "TASK-${task.id}：distanceOld = $distanceOld, distanceNew = $distanceNew")
-                                description += String.format(getString(R.string.current_distance_from_center), String.format("%.2f", distanceNew))
+                                val distanceOld = calculateDistance(
+                                    locationOld.latitude,
+                                    locationOld.longitude,
+                                    locationSetting.latitude,
+                                    locationSetting.longitude
+                                )
+                                val distanceNew = calculateDistance(
+                                    locationNew.latitude,
+                                    locationNew.longitude,
+                                    locationSetting.latitude,
+                                    locationSetting.longitude
+                                )
+                                Log.d(
+                                    TAG,
+                                    "TASK-${task.id}：distanceOld = $distanceOld, distanceNew = $distanceNew"
+                                )
+                                description += String.format(
+                                    getString(R.string.current_distance_from_center),
+                                    String.format("%.2f", distanceNew)
+                                )
                                 distanceOld <= locationSetting.distance && distanceNew > locationSetting.distance
                             }
 
                             "address" -> {
-                                locationOld.address.contains(locationSetting.address) && !locationNew.address.contains(locationSetting.address)
+                                locationOld.address.contains(locationSetting.address) && !locationNew.address.contains(
+                                    locationSetting.address
+                                )
                             }
 
                             else -> false
@@ -165,9 +216,14 @@ class LocationWorker(context: Context, params: WorkerParameters) : CoroutineWork
                         }
 
                         //TODO: 组装消息体 && 执行具体任务
-                        val msgInfo = MsgInfo("task", task.name, locationNew.toString(), Date(), description)
-                        val actionData = Data.Builder().putLong(TaskWorker.taskId, task.id).putString(TaskWorker.taskActions, task.actions).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                        val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                        val msgInfo =
+                            MsgInfo("task", task.name, locationNew.toString(), Date(), description)
+                        val actionData = Data.Builder().putLong(TaskWorker.taskId, task.id)
+                            .putString(TaskWorker.taskActions, task.actions)
+                            .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                        val actionRequest =
+                            OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData)
+                                .build()
                         WorkManager.getInstance().enqueue(actionRequest)
                     }
 

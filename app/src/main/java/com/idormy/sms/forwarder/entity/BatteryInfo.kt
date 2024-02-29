@@ -18,7 +18,10 @@ data class BatteryInfo(
         msg += "\n" + String.format(getString(R.string.battery_level), level)
         if (scale != "") msg += "\n" + String.format(getString(R.string.battery_scale), scale)
         if (voltage != "") msg += "\n" + String.format(getString(R.string.battery_voltage), voltage)
-        if (temperature != "") msg += "\n" + String.format(getString(R.string.battery_temperature), temperature)
+        if (temperature != "") msg += "\n" + String.format(
+            getString(R.string.battery_temperature),
+            temperature
+        )
         msg += "\n" + String.format(getString(R.string.battery_status), status)
         msg += "\n" + String.format(getString(R.string.battery_health), health)
         msg += "\n" + String.format(getString(R.string.battery_plugged), plugged)

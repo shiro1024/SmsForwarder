@@ -40,7 +40,8 @@ class LockScreenReceiver : BroadcastReceiver() {
     }
 
     private fun isDeviceLocked(context: Context?): Boolean {
-        val keyguardManager = context?.getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
+        val keyguardManager =
+            context?.getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             keyguardManager?.isDeviceLocked ?: false
         } else {

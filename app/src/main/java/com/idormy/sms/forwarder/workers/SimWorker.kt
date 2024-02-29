@@ -36,7 +36,8 @@ class SimWorker(context: Context, params: WorkerParameters) : CoroutineWorker(co
                 Log.d(TAG, "task = $task")
 
                 // 根据任务信息执行相应操作
-                val conditionList = Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
+                val conditionList =
+                    Gson().fromJson(task.conditions, Array<TaskSetting>::class.java).toMutableList()
                 if (conditionList.isEmpty()) {
                     Log.d(TAG, "TASK-${task.id}：conditionList is empty")
                     continue
@@ -54,7 +55,10 @@ class SimWorker(context: Context, params: WorkerParameters) : CoroutineWorker(co
                 }
 
                 if (TaskUtils.simState != simSetting.simState) {
-                    Log.d(TAG, "TASK-${task.id}：networkState is not match, simSetting = $simSetting")
+                    Log.d(
+                        TAG,
+                        "TASK-${task.id}：networkState is not match, simSetting = $simSetting"
+                    )
                     continue
                 }
 
@@ -72,19 +76,28 @@ class SimWorker(context: Context, params: WorkerParameters) : CoroutineWorker(co
                     //Log.d(TAG, App.SimInfoList.toString())
                     App.SimInfoList.forEach {
                         msg.append("[SIM-").append(it.key + 1).append("]\n")
-                        msg.append(getString(R.string.carrier_name)).append(": ").append(it.value.mCarrierName).append("\n")
+                        msg.append(getString(R.string.carrier_name)).append(": ")
+                            .append(it.value.mCarrierName).append("\n")
                         //msg.append(getString(R.string.icc_id)).append(": ").append(it.value.mIccId).append("\n")
-                        msg.append(getString(R.string.sim_slot_index)).append(": ").append(it.value.mSimSlotIndex).append("\n")
-                        msg.append(getString(R.string.number)).append(": ").append(it.value.mNumber).append("\n")
-                        msg.append(getString(R.string.country_iso)).append(": ").append(it.value.mCountryIso).append("\n")
-                        msg.append(getString(R.string.subscription_id)).append(": ").append(it.value.mSubscriptionId).append("\n")
+                        msg.append(getString(R.string.sim_slot_index)).append(": ")
+                            .append(it.value.mSimSlotIndex).append("\n")
+                        msg.append(getString(R.string.number)).append(": ").append(it.value.mNumber)
+                            .append("\n")
+                        msg.append(getString(R.string.country_iso)).append(": ")
+                            .append(it.value.mCountryIso).append("\n")
+                        msg.append(getString(R.string.subscription_id)).append(": ")
+                            .append(it.value.mSubscriptionId).append("\n")
                     }
                 }
 
                 //TODO: 组装消息体 && 执行具体任务
-                val msgInfo = MsgInfo("task", task.name, msg.toString().trimEnd(), Date(), task.description)
-                val actionData = Data.Builder().putLong(TaskWorker.taskId, task.id).putString(TaskWorker.taskActions, task.actions).putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
-                val actionRequest = OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
+                val msgInfo =
+                    MsgInfo("task", task.name, msg.toString().trimEnd(), Date(), task.description)
+                val actionData = Data.Builder().putLong(TaskWorker.taskId, task.id)
+                    .putString(TaskWorker.taskActions, task.actions)
+                    .putString(TaskWorker.msgInfo, Gson().toJson(msgInfo)).build()
+                val actionRequest =
+                    OneTimeWorkRequestBuilder<ActionWorker>().setInputData(actionData).build()
                 WorkManager.getInstance().enqueue(actionRequest)
             }
 

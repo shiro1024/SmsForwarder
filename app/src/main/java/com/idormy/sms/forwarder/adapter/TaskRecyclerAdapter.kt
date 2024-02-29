@@ -24,7 +24,8 @@ class TaskRecyclerAdapter(
     private lateinit var touchHelper: ItemTouchHelper
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.adapter_task_list_item, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.adapter_task_list_item, parent, false)
         return ViewHolder(view)
     }
 
@@ -40,7 +41,8 @@ class TaskRecyclerAdapter(
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
         private val image: ImageView = itemView.findViewById(R.id.iv_image)
         private val status: ImageView = itemView.findViewById(R.id.iv_status)
         private val title: TextView = itemView.findViewById(R.id.tv_title)
