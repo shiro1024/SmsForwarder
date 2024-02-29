@@ -2,7 +2,6 @@ package com.idormy.sms.forwarder.server.controller
 
 import android.Manifest
 import android.content.pm.PackageManager
-import com.idormy.sms.forwarder.utils.Log
 import androidx.core.app.ActivityCompat
 import com.idormy.sms.forwarder.App
 import com.idormy.sms.forwarder.R
@@ -10,6 +9,7 @@ import com.idormy.sms.forwarder.entity.SmsInfo
 import com.idormy.sms.forwarder.server.model.BaseRequest
 import com.idormy.sms.forwarder.server.model.SmsQueryData
 import com.idormy.sms.forwarder.server.model.SmsSendData
+import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.utils.PhoneUtils
 import com.xuexiang.xutil.XUtil
 import com.xuexiang.xutil.resource.ResUtils.getString
@@ -40,11 +40,16 @@ class SmsController {
         //TODO：取不到卡槽信息时，采用默认卡槽发送
         val mSubscriptionId: Int = App.SimInfoList[simSlotIndex]?.mSubscriptionId ?: -1
 
-        if (ActivityCompat.checkSelfPermission(XUtil.getContext(), Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                XUtil.getContext(),
+                Manifest.permission.SEND_SMS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             return getString(R.string.no_sms_sending_permission)
         }
 
-        return PhoneUtils.sendSms(mSubscriptionId, smsSendData.phoneNumbers, smsSendData.msgContent) ?: "success"
+        return PhoneUtils.sendSms(mSubscriptionId, smsSendData.phoneNumbers, smsSendData.msgContent)
+            ?: "success"
     }
 
     //查询短信

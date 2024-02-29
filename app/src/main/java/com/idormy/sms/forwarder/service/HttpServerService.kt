@@ -3,9 +3,9 @@ package com.idormy.sms.forwarder.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.utils.HTTP_SERVER_PORT
 import com.idormy.sms.forwarder.utils.HTTP_SERVER_TIME_OUT
+import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.utils.SettingUtils
 import com.yanzhenjie.andserver.AndServer
 import com.yanzhenjie.andserver.Server
@@ -16,7 +16,8 @@ class HttpServerService : Service(), Server.ServerListener {
 
     private val TAG: String = HttpServerService::class.java.simpleName
     private val server by lazy {
-        AndServer.webServer(this).port(HTTP_SERVER_PORT).listener(this).timeout(HTTP_SERVER_TIME_OUT, TimeUnit.SECONDS).build()
+        AndServer.webServer(this).port(HTTP_SERVER_PORT).listener(this)
+            .timeout(HTTP_SERVER_TIME_OUT, TimeUnit.SECONDS).build()
     }
 
     override fun onBind(p0: Intent?): IBinder? {

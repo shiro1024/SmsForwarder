@@ -58,7 +58,10 @@ class LocationService : Service() {
         if (!SettingUtils.enableLocation) return
 
         //注册广播接收器
-        registerReceiver(locationStatusReceiver, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION))
+        registerReceiver(
+            locationStatusReceiver,
+            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+        )
         startService()
     }
 
@@ -96,7 +99,11 @@ class LocationService : Service() {
             HttpServerUtils.apiLocationCache = LocationInfo()
             TaskUtils.locationInfoOld = LocationInfo()
 
-            if (SettingUtils.enableLocation && PermissionUtils.isGranted(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+            if (SettingUtils.enableLocation && PermissionUtils.isGranted(
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            ) {
 
                 //设置定位监听
                 App.LocationClient.setOnLocationListener(object : OnLocationListener() {
@@ -105,11 +112,16 @@ class LocationService : Service() {
                         Log.d(TAG, "onLocationChanged(location = ${location})")
 
                         val locationInfoNew = LocationInfo(
-                            location.longitude, location.latitude, "", App.DateFormat.format(Date(location.time)), location.provider.toString()
+                            location.longitude,
+                            location.latitude,
+                            "",
+                            App.DateFormat.format(Date(location.time)),
+                            location.provider.toString()
                         )
 
                         //根据坐标经纬度获取位置地址信息（WGS-84坐标系）
-                        val list = App.Geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                        val list =
+                            App.Geocoder.getFromLocation(location.latitude, location.longitude, 1)
                         if (list?.isNotEmpty() == true) {
                             locationInfoNew.address = list[0].getAddressLine(0)
                         }
@@ -126,8 +138,16 @@ class LocationService : Service() {
                             val gson = Gson()
                             val locationJsonOld = gson.toJson(locationInfoOld)
                             val locationJsonNew = gson.toJson(locationInfoNew)
-                            enqueueLocationWorkerRequest(TASK_CONDITION_TO_ADDRESS, locationJsonOld, locationJsonNew)
-                            enqueueLocationWorkerRequest(TASK_CONDITION_LEAVE_ADDRESS, locationJsonOld, locationJsonNew)
+                            enqueueLocationWorkerRequest(
+                                TASK_CONDITION_TO_ADDRESS,
+                                locationJsonOld,
+                                locationJsonNew
+                            )
+                            enqueueLocationWorkerRequest(
+                                TASK_CONDITION_LEAVE_ADDRESS,
+                                locationJsonOld,
+                                locationJsonNew
+                            )
 
                             TaskUtils.locationInfoOld = locationInfoNew
                         }
@@ -184,7 +204,8 @@ class LocationService : Service() {
         }
         if (LocationUtils.isLocationEnabled(App.context) && LocationUtils.hasLocationCapability(App.context)) {
             //可根据具体需求设置定位配置参数（这里只列出一些主要的参数）
-            val locationOption = App.LocationClient.getLocationOption().setAccuracy(SettingUtils.locationAccuracy)//设置位置精度：高精度
+            val locationOption = App.LocationClient.getLocationOption()
+                .setAccuracy(SettingUtils.locationAccuracy)//设置位置精度：高精度
                 .setPowerRequirement(SettingUtils.locationPowerRequirement) //设置电量消耗：低电耗
                 .setMinTime(SettingUtils.locationMinInterval)//设置位置更新最小时间间隔（单位：毫秒）； 默认间隔：10000毫秒，最小间隔：1000毫秒
                 .setMinDistance(SettingUtils.locationMinDistance)//设置位置更新最小距离（单位：米）；默认距离：0米
@@ -203,7 +224,9 @@ class LocationService : Service() {
     ) {
         val locationWorkerRequest = OneTimeWorkRequestBuilder<LocationWorker>().setInputData(
             workDataOf(
-                TaskWorker.conditionType to conditionType, "locationJsonOld" to locationJsonOld, "locationJsonNew" to locationJsonNew
+                TaskWorker.conditionType to conditionType,
+                "locationJsonOld" to locationJsonOld,
+                "locationJsonNew" to locationJsonNew
             )
         ).build()
 

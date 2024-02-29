@@ -1,8 +1,8 @@
 package com.idormy.sms.forwarder.server.controller
 
-import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.server.model.BaseRequest
 import com.idormy.sms.forwarder.server.model.WolData
+import com.idormy.sms.forwarder.utils.Log
 import com.xuexiang.xrouter.utils.TextUtils
 import com.yanzhenjie.andserver.annotation.*
 import java.net.DatagramPacket
@@ -35,7 +35,8 @@ class WolController {
 
     private fun wakeOnLAN(macAddress: String, broadcastAddress: String? = null, port: Int = 9) {
         try {
-            val macBytes = macAddress.replace("-", ":").split(":").map { it.uppercase(Locale.getDefault()).toInt(16).toByte() }.toByteArray()
+            val macBytes = macAddress.replace("-", ":").split(":")
+                .map { it.uppercase(Locale.getDefault()).toInt(16).toByte() }.toByteArray()
             val magicPacket = ByteArray(102)
 
             // 首先添加6个0xFF字节

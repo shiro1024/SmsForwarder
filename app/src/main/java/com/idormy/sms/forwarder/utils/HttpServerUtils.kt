@@ -30,10 +30,10 @@ class HttpServerUtils private constructor() {
         var serverSignKey: String by SharedPreference(SP_SERVER_SIGN_KEY, "")
 
         //服务端安全设置
-        var safetyMeasures: Int by SharedPreference(SP_SERVER_SAFETY_MEASURES, if (TextUtils.isEmpty(serverSignKey)) 0 else 1)
-
-        //服务端SM4密钥
-        var serverSm4Key: String by SharedPreference(SP_SERVER_SM4_KEY, "")
+        var safetyMeasures: Int by SharedPreference(
+            SP_SERVER_SAFETY_MEASURES,
+            if (TextUtils.isEmpty(serverSignKey)) 0 else 1
+        )
 
         //服务端RSA公钥
         var serverPublicKey: String by SharedPreference(SP_SERVER_PUBLIC_KEY, "")
@@ -60,7 +60,10 @@ class HttpServerUtils private constructor() {
         var clientSignKey: String by SharedPreference(SP_CLIENT_SIGN_KEY, "")
 
         //服务端安全设置
-        var clientSafetyMeasures: Int by SharedPreference(SP_CLIENT_SAFETY_MEASURES, if (TextUtils.isEmpty(clientSignKey)) 0 else 1)
+        var clientSafetyMeasures: Int by SharedPreference(
+            SP_CLIENT_SAFETY_MEASURES,
+            if (TextUtils.isEmpty(clientSignKey)) 0 else 1
+        )
 
         //是否启用一键克隆
         var enableApiClone: Boolean by SharedPreference(SP_ENABLE_API_CLONE, true)
@@ -90,7 +93,10 @@ class HttpServerUtils private constructor() {
         var enableApiLocation: Boolean by SharedPreference(SP_ENABLE_API_LOCATION, false)
 
         //远程找手机定位缓存
-        var apiLocationCache: LocationInfo by SharedPreference(SP_API_LOCATION_CACHE, LocationInfo())
+        var apiLocationCache: LocationInfo by SharedPreference(
+            SP_API_LOCATION_CACHE,
+            LocationInfo()
+        )
 
         //WOL历史记录
         var wolHistory: String by SharedPreference(SP_WOL_HISTORY, "")
@@ -110,14 +116,28 @@ class HttpServerUtils private constructor() {
             val signSecret = serverSignKey
             if (TextUtils.isEmpty(signSecret)) return
 
-            if (TextUtils.isEmpty(req.sign)) throw HttpException(500, getString(R.string.sign_required))
-            if (req.timestamp == 0L) throw HttpException(500, getString(R.string.timestamp_required))
+            if (TextUtils.isEmpty(req.sign)) throw HttpException(
+                500,
+                getString(R.string.sign_required)
+            )
+            if (req.timestamp == 0L) throw HttpException(
+                500,
+                getString(R.string.timestamp_required)
+            )
 
             val timestamp = System.currentTimeMillis()
             val diffTime = kotlin.math.abs(timestamp - req.timestamp)
             val tolerance = timeTolerance * 1000L
             if (diffTime > tolerance) {
-                throw HttpException(500, String.format(getString(R.string.timestamp_verify_failed), timestamp, timeTolerance, diffTime))
+                throw HttpException(
+                    500,
+                    String.format(
+                        getString(R.string.timestamp_verify_failed),
+                        timestamp,
+                        timeTolerance,
+                        diffTime
+                    )
+                )
             }
 
             val sign = calcSign(req.timestamp.toString(), signSecret)
@@ -132,9 +152,15 @@ class HttpServerUtils private constructor() {
         @Throws(HttpException::class)
         fun compareVersion(cloneInfo: CloneInfo) {
             val versionCodeRequest = cloneInfo.versionCode
-            if (versionCodeRequest == 0) throw HttpException(500, getString(R.string.version_code_required))
+            if (versionCodeRequest == 0) throw HttpException(
+                500,
+                getString(R.string.version_code_required)
+            )
             val versionCodeLocal = AppUtils.getAppVersionCode().toString().substring(1)
-            if (!versionCodeRequest.toString().endsWith(versionCodeLocal)) throw HttpException(500, getString(R.string.inconsistent_version))
+            if (!versionCodeRequest.toString().endsWith(versionCodeLocal)) throw HttpException(
+                500,
+                getString(R.string.inconsistent_version)
+            )
         }
 
         //导出设置
@@ -145,7 +171,6 @@ class HttpServerUtils private constructor() {
             cloneInfo.settings = SharedPreference.exportPreference()
             cloneInfo.senderList = Core.sender.getAllNonCache()
             cloneInfo.ruleList = Core.rule.getAllNonCache()
-            cloneInfo.frpcList = Core.frpc.getAllNonCache()
             cloneInfo.taskList = Core.task.getAllNonCache()
             return cloneInfo
         }
@@ -183,13 +208,6 @@ class HttpServerUtils private constructor() {
                 if (!cloneInfo.ruleList.isNullOrEmpty()) {
                     for (rule in cloneInfo.ruleList!!) {
                         Core.rule.insert(rule)
-                    }
-                }
-                //Frpc配置
-                Core.frpc.deleteAll()
-                if (!cloneInfo.frpcList.isNullOrEmpty()) {
-                    for (frpc in cloneInfo.frpcList!!) {
-                        Core.frpc.insert(frpc)
                     }
                 }
                 //Task配置

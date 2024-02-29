@@ -10,12 +10,10 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
-import android.text.TextUtils
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.Observer
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.idormy.sms.forwarder.App
 import com.idormy.sms.forwarder.R
 import com.idormy.sms.forwarder.activity.MainActivity
 import com.idormy.sms.forwarder.core.Core
@@ -25,13 +23,7 @@ import com.idormy.sms.forwarder.utils.task.CronJobScheduler
 import com.idormy.sms.forwarder.workers.LoadAppListWorker
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.xuexiang.xutil.XUtil
-import frpclib.Frpclib
-import io.reactivex.Single
-import io.reactivex.SingleObserver
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -45,33 +37,6 @@ class ForegroundService : Service() {
     private var notificationManager: NotificationManager? = null
 
     private val compositeDisposable = CompositeDisposable()
-    private val frpcObserver = Observer { uid: String ->
-        if (!App.FrpclibInited || Frpclib.isRunning(uid)) return@Observer
-
-        Core.frpc.get(uid).flatMap { (uid1, _, config) ->
-            val error = Frpclib.runContent(uid1, config)
-            Single.just(error)
-        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(object : SingleObserver<String> {
-            override fun onSubscribe(d: Disposable) {
-                compositeDisposable.add(d)
-            }
-
-            override fun onError(e: Throwable) {
-                e.printStackTrace()
-                Log.e(TAG, "onError: ${e.message}")
-                LiveEventBus.get(EVENT_FRPC_RUNNING_ERROR, String::class.java).post(uid)
-            }
-
-            override fun onSuccess(msg: String) {
-                if (!TextUtils.isEmpty(msg)) {
-                    Log.e(TAG, msg)
-                    LiveEventBus.get(EVENT_FRPC_RUNNING_ERROR, String::class.java).post(uid)
-                } else {
-                    LiveEventBus.get(EVENT_FRPC_RUNNING_SUCCESS, String::class.java).post(uid)
-                }
-            }
-        })
-    }
 
     private var alarmPlayer: MediaPlayer? = null
     private var alarmPlayTimes = 0
@@ -86,11 +51,17 @@ class ForegroundService : Service() {
             val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
             Log.d(TAG, "maxVolume=$maxVolume, currentVolume=$currentVolume")
             //设置音量
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (maxVolume * alarm.volume / 100), 0)
+            audioManager.setStreamVolume(
+                AudioManager.STREAM_MUSIC,
+                (maxVolume * alarm.volume / 100),
+                0
+            )
             //播放音乐
             alarmPlayer = MediaPlayer().apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    val audioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
+                    val audioAttributes =
+                        AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
                     setAudioAttributes(audioAttributes)
                 } else {
                     // 对于 Android 5.0 之前的版本，使用 setAudioStreamType
@@ -126,7 +97,11 @@ class ForegroundService : Service() {
                             alarmPlayer = null
                             alarmPlayTimes = 0
                             //恢复音量
-                            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentVolume, 0)
+                            audioManager.setStreamVolume(
+                                AudioManager.STREAM_MUSIC,
+                                currentVolume,
+                                0
+                            )
                             //恢复通知栏
                             updateNotification(SettingUtils.notifyContent)
                         }
@@ -210,7 +185,10 @@ class ForegroundService : Service() {
 
         try {
             //开关通知监听服务
-            if (SettingUtils.enableAppNotify && CommonUtils.isNotificationListenerServiceEnabled(this)) {
+            if (SettingUtils.enableAppNotify && CommonUtils.isNotificationListenerServiceEnabled(
+                    this
+                )
+            ) {
                 CommonUtils.toggleNotificationListenerService(this)
             }
 
@@ -228,28 +206,6 @@ class ForegroundService : Service() {
             if (SettingUtils.enableLoadAppList) {
                 val request = OneTimeWorkRequestBuilder<LoadAppListWorker>().build()
                 WorkManager.getInstance(XUtil.getContext()).enqueue(request)
-            }
-
-            //启动 Frpc
-            if (App.FrpclibInited) {
-                //监听Frpc启动指令
-                LiveEventBus.get(INTENT_FRPC_APPLY_FILE, String::class.java).observeForever(frpcObserver)
-                //自启动的Frpc
-                GlobalScope.async(Dispatchers.IO) {
-                    val frpcList = Core.frpc.getAutorun()
-
-                    if (frpcList.isEmpty()) {
-                        Log.d(TAG, "没有自启动的Frpc")
-                        return@async
-                    }
-
-                    for (frpc in frpcList) {
-                        val error = Frpclib.runContent(frpc.uid, frpc.config)
-                        if (!TextUtils.isEmpty(error)) {
-                            Log.e(TAG, error)
-                        }
-                    }
-                }
             }
 
             //播放警报
@@ -278,7 +234,8 @@ class ForegroundService : Service() {
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val notificationChannel = NotificationChannel(FRONT_CHANNEL_ID, FRONT_CHANNEL_NAME, importance)
+            val notificationChannel =
+                NotificationChannel(FRONT_CHANNEL_ID, FRONT_CHANNEL_NAME, importance)
             notificationChannel.description = getString(R.string.notification_content)
             notificationChannel.enableLights(true)
             notificationChannel.lightColor = Color.GREEN
@@ -290,12 +247,20 @@ class ForegroundService : Service() {
         }
     }
 
-    private fun createNotification(content: String, largeIconResId: Int? = null, showStopButton: Boolean = false): Notification {
+    private fun createNotification(
+        content: String,
+        largeIconResId: Int? = null,
+        showStopButton: Boolean = false
+    ): Notification {
         val notificationIntent = Intent(this, MainActivity::class.java)
-        val flags = if (Build.VERSION.SDK_INT >= 30) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
+        val flags =
+            if (Build.VERSION.SDK_INT >= 30) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_UPDATE_CURRENT
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, flags)
 
-        val builder = NotificationCompat.Builder(this, FRONT_CHANNEL_ID).setContentTitle(getString(R.string.app_name)).setContentText(content).setSmallIcon(R.drawable.ic_forwarder).setContentIntent(pendingIntent).setWhen(System.currentTimeMillis())
+        val builder = NotificationCompat.Builder(this, FRONT_CHANNEL_ID)
+            .setContentTitle(getString(R.string.app_name)).setContentText(content)
+            .setSmallIcon(R.drawable.ic_forwarder).setContentIntent(pendingIntent)
+            .setWhen(System.currentTimeMillis())
 
         // 设置大图标（可选）
         if (largeIconResId != null) {
@@ -316,7 +281,11 @@ class ForegroundService : Service() {
         return builder.build()
     }
 
-    private fun updateNotification(updatedContent: String, largeIconResId: Int? = null, showStopButton: Boolean = false) {
+    private fun updateNotification(
+        updatedContent: String,
+        largeIconResId: Int? = null,
+        showStopButton: Boolean = false
+    ) {
         try {
             val notification = createNotification(updatedContent, largeIconResId, showStopButton)
             notificationManager?.notify(FRONT_NOTIFY_ID, notification)

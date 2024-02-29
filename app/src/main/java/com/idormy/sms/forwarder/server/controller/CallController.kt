@@ -1,9 +1,9 @@
 package com.idormy.sms.forwarder.server.controller
 
-import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.entity.CallInfo
 import com.idormy.sms.forwarder.server.model.BaseRequest
 import com.idormy.sms.forwarder.server.model.CallQueryData
+import com.idormy.sms.forwarder.utils.Log
 import com.idormy.sms.forwarder.utils.PhoneUtils
 import com.yanzhenjie.andserver.annotation.*
 
@@ -23,7 +23,12 @@ class CallController {
 
         val limit = callQueryData.pageSize
         val offset = (callQueryData.pageNum - 1) * limit
-        return PhoneUtils.getCallInfoList(callQueryData.type, limit, offset, callQueryData.phoneNumber)
+        return PhoneUtils.getCallInfoList(
+            callQueryData.type,
+            limit,
+            offset,
+            callQueryData.phoneNumber
+        )
     }
 
 }

@@ -7,12 +7,6 @@ import com.xuexiang.xutil.resource.ResUtils.getString
 class SettingUtils private constructor() {
     companion object {
 
-        //是否启动时检查更新
-        var autoCheckUpdate: Boolean by SharedPreference(AUTO_CHECK_UPDATE, true)
-
-        //是否同意隐私政策
-        var isAgreePrivacy: Boolean by SharedPreference(IS_AGREE_PRIVACY_KEY, false)
-
         //是否转发短信
         var enableSms: Boolean by SharedPreference(SP_ENABLE_SMS, false)
 
@@ -75,7 +69,10 @@ class SettingUtils private constructor() {
         var enableSilentPeriodLogs: Boolean by SharedPreference(SP_ENABLE_SILENT_PERIOD_LOGS, false)
 
         //是否不在最近任务列表中显示
-        var enableExcludeFromRecents: Boolean by SharedPreference(SP_ENABLE_EXCLUDE_FROM_RECENTS, false)
+        var enableExcludeFromRecents: Boolean by SharedPreference(
+            SP_ENABLE_EXCLUDE_FROM_RECENTS,
+            false
+        )
 
         //是否转发应用通知
         var enableCactus: Boolean by SharedPreference(SP_ENABLE_CACTUS, false)
@@ -96,7 +93,10 @@ class SettingUtils private constructor() {
         var requestTimeout: Int by SharedPreference(SP_REQUEST_TIMEOUT, 10)
 
         //通知内容
-        var notifyContent: String by SharedPreference(SP_NOTIFY_CONTENT, getString(R.string.notification_content))
+        var notifyContent: String by SharedPreference(
+            SP_NOTIFY_CONTENT,
+            getString(R.string.notification_content)
+        )
 
         //设备名称
         var extraDeviceMark: String by SharedPreference(SP_EXTRA_DEVICE_MARK, "")
@@ -135,7 +135,10 @@ class SettingUtils private constructor() {
         var locationAccuracy: Int by SharedPreference(SP_LOCATION_ACCURACY, Criteria.ACCURACY_FINE)
 
         //设置电量消耗：低电耗
-        var locationPowerRequirement: Int by SharedPreference(SP_LOCATION_POWER_REQUIREMENT, Criteria.POWER_LOW)
+        var locationPowerRequirement: Int by SharedPreference(
+            SP_LOCATION_POWER_REQUIREMENT,
+            Criteria.POWER_LOW
+        )
 
         //设置位置更新最小时间间隔（单位：毫秒）； 默认间隔：10000毫秒，最小间隔：1000毫秒
         var locationMinInterval: Long by SharedPreference(SP_LOCATION_MIN_INTERVAL, 10000L)

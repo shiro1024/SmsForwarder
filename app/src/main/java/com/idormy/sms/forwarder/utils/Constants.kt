@@ -22,12 +22,8 @@ object TaskWorker {
     const val action = "action"
 }
 
-//初始化相关
-const val AUTO_CHECK_UPDATE = "auto_check_update"
-const val IS_AGREE_PRIVACY_KEY = "is_agree_privacy_key"
-
 //数据库
-const val DATABASE_NAME = "sms_forwarder.db"
+const val DATABASE_NAME = "smsforwarder.db"
 const val PACKAGE_NAME = "com.idormy.sms.forwarder"
 
 //通用设置
@@ -143,16 +139,6 @@ const val FRONT_NOTIFY_ID = 0x1010
 const val FRONT_CHANNEL_ID = "com.idormy.sms.forwarder"
 const val FRONT_CHANNEL_NAME = "SmsForwarder Foreground Service"
 
-//Frp内网穿透
-const val FRPC_LIB_DOWNLOAD_URL = "https://xupdate.ppps.cn/uploads/%s/%s/libgojni.so"
-const val FRPC_LIB_VERSION = "0.54.0"
-const val EVENT_FRPC_UPDATE_CONFIG = "EVENT_FRPC_UPDATE_CONFIG"
-const val EVENT_FRPC_DELETE_CONFIG = "EVENT_FRPC_DELETE_CONFIG"
-const val EVENT_FRPC_RUNNING_ERROR = "EVENT_FRPC_RUNNING_ERROR"
-const val EVENT_FRPC_RUNNING_SUCCESS = "EVENT_FRPC_RUNNING_SUCCESS"
-const val INTENT_FRPC_EDIT_FILE = "INTENT_FRPC_EDIT_FILE"
-const val INTENT_FRPC_APPLY_FILE = "INTENT_FRPC_APPLY_FILE"
-
 //声音警报
 const val EVENT_ALARM_ACTION = "EVENT_ALARM_ACTION"
 
@@ -192,7 +178,6 @@ const val SP_ENABLE_SERVER_AUTORUN = "enable_server_autorun"
 const val SP_SERVER_SAFETY_MEASURES = "server_safety_measures"
 const val SP_SERVER_SIGN_KEY = "server_sign_key"
 const val SP_SERVER_TIME_TOLERANCE = "server_time_tolerance"
-const val SP_SERVER_SM4_KEY = "server_sm4_key"
 const val SP_SERVER_PUBLIC_KEY = "server_public_key"
 const val SP_SERVER_PRIVATE_KEY = "server_private_key"
 const val SP_SERVER_WEB_PATH = "server_web_path"
@@ -242,7 +227,6 @@ const val TASK_ACTION_SENDSMS = 2000
 const val TASK_ACTION_NOTIFICATION = 2001
 const val TASK_ACTION_CLEANER = 2002
 const val TASK_ACTION_SETTINGS = 2003
-const val TASK_ACTION_FRPC = 2004
 const val TASK_ACTION_HTTPSERVER = 2005
 const val TASK_ACTION_RULE = 2006
 const val TASK_ACTION_SENDER = 2007
@@ -282,14 +266,30 @@ val TAG_LIST = arrayOf(
     mapOf("zh_CN" to "{{接收时间}}", "zh_TW" to "{{接收時間}}", "en" to "{{RECEIVE_TIME}}"),
     mapOf("zh_CN" to "{{当前时间}}", "zh_TW" to "{{當前時間}}", "en" to "{{CURRENT_TIME}}"),
     mapOf("zh_CN" to "{{设备名称}}", "zh_TW" to "{{設備名稱}}", "en" to "{{DEVICE_NAME}}"),
-    mapOf("zh_CN" to "{{当前应用版本号}}", "zh_TW" to "{{當前應用版本號}}", "en" to "{{APP_VERSION}}"),
+    mapOf(
+        "zh_CN" to "{{当前应用版本号}}",
+        "zh_TW" to "{{當前應用版本號}}",
+        "en" to "{{APP_VERSION}}"
+    ),
     mapOf("zh_CN" to "{{通知标题}}", "zh_TW" to "{{通知標題}}", "en" to "{{TITLE}}"),
     mapOf("zh_CN" to "{{通知Scheme}}", "zh_TW" to "{{通知Scheme}}", "en" to "{{SCHEME}}"),
     mapOf("zh_CN" to "{{通话类型}}", "zh_TW" to "{{通話類型}}", "en" to "{{CALL_TYPE}}"),
     mapOf("zh_CN" to "{{定位信息}}", "zh_TW" to "{{定位信息}}", "en" to "{{LOCATION}}"),
-    mapOf("zh_CN" to "{{定位信息_经度}}", "zh_TW" to "{{定位信息_經度}}", "en" to "{{LOCATION_LONGITUDE}}"),
-    mapOf("zh_CN" to "{{定位信息_纬度}}", "zh_TW" to "{{定位信息_緯度}}", "en" to "{{LOCATION_LATITUDE}}"),
-    mapOf("zh_CN" to "{{定位信息_地址}}", "zh_TW" to "{{定位信息_地址}}", "en" to "{{LOCATION_ADDRESS}}"),
+    mapOf(
+        "zh_CN" to "{{定位信息_经度}}",
+        "zh_TW" to "{{定位信息_經度}}",
+        "en" to "{{LOCATION_LONGITUDE}}"
+    ),
+    mapOf(
+        "zh_CN" to "{{定位信息_纬度}}",
+        "zh_TW" to "{{定位信息_緯度}}",
+        "en" to "{{LOCATION_LATITUDE}}"
+    ),
+    mapOf(
+        "zh_CN" to "{{定位信息_地址}}",
+        "zh_TW" to "{{定位信息_地址}}",
+        "en" to "{{LOCATION_ADDRESS}}"
+    ),
     mapOf("zh_CN" to "{{电池电量}}", "zh_TW" to "{{電池電量}}", "en" to "{{BATTERY_PCT}}"),
     mapOf("zh_CN" to "{{电池状态}}", "zh_TW" to "{{電池狀態}}", "en" to "{{BATTERY_STATUS}}"),
     mapOf("zh_CN" to "{{充电方式}}", "zh_TW" to "{{充電方式}}", "en" to "{{BATTERY_PLUGGED}}"),
